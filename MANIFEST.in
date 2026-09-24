@@ -1,0 +1,3 @@
+# sdist 不下发测试：没有下游消费者；而 setuptools 的默认清单只会捞到 tests/test_*.py，
+# 不含 conftest.py 与 fixtures/，带出去等于给了一份跑不起来的测试。
+prune tests

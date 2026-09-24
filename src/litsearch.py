@@ -56,7 +56,7 @@ from http.client import HTTPException
 from pathlib import Path
 from typing import Any, Callable, Iterable
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 API_OPENALEX = "https://api.openalex.org"
 API_CROSSREF = "https://api.crossref.org"

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "litsearch"
-version = "0.2.0"
+version = "0.3.0"
 description = "多源文献检索 CLI（OpenAlex + Crossref），零第三方运行时依赖"
 readme = "README.md"
 requires-python = ">=3.12"
