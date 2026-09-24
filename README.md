@@ -11,13 +11,18 @@
 
 ## 安装
 
-三种方式，任选其一。
+从远程仓库克隆到本地（下面的方式 1~3 都在克隆出来的目录里执行）：
+
+```bash
+git clone https://github.com/meteoritel/lit-search.git
+cd lit-search
+```
 
 **1. 单文件拷走（最省事，无需安装）**
 
 ```bash
-# 把 src/litsearch.py 拷到任意位置
-python litsearch.py "marine protist prokaryote interaction" --year 2021-2026
+# 把 src/litsearch.py 拷到任意位置即可，不必保留仓库的其它文件
+python src/litsearch.py "marine protist prokaryote interaction" --year 2021-2026
 ```
 
 要求本机有 Python 3.12+，仅此而已。
@@ -29,11 +34,20 @@ uv tool install .          # 之后任何目录敲 litsearch 即可
 # 或： pipx install .
 ```
 
+不想先克隆也能直接装：
+
+```bash
+uv tool install git+https://github.com/meteoritel/lit-search.git
+# 或： pipx install git+https://github.com/meteoritel/lit-search.git
+```
+
 **3. 不安装，直接从源码运行**
 
 ```bash
-uv run litsearch "your query"       # 在仓库根目录执行
+uv run litsearch "your query"       # 在克隆目录里执行
 ```
+
+更新到最新版：在克隆目录 `git pull`，再重跑一次对应的安装命令（方式 2/3）即可。
 
 ## 配置 API key
 
