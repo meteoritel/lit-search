@@ -6,7 +6,8 @@
 - **零第三方运行时依赖**：只用 Python 标准库（`>=3.12`），拷一个文件到任何机器就能跑
 - **可插拔数据源**：OpenAlex（默认，主力）与 Crossref（默认关闭，见「关于 Crossref」）
 - **面向 Zotero 的交付**：DOI 列表可直接交给 Zotero 的按标识符导入 / 相关插件，不必自己写文献管理器导出格式
-- **对 AI agent 友好**：JSON 走 stdout、进度与警告走 stderr、退出码明确、无交互式输入
+- **对 AI agent 友好**：结果可走 stdout（默认 JSON，`--stdout-format md|csv|doi` 可换）／
+  进度与警告走 stderr／退出码明确／无交互式输入
 
 ## 安装
 
@@ -70,21 +71,23 @@ openalex = "你的key"
 结构化配置（`output_dir` / `default_sources` / `[api_keys]` / `[presets]`）只能来自 TOML。
 项目根 `litsearch.toml` 是项目级配置，适合把「一组检索方案」随项目一起交给组内同学。
 
+> **工具不自带任何预设。** 下面这份 `litsearch.toml` 是**示例**，不是默认值
+
 同名预设以高优先级文件为准（用户级覆盖项目级），不同名则叠加 —— 所以你可以把 key 放在用户级、
 把预设放在项目级，两者同时生效。
 
 ```toml
-# litsearch.toml
+# litsearch.toml —— 以下全部是示例，请按自己的实际情况替换
 output_dir = "output"
 
-[presets.marine_amplicon]
+[presets.marine_amplicon]      # 预设名由你自己定，这里只是个名字
 queries = ["marine amplicon ASV protist prokaryote interaction",
            "nanoflagellate grazing bacteria"]
 year = "2021-2026"
 limit = 50
 sort = "citations"
 language = "en"
-require = ["amplicon,asv,16s,18s,metabarcoding",
+require = ["amplicon,asv,16s,18s,metabarcoding",       # 这两个词表只适用于该课题
            "protist,eukaryot,prokaryot,*bacteri*"]
 exclude = ["retraction", "corrigendum"]
 ```
@@ -150,9 +153,10 @@ litsearch "grazing nanoflagellate" --source openalex,crossref --limit 20
 | `--sort citations\|year\|relevance` | **展示**排序，默认 `citations`。只改变清单顺序 |
 | `--fetch-sort relevance\|citations\|year` | **远端抓取**排序，默认 `relevance`。决定取到哪一批候选 |
 | `--title` | Markdown 清单标题 |
-| `--output PATH` | 覆盖主输出路径，后缀 `.md` / `.csv` / `.json` 决定格式 |
+| `--output PATH` | 覆盖主输出路径，后缀 `.md` / `.csv` / `.json` 决定格式（**只认这三个**，写别的后缀直接报错） |
 | `--doi-list PATH` | 覆盖 DOI 列表输出路径 |
-| `--stdout` | 把 JSON 打到 stdout，不写任何文件 |
+| `--stdout` | 把结果打到 stdout，不写任何文件 |
+| `--stdout-format json\|md\|csv\|doi` | `--stdout` 的内容格式，默认 `json` |
 | `--version` | 打印版本号 |
 
 `--require` / `--exclude` 的作用范围是「标题 + 摘要」，在**合并去重之后**执行 —— 因此 `--limit`
@@ -180,9 +184,15 @@ stderr 提示「共 N 篇，只考察了前 M 篇」，召回天花板不会是�
 
 默认写到 `<output_dir>/`，未配置 `output_dir` 时写到 `<当前目录>/output/`：
 
-- `litsearch_<检索词slug>_<日期>.md` —— 人读清单，表格含年份/标题/作者/期刊/被引/DOI/开放获取；
+- `litsearch_<片段>_<日期>.md` —— 人读清单，表格含年份/标题/作者/期刊/被引/DOI/开放获取；
   用了多个源时额外加一列「来源」
-- `litsearch_<检索词slug>_<日期>.doi.txt` —— 每行一个裸 DOI，无表头
+- `litsearch_<片段>_<日期>.doi.txt` —— 每行一个裸 DOI，无表头
+
+`<片段>` 优先取 `--title`，没给标题时取**第一个**查询；中文会被保留（`litsearch_海洋细菌_2026-09-24.md`），
+不会退化成 `query` 而让同一天的两个课题互相覆盖；超长时按 `-` 边界截断，不会切出半个单词。
+
+`--stdout` 默认输出 JSON（供 agent 解析），`--stdout-format md|csv|doi` 可换成 markdown 表格、
+CSV 或裸 DOI 列表；`--stdout` 与 `--output` / `--doi-list` 互斥。
 
 写入的文件路径会打印到 **stdout**（每行一个），其余日志与警告走 **stderr**，方便管道与 agent 取用。
 无 DOI 的条目不会进 DOI 列表，数量会在 stderr 报告。

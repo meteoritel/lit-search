@@ -5,6 +5,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 import litsearch
 from conftest import make_plan, make_record
 
@@ -145,6 +147,33 @@ def test_query_slug_is_truncated_and_never_empty():
     assert litsearch.query_slug([]) == "query"
 
 
+def test_query_slug_prefers_title_over_the_first_query():
+    assert litsearch.query_slug(["marine protist"], "HNA/LNA 海洋细菌 2022-2026") == \
+        "hna-lna-海洋细菌-2022-2026"
+
+
+def test_query_slug_keeps_chinese_instead_of_degenerating_to_query():
+    """中文检索词以前会变成 'query'，同一天跑两个中文课题就会互相覆盖。"""
+    slug = litsearch.query_slug(["海洋细菌"])
+    assert slug == "海洋细菌"
+    assert slug != litsearch.query_slug(["淡水湖泊"])
+
+
+def test_query_slug_truncates_on_a_word_boundary():
+    slug = litsearch.query_slug(["high nucleic acid low nucleic acid marine bacteria"])
+    assert len(slug) <= 48
+    assert not slug.endswith("bacter")          # 不能切出半个单词
+    assert "high-nucleic-acid" in slug
+
+
+def test_query_slug_uses_a_hash_when_there_is_no_word_character():
+    """标题全是标点时要靠哈希区分，否则不同课题会撞成同一个文件名。"""
+    a = litsearch.query_slug([], "---")
+    b = litsearch.query_slug([], "!!!")
+    assert a.startswith("query-") and b.startswith("query-")
+    assert a != b
+
+
 def test_resolve_outputs_uses_configured_output_dir(tmp_path):
     args = litsearch.build_parser().parse_args(["q"])
     plan = make_plan(queries=["marine protist"])
@@ -184,6 +213,29 @@ def test_resolve_outputs_honours_explicit_paths(tmp_path):
 def test_resolve_outputs_returns_none_for_stdout():
     args = litsearch.build_parser().parse_args(["q", "--stdout"])
     assert litsearch.resolve_outputs(args, litsearch.Config(), make_plan()) == (None, None)
+
+
+def test_resolve_outputs_rejects_an_unknown_suffix():
+    """以前不认识的 suffix 会静默当 markdown，把 markdown 写进 a.txt。"""
+    for suffix in (".txt", ".markdown", ""):
+        args = litsearch.build_parser().parse_args(["q", "--output", "a" + suffix])
+        with pytest.raises(litsearch.UsageError) as exc:
+            litsearch.resolve_outputs(args, litsearch.Config(), make_plan())
+        assert ".md" in str(exc.value)
+
+
+def test_resolve_outputs_accepts_md_csv_json():
+    for suffix in (".md", ".csv", ".json", ".CSV"):
+        args = litsearch.build_parser().parse_args(["q", "--output", "a" + suffix])
+        main_path, _ = litsearch.resolve_outputs(args, litsearch.Config(), make_plan())
+        assert str(main_path).endswith(suffix)
+
+
+def test_render_main_rejects_an_unknown_suffix():
+    report = make_report(make_plan(queries=["q"]))
+    with pytest.raises(litsearch.UsageError):
+        litsearch.render_main(Path("a.txt"), report, [])
+    assert litsearch.render_main(None, report, []).startswith("#")   # 无路径 → markdown
 
 
 def test_write_outputs_creates_parent_dirs_and_returns_paths(tmp_path):

@@ -84,7 +84,8 @@ def test_run_writes_markdown_and_doi_list(tmp_path, monkeypatch):
     doi_files = list(out_dir.glob("*.doi.txt"))
     assert len(md_files) == 1
     assert len(doi_files) == 1
-    assert md_files[0].name.startswith("litsearch_marine-protist-grazing_")
+    # --title 现在优先作为文件名片段（可读，且中/英文都能用）
+    assert md_files[0].name.startswith("litsearch_test-list_")
     assert doi_files[0].name == md_files[0].stem + ".doi.txt"
 
     markdown = md_files[0].read_text(encoding="utf-8")
@@ -159,6 +160,57 @@ def test_run_stdout_prints_json_and_writes_nothing(tmp_path, monkeypatch, capsys
     assert payload["results"][0]["doi"] == "10.1000/aaa"
     assert payload["results"][0]["source"] == "openalex"
     assert not (tmp_path / "output").exists()
+
+
+def test_run_stdout_format_md_gives_a_markdown_table(tmp_path, monkeypatch, capsys):
+    code, _, _ = run_cli(["q", "--limit", "1", "--stdout", "--stdout-format", "md"],
+                         [load_fixture("openalex_page1.json")], tmp_path, monkeypatch)
+    assert code == litsearch.EXIT_OK
+    out = capsys.readouterr().out
+    assert out.startswith("# q")
+    assert "| 年份 |" in out
+    assert not (tmp_path / "output").exists()
+
+
+def test_run_stdout_format_doi_gives_bare_dois(tmp_path, monkeypatch, capsys):
+    code, _, _ = run_cli(["q", "--limit", "1", "--stdout", "--stdout-format", "doi"],
+                         [load_fixture("openalex_page1.json")], tmp_path, monkeypatch)
+    assert code == litsearch.EXIT_OK
+    assert capsys.readouterr().out.strip() == "10.1000/aaa"
+
+
+def test_run_stdout_format_needs_stdout(tmp_path):
+    with pytest.raises(litsearch.UsageError):
+        litsearch.run(litsearch.build_parser().parse_args(["q", "--stdout-format", "md"]),
+                      tmp_path, litsearch.Http(), litsearch.RetryPolicy(), SleepRecorder())
+
+
+def test_run_rejects_an_unknown_output_suffix_before_any_request(tmp_path):
+    """后缀写错要在联网之前失败；且命令行的错优先于「缺 key」报出。
+
+    这里刻意不设 OPENALEX_API_KEY（autouse 的 isolate 会清掉它）：
+    若顺序反了，读到的会是 ConfigError（退出码 3）而不是 UsageError（退出码 2）。
+    """
+    http, opener = make_http([])                     # 空队列：一旦发请求就会报错
+    args = litsearch.build_parser().parse_args(["q", "--output", str(tmp_path / "a.txt")])
+    with pytest.raises(litsearch.UsageError):
+        litsearch.run(args, tmp_path, http, litsearch.RetryPolicy(), SleepRecorder())
+    assert opener.urls == []
+
+
+def test_run_rejects_a_reversed_year_range_before_any_request(tmp_path):
+    http, opener = make_http([])
+    args = litsearch.build_parser().parse_args(["q", "--year", "2026-2021"])
+    with pytest.raises(litsearch.UsageError):
+        litsearch.run(args, tmp_path, http, litsearch.RetryPolicy(), SleepRecorder())
+    assert opener.urls == []
+
+
+def test_run_filename_uses_the_first_query_when_no_title(tmp_path, monkeypatch):
+    run_cli(["marine protist", "--limit", "2"],
+            [load_fixture("openalex_page1.json")], tmp_path, monkeypatch)
+    assert next((tmp_path / "output").glob("*.md")).name.startswith(
+        "litsearch_marine-protist_")
 
 
 def test_run_stdout_conflicts_with_output(tmp_path):

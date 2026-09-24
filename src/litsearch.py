@@ -40,6 +40,7 @@ import argparse
 import csv
 import datetime as _dt
 import functools
+import hashlib
 import html
 import io
 import json
@@ -1139,11 +1140,28 @@ def render_doi_list(records: list[Record]) -> tuple[str, int]:
     return "\n".join(dois) + ("\n" if dois else ""), missing
 
 
-def query_slug(queries: list[str]) -> str:
-    base = queries[0] if queries else "query"
-    slug = re.sub(r"[^a-z0-9]+", "-", base.lower()).strip("-")
-    slug = slug[:48].strip("-")
-    return slug or "query"
+def query_slug(queries: list[str], title: str | None = None,
+               max_len: int = 48) -> str:
+    """生成文件名片段，优先用 --title，否则用第一个查询。
+
+    三个约束：
+    - 保留 Unicode 词字符（`\\w` 含中文），否则中文课题会退化成 'query'，
+      同一天跑两个中文课题就会互相覆盖；
+    - 按 '-' 边界截断，避免出现 '...marine-bacter' 这种切了一半的单词；
+    - 万一连一个词字符都没有（标题全是标点），补短哈希，保证不同课题不撞名。
+    """
+    base = (title or "").strip() or (queries[0].strip() if queries else "")
+    slug = re.sub(r"[^\w]+", "-", base.lower(), flags=re.UNICODE).strip("-_")
+    if len(slug) > max_len:
+        slug = slug[:max_len].rstrip("-_")
+        cut = slug.rfind("-")
+        if cut > max_len // 2:        # 只在回退幅度不大时才退到词边界
+            slug = slug[:cut]
+    if not slug:
+        if not base:
+            return "query"
+        return f"query-{hashlib.sha1(base.encode('utf-8')).hexdigest()[:8]}"
+    return slug
 
 
 # --------------------------------------------------------------------------- #
@@ -1369,6 +1387,13 @@ def build_plan(args: argparse.Namespace, preset: dict | None,
         if not re.fullmatch(r"\d{4}(\s*-\s*\d{4})?", year):
             raise UsageError(f"--year 格式应为 2024 或 2021-2026：{year!r}")
         year = re.sub(r"\s+", "", year)
+        if "-" in year:
+            lo, _, hi = year.partition("-")
+            # 起点大于终点会发出一个空区间，远端返回 0 篇却不报错 —— 最难看懂的那种失败
+            if int(lo) > int(hi):
+                raise UsageError(
+                    f"--year 的起点不能大于终点：{year!r}（应写作 {hi}-{lo}）"
+                )
 
     require_specs = _resolve(args.require, preset, "require", []) or []
     exclude_specs = _resolve(args.exclude, preset, "exclude", []) or []
@@ -1415,9 +1440,11 @@ def resolve_outputs(args: argparse.Namespace, cfg: Config, plan: QueryPlan,
     out_dir = cfg.output_dir or (base_dir / "output")
     if args.output:
         main_path = Path(args.output).expanduser()
+        _render_suffix(main_path)      # 尽早失败：别等检索完才发现后缀不对
     else:
         stamp = _dt.date.today().isoformat()
-        main_path = out_dir / f"litsearch_{query_slug(plan.queries)}_{stamp}.md"
+        slug = query_slug(plan.queries, plan.title)
+        main_path = out_dir / f"litsearch_{slug}_{stamp}.md"
 
     if args.doi_list:
         doi_path = Path(args.doi_list).expanduser()
@@ -1469,6 +1496,11 @@ EPILOG = """\
   <output_dir>/litsearch_<检索词slug>_<日期>.md   人读清单
   <同目录>/litsearch_<检索词slug>_<日期>.doi.txt  每行一个裸 DOI，供 Zotero 等导入
   output_dir 取自配置，未配置则为 <当前目录>/output
+  文件名片段优先取 --title，否则取第一个查询；中文会保留，不会退化成 query。
+  --output 的后缀只认 .md / .csv / .json，写别的后缀直接报错（不再静默当 markdown）。
+
+--stdout 格式：
+  默认 json；加 --stdout-format md|csv|doi 可换成 markdown 表格 / CSV / 裸 DOI 列表。
 
 示例：
   litsearch "marine protist prokaryote interaction" --year 2021-2026 --limit 30
@@ -1523,7 +1555,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--doi-list", dest="doi_list", default=None,
                         help="覆盖 DOI 列表输出路径")
     parser.add_argument("--stdout", action="store_true",
-                        help="把 JSON 打到 stdout，不写任何文件")
+                        help="把结果打到 stdout，不写任何文件")
+    parser.add_argument("--stdout-format", dest="stdout_format",
+                        choices=list(STDOUT_FORMATS), default=None,
+                        help="--stdout 的内容格式（默认 json）；md / csv / doi 可选")
     parser.add_argument("--version", action="version",
                         version=f"litsearch {__version__}")
     return parser
@@ -1538,9 +1573,29 @@ def _force_utf8_stdio() -> None:
             pass
 
 
+RENDER_SUFFIXES = (".md", ".csv", ".json")
+
+
+def _render_suffix(main_path: Path) -> str:
+    """校验并返回主输出的后缀。
+
+    以前是不认识的后缀悄悄当 markdown，于是 `--output a.txt` 会把 markdown 写进
+    a.txt；现在直接报错，免得格式与文件名不符还没人发现。
+    """
+    suffix = main_path.suffix.lower()
+    if suffix not in RENDER_SUFFIXES:
+        raise UsageError(
+            f"输出后缀必须是 {' / '.join(RENDER_SUFFIXES)}，"
+            f"收到 {suffix or '（无后缀）'}：{main_path}"
+        )
+    return suffix
+
+
 def render_main(main_path: Path | None, report: Report,
                 records: list[Record]) -> str:
-    suffix = main_path.suffix.lower() if main_path else ".md"
+    if main_path is None:                       # 只在意格式时给了无路径的调用方
+        return render_markdown(report, records)
+    suffix = _render_suffix(main_path)
     if suffix == ".csv":
         return render_csv(records)
     if suffix == ".json":
@@ -1548,10 +1603,26 @@ def render_main(main_path: Path | None, report: Report,
     return render_markdown(report, records)
 
 
+STDOUT_FORMATS = ("json", "md", "csv", "doi")
+
+
+def render_stdout(fmt: str, report: Report, records: list[Record]) -> str:
+    """--stdout 的内容格式。默认 json 便于 agent 解析；md / csv / doi 便于直读或管道。"""
+    if fmt == "md":
+        return render_markdown(report, records)
+    if fmt == "csv":
+        return render_csv(records)
+    if fmt == "doi":
+        return render_doi_list(records)[0].rstrip("\n")
+    return render_json(report, records)
+
+
 def run(args: argparse.Namespace, cwd: Path, http: Http,
         policy: RetryPolicy, sleep_fn: Callable[[float], None]) -> int:
     if args.stdout and (args.output or args.doi_list):
         raise UsageError("--stdout 与 --output / --doi-list 不能同时使用")
+    if args.stdout_format and not args.stdout:
+        raise UsageError("--stdout-format 需要与 --stdout 一起使用")
 
     cfg = load_config(cwd)
     preset_name = args.preset
@@ -1565,6 +1636,9 @@ def run(args: argparse.Namespace, cwd: Path, http: Http,
             )
 
     plan = build_plan(args, preset, cfg)
+    # 输出路径提前解析：命令行的错（后缀、路径）优先于配置的错（缺 key）报出，
+    # 且都在联网之前 —— 别等跑完检索才发现后缀不对
+    main_path, doi_path = resolve_outputs(args, cfg, plan, cwd)
     check_keys(plan.sources, cfg)
 
     raw_records, totals, warnings = search_all(
@@ -1589,7 +1663,7 @@ def run(args: argparse.Namespace, cwd: Path, http: Http,
               f"{plan.max_results} 截断掉 {truncated} 篇", file=sys.stderr)
 
     if args.stdout:
-        print(render_json(report, ordered))
+        print(render_stdout(args.stdout_format or "json", report, ordered))
         print(
             f"[ok] 共 {len(ordered)} 篇（抓取 {stats.total_in} 条，"
             f"DOI 合并 {stats.doi_merged}，标题合并 {stats.title_merged}）",
@@ -1597,7 +1671,6 @@ def run(args: argparse.Namespace, cwd: Path, http: Http,
         )
         return EXIT_OK
 
-    main_path, doi_path = resolve_outputs(args, cfg, plan, cwd)
     doi_text, missing_doi = render_doi_list(ordered)
     written = write_outputs(
         main_path, doi_path,
