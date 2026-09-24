@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import urllib.parse
+from http.client import IncompleteRead
 
 import pytest
 
@@ -52,6 +53,65 @@ def test_openalex_single_year_becomes_full_range():
     filt = query_params(OA.build_url("q", plan, "", "*", 10))["filter"][0]
     assert "from_publication_date:2024-01-01" in filt
     assert "to_publication_date:2024-12-31" in filt
+
+
+def test_openalex_fetch_sort_maps_to_remote_sort():
+    for fetch_sort, expected in (("citations", "cited_by_count:desc"),
+                                 ("year", "publication_date:desc")):
+        params = query_params(
+            OA.build_url("q", make_plan(fetch_sort=fetch_sort), "K", "*", 10))
+        assert params["sort"] == [expected]
+    params = query_params(
+        OA.build_url("q", make_plan(fetch_sort="relevance"), "K", "*", 10))
+    assert "sort" not in params
+
+
+def test_min_citations_zero_sends_no_citation_filter():
+    """0 与 None 同义（不限）。原实现发 cited_by_count:>0，会丢掉全部零被引文献。"""
+    for value in (None, 0):
+        assert "cited_by_count" not in OA.filter_string(make_plan(min_citations=value))[0]
+    assert "cited_by_count:>0" in OA.filter_string(make_plan(min_citations=1))[0]
+    assert "cited_by_count:>4" in OA.filter_string(make_plan(min_citations=5))[0]
+
+
+def test_decode_json_turns_non_json_body_into_network_error():
+    """网关返回 HTML 错误页时必须是 NetworkError（退出码 4），不能漏出 JSONDecodeError。"""
+    with pytest.raises(litsearch.NetworkError):
+        litsearch.decode_json(b"<html>502 Bad Gateway</html>", "openalex")
+
+
+def test_openalex_search_maps_non_json_body_to_network_error():
+    plan = make_plan(limit=5)
+    http, _ = make_http([b"<html>502 Bad Gateway</html>"])
+    with pytest.raises(litsearch.NetworkError):
+        OA.search("q", plan, http, litsearch.RetryPolicy(), litsearch.Config())
+
+
+def test_crossref_search_maps_non_json_body_to_network_error():
+    plan = make_plan(sources=["crossref"], limit=5)
+    http, _ = make_http([b"not json at all"])
+    with pytest.raises(litsearch.NetworkError):
+        CR.search("q", plan, http, litsearch.RetryPolicy(), litsearch.Config())
+
+
+def test_incomplete_read_is_retried_then_reported_as_network_error():
+    """连接被截断（IncompleteRead）必须走重试 → NetworkError，而不是漏出裸异常。"""
+    plan = make_plan(limit=5)
+    policy = litsearch.RetryPolicy(attempts=2, sleep=lambda _: None)
+    http, opener = make_http([IncompleteRead(b"x", 10)] * 2)
+    with pytest.raises(litsearch.NetworkError):
+        OA.search("q", plan, http, policy, litsearch.Config())
+    assert len(opener.urls) == 2          # 确实重试了
+
+
+def test_incomplete_read_then_success_recovers():
+    plan = make_plan(limit=2)          # 只取首页（fixture 首页 2 条），不再翻页
+    policy = litsearch.RetryPolicy(attempts=3, sleep=lambda _: None)
+    http, opener = make_http([IncompleteRead(b"x", 1),
+                              load_fixture("openalex_page1.json")])
+    result = OA.search("q", plan, http, policy, litsearch.Config())
+    assert result.records
+    assert len(opener.urls) == 2
 
 
 def test_openalex_author_and_institution_dispatch_id_vs_name():
@@ -135,18 +195,30 @@ def test_crossref_url_uses_query_not_bibliographic():
     assert "issn:1234-5678" in filt
 
 
-def test_crossref_sort_mapping():
-    plan = make_plan(sources=["crossref"], sort="citations")
+def test_crossref_fetch_sort_mapping():
+    plan = make_plan(sources=["crossref"], fetch_sort="citations")
     params = query_params(CR.build_url("q", plan, 10, 0, None))
     assert params["sort"] == ["is-referenced-by-count"]
     assert params["order"] == ["desc"]
 
-    plan_year = make_plan(sources=["crossref"], sort="year")
+    plan_year = make_plan(sources=["crossref"], fetch_sort="year")
     params2 = query_params(CR.build_url("q", plan_year, 10, 0, None))
     assert params2["sort"] == ["published"]
 
-    plan_rel = make_plan(sources=["crossref"], sort="relevance")
+    plan_rel = make_plan(sources=["crossref"], fetch_sort="relevance")
     assert "sort" not in query_params(CR.build_url("q", plan_rel, 10, 0, None))
+
+
+def test_display_sort_does_not_change_the_remote_request():
+    """--sort 只影响展示顺序，抓取哪一批由 --fetch-sort 决定。"""
+    by_citations = make_plan(sources=["crossref"], sort="citations")
+    by_relevance = make_plan(sources=["crossref"], sort="relevance")
+    assert (CR.build_url("q", by_citations, 10, 0, None)
+            == CR.build_url("q", by_relevance, 10, 0, None))
+    oa_cit = make_plan(sort="citations")
+    oa_rel = make_plan(sort="relevance")
+    assert (OA.build_url("q", oa_cit, "K", "*", 10)
+            == OA.build_url("q", oa_rel, "K", "*", 10))
 
 
 def test_crossref_map_item_full_record():

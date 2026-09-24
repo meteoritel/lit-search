@@ -16,6 +16,9 @@
     # 同时用两个源（Crossref 默认关闭）
     python litsearch.py "grazing nanoflagellate" --source openalex,crossref
 
+检索式注意：OpenAlex 的 search 是词袋匹配，多词术语要加英文双引号 ——
+    '"low nucleic acid content" bacteria' 156 篇，不加引号 99869 篇。
+
 配置（逐键取首个命中：环境变量 → 用户级 config.toml → 项目 litsearch.toml → 项目 .env）：
     OPENALEX_API_KEY                  OpenAlex API key（必需）
     CROSSREF_MAILTO                   联系邮箱（可选，Crossref 礼貌池）
@@ -36,6 +39,7 @@ from __future__ import annotations
 import argparse
 import csv
 import datetime as _dt
+import functools
 import html
 import io
 import json
@@ -48,6 +52,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass, field, replace
+from http.client import HTTPException
 from pathlib import Path
 from typing import Any, Callable, Iterable
 
@@ -69,6 +74,18 @@ OPENALEX_SELECT = (
 
 RETRY_STATUS = frozenset({429, 500, 502, 503, 504})
 
+# 归一化标题短于此长度时不参与标题合并：'Editorial'、'Erratum'、'Correction'、
+# 'Front matter'、'Author index' 这类通用标题会把毫不相干的论文错误并成一条
+# （静默丢数据）。取 15 是因为 'deepseaprotists'（Deep sea protists）这类真实短标题
+# 归一化后正好 15，要保住它们；而上面那些通用标题都短于 15。
+TITLE_MERGE_MIN_CHARS = 15
+
+# 传输层瞬时故障，值得重试：连接被截断（IncompleteRead 是 HTTPException 的子类）、
+# 超时、DNS 失败等。用具名导入而不是 import http.client，避免与形参 http 撞名。
+TRANSPORT_ERRORS = (
+    urllib.error.URLError, HTTPException, TimeoutError, OSError,
+)
+
 EXIT_OK = 0
 EXIT_ARGS = 2
 EXIT_CONFIG = 3
@@ -85,6 +102,19 @@ DOI_PREFIXES = (
 CROSSREF_TYPE_MAP = {
     "article": "journal-article",
     "preprint": "posted-content",
+}
+
+# 远端抓取排序：决定「取到哪一批候选」。默认 relevance 即两个源各自的相关度序。
+# 与 QueryPlan.sort（只改展示顺序）是两个独立旋钮 —— 只设 --sort citations 时，
+# 被引排序只作用在「相关度最高的 N 条」这个切片内部，并不是全网最高被引的 N 条。
+FETCH_SORT_CHOICES = ("relevance", "citations", "year")
+FETCH_SORT_OPENALEX = {
+    "citations": "cited_by_count:desc",
+    "year": "publication_date:desc",
+}
+FETCH_SORT_CROSSREF = {
+    "citations": "is-referenced-by-count",
+    "year": "published",
 }
 
 # Crossref 缺少 relevance_score，且不支持 cited_by_count 服务端过滤
@@ -159,6 +189,21 @@ class MergeStats:
 
 
 @dataclass(slots=True)
+class FilterStats:
+    """相关性过滤的分阶段计数。
+
+    每个 require 组单独统计「只靠这一组能留下多少条」，输入集合相同，所以能直接看出
+    是哪个组把结果卡掉了 —— 比只看最终一个数字好排查得多。
+    """
+
+    before: int = 0
+    excluded: int = 0
+    passed_exclude: int = 0
+    per_group: list[int] = field(default_factory=list)
+    after: int = 0
+
+
+@dataclass(slots=True)
 class ProviderResult:
     total: int
     records: list[Record]
@@ -184,6 +229,8 @@ class QueryPlan:
     require: list[list[str]] = field(default_factory=list)
     exclude: list[str] = field(default_factory=list)
     sort: str = "citations"
+    fetch_sort: str = "relevance"
+    max_results: int | None = None
     title: str | None = None
 
 
@@ -192,6 +239,8 @@ class Report:
     plan: QueryPlan
     totals: list[tuple[str, int]]
     stats: MergeStats
+    filters: FilterStats = field(default_factory=FilterStats)
+    truncated: int = 0
 
 
 # --------------------------------------------------------------------------- #
@@ -244,7 +293,7 @@ def request_with_backoff(http: Http, url: str, policy: RetryPolicy) -> bytes:
                     hint = "（请检查 API key 是否有效）"
                 raise NetworkError(f"HTTP {exc.code}: {exc.reason}{hint}") from exc
             last = exc
-        except (urllib.error.URLError, TimeoutError, OSError) as exc:
+        except TRANSPORT_ERRORS as exc:
             last = exc
         if attempt + 1 < max(1, policy.attempts):
             policy.sleep(policy.delay(attempt))
@@ -252,6 +301,20 @@ def request_with_backoff(http: Http, url: str, policy: RetryPolicy) -> bytes:
     if isinstance(last, urllib.error.HTTPError) and last.code == 429:
         hint = "；429 通常是超出每日预算或访问过频，请检查 API key 是否有效"
     raise NetworkError(f"请求失败（已重试 {policy.attempts} 次）：{last}{hint}")
+
+
+def decode_json(payload: bytes, source: str) -> dict:
+    """远端返回的不是 JSON（网关 HTML 错误页、代理返回 200+HTML 等）时转成 NetworkError。
+
+    不能让 json.JSONDecodeError 漏出去：它不是 LitsearchError，main() 的四条
+    退出码映射全都接不住，会退化成裸 traceback + 退出码 1。
+    """
+    try:
+        return json.loads(payload.decode("utf-8", "replace"))
+    except json.JSONDecodeError as exc:
+        raise NetworkError(
+            f"{source}: 远端返回的不是合法 JSON（{exc}）"
+        ) from exc
 
 
 # --------------------------------------------------------------------------- #
@@ -359,6 +422,14 @@ def _collapse(records: Iterable[Record],
     return [merged[k] for k in order] + passthrough
 
 
+def title_merge_key(rec: Record) -> str | None:
+    """标题合并用的键。太短的通用标题返回 None，不参与合并、原样保留。"""
+    key = norm_title(rec.title)
+    if key is None or len(key) < TITLE_MERGE_MIN_CHARS:
+        return None
+    return key
+
+
 def merge_records(records: list[Record]) -> tuple[list[Record], MergeStats]:
     """两级去重：先 DOI（跨源同文），再归一化标题（preprint/正式版），迭代到不动点。"""
     stats = MergeStats(total_in=len(records))
@@ -372,7 +443,7 @@ def merge_records(records: list[Record]) -> tuple[list[Record], MergeStats]:
         pool = _collapse(pool, lambda r: norm_doi(r.doi))
         stats.doi_merged += before - len(pool)
         mid = len(pool)
-        pool = _collapse(pool, lambda r: norm_title(r.title))
+        pool = _collapse(pool, title_merge_key)
         stats.title_merged += mid - len(pool)
         if len(pool) == before:
             break
@@ -398,29 +469,96 @@ def _split_or(spec: str) -> list[str]:
     return [t.strip().lower() for t in spec.split(",") if t.strip()]
 
 
+# 把标点（连字符、斜杠、括号…）统一成空格，这样检索词 'nucleic acid content'
+# 也能匹配上标题里写作 'Nucleic Acid-Content' 的论文。\w 在 str 模式下含 CJK，
+# 所以中文本不会被拆开。
+_WORD_SPLIT_RE = re.compile(r"\W+", re.UNICODE)
+
+
+def _normalize_text(text: str) -> str:
+    return _WORD_SPLIT_RE.sub(" ", text.lower()).strip()
+
+
+@functools.lru_cache(maxsize=None)
+def _compile_term(term: str) -> re.Pattern[str] | None:
+    """把单个检索词编译成匹配模式。
+
+    - 不加修饰：词首前缀匹配。'protist' 命中 protists，'sea' 不再命中
+      research / disease / increase（这些 'sea' 出现在词中而非词首）。
+    - '=词'   ：整词（或整短语）精确匹配。短词、易混词用这个，如 '=sea'
+      只命中独立的 sea，不命中 seasonality / seawater。
+    - '*词*'  ：任意位置子串匹配，即加修饰前的旧行为。生物学的复合词
+      （cyanobacteria、bacterioplankton）需要它。
+    - 含非 ASCII（中文等无空格文本）：退回子串匹配。
+    """
+    raw = term.strip().lower()
+    if not raw:
+        return None
+    if not raw.isascii():
+        return re.compile(re.escape(raw))
+    if raw.startswith("*") and raw.endswith("*") and len(raw) > 2:
+        body = _normalize_text(raw.strip("*"))
+        return re.compile(re.escape(body)) if body else None
+    exact = raw.startswith("=")
+    if exact:
+        raw = raw[1:]
+    body = _normalize_text(raw)
+    if not body:
+        return None
+    return re.compile(r"(?<!\w)" + re.escape(body) + (r"(?!\w)" if exact else r"\w*"))
+
+
+def _term_hits(term: str, normalized: str) -> bool:
+    pattern = _compile_term(term)
+    return pattern is not None and pattern.search(normalized) is not None
+
+
 def matches(text: str, require_groups: list[list[str]],
             exclude_terms: list[str]) -> bool:
-    """须命中所有 require 组（组内任一），且不命中任一 exclude 词。"""
-    lowered = text.lower()
-    if exclude_terms and any(t in lowered for t in exclude_terms):
+    """须命中所有 require 组（组内任一），且不命中任一 exclude 词。
+
+    在归一化后的文本上匹配（标点→空格、小写），单词匹配规则见 _compile_term。
+    """
+    normalized = _normalize_text(text)
+    if exclude_terms and any(_term_hits(t, normalized) for t in exclude_terms):
         return False
     for group in require_groups:
-        if not any(t in lowered for t in group):
+        if not any(_term_hits(t, normalized) for t in group):
             return False
     return True
 
 
+def _record_text(rec: Record) -> str:
+    return f"{rec.title or ''} {rec.abstract or ''}"
+
+
 def apply_filters(records: list[Record], require_groups: list[list[str]],
-                  exclude_terms: list[str]) -> list[Record]:
-    """在合并后的集合上执行 —— 绝不逐源执行，否则跨源召回不一致。"""
+                  exclude_terms: list[str]) -> tuple[list[Record], FilterStats]:
+    """在合并后的集合上执行 —— 绝不逐源执行，否则跨源召回不一致。
+
+    同时返回分阶段计数：每个 require 组都在**同一个输入集合**上单独统计，
+    所以能直接看出是哪个组把结果卡掉的，不必再写脚本排查。
+    """
+    stats = FilterStats(before=len(records))
     if not require_groups and not exclude_terms:
-        return list(records)
-    out: list[Record] = []
-    for rec in records:
-        text = f"{rec.title or ''} {rec.abstract or ''}"
-        if matches(text, require_groups, exclude_terms):
-            out.append(rec)
-    return out
+        stats.passed_exclude = stats.after = len(records)
+        return list(records), stats
+
+    texts = [_record_text(rec) for rec in records]
+    normalized = [_normalize_text(text) for text in texts]
+    excluded = [any(_term_hits(term, text) for term in exclude_terms)
+                for text in normalized]
+    stats.excluded = sum(excluded)
+    stats.passed_exclude = len(records) - stats.excluded
+    for group in require_groups:
+        stats.per_group.append(sum(
+            1 for flag, text in zip(excluded, normalized)
+            if not flag and any(_term_hits(term, text) for term in group)
+        ))
+    out = [rec for rec, text in zip(records, texts)
+           if matches(text, require_groups, exclude_terms)]
+    stats.after = len(out)
+    return out, stats
 
 
 def _sort_key(sort: str) -> Callable[[Record], tuple]:
@@ -483,8 +621,10 @@ class OpenAlexProvider(Provider):
             hi = hi or lo
             pairs.append(("from_publication_date", f"{lo.strip()}-01-01"))
             pairs.append(("to_publication_date", f"{hi.strip()}-12-31"))
-        if plan.min_citations is not None:
-            pairs.append(("cited_by_count", f">{max(0, plan.min_citations - 1)}"))
+        # min_citations 为 0 与 None 同义（不限）。原写法 max(0, 0-1) 会发出
+        # cited_by_count:>0，把全部零被引文献丢掉，也与 Crossref 的本地 >= 过滤不一致。
+        if plan.min_citations:
+            pairs.append(("cited_by_count", f">{plan.min_citations - 1}"))
         if plan.author:
             value = plan.author.strip()
             if re.fullmatch(r"A\d+", value):
@@ -545,6 +685,9 @@ class OpenAlexProvider(Provider):
         }
         if filter_str:
             params["filter"] = filter_str
+        remote_sort = FETCH_SORT_OPENALEX.get(plan.fetch_sort)
+        if remote_sort:
+            params["sort"] = remote_sort
         if api_key:
             params["api_key"] = api_key
         return f"{API_OPENALEX}/works?{urllib.parse.urlencode(params)}"
@@ -590,9 +733,7 @@ class OpenAlexProvider(Provider):
         while remaining > 0 and cursor:
             url = self.build_url(query, plan, api_key, cursor,
                                  min(MAX_PER_PAGE, remaining))
-            payload = json.loads(
-                request_with_backoff(http, url, policy).decode("utf-8", "replace")
-            )
+            payload = decode_json(request_with_backoff(http, url, policy), self.name)
             meta = payload.get("meta") or {}
             if total == 0:
                 total = meta.get("count") or 0
@@ -641,11 +782,9 @@ class CrossrefProvider(Provider):
             params["filter"] = ",".join(filters)
         if plan.author:
             params["query.author"] = plan.author.strip()
-        if plan.sort == "citations":
-            params["sort"] = "is-referenced-by-count"
-            params["order"] = "desc"
-        elif plan.sort == "year":
-            params["sort"] = "published"
+        remote_sort = FETCH_SORT_CROSSREF.get(plan.fetch_sort)
+        if remote_sort:
+            params["sort"] = remote_sort
             params["order"] = "desc"
         if mailto:
             params["mailto"] = mailto
@@ -709,7 +848,7 @@ class CrossrefProvider(Provider):
     def search(self, query: str, plan: QueryPlan, http: Http,
                policy: RetryPolicy, cfg: "Config") -> ProviderResult:
         warnings: list[str] = []
-        local_filter_needed = plan.min_citations is not None or bool(plan.language)
+        local_filter_needed = bool(plan.min_citations) or bool(plan.language)
         overfetch = min(
             CROSSREF_MAX_ROWS,
             plan.limit * 3 if local_filter_needed else plan.limit,
@@ -726,9 +865,7 @@ class CrossrefProvider(Provider):
         while fetched < overfetch:
             rows = min(CROSSREF_PAGE_SIZE, overfetch - fetched)
             url = self.build_url(query, plan, rows, offset, cfg.mailto)
-            payload = json.loads(
-                request_with_backoff(http, url, policy).decode("utf-8", "replace")
-            )
+            payload = decode_json(request_with_backoff(http, url, policy), self.name)
             message = payload.get("message") or {}
             if total == 0:
                 total = message.get("total-results") or 0
@@ -744,7 +881,7 @@ class CrossrefProvider(Provider):
             if offset >= total or len(items) < rows:
                 break
 
-        if plan.min_citations is not None:
+        if plan.min_citations:
             before = len(records)
             records = [r for r in records
                        if (r.citation_count or 0) >= plan.min_citations]
@@ -752,7 +889,7 @@ class CrossrefProvider(Provider):
             if removed:
                 warnings.append(
                     f"crossref: --min-citations 为本地过滤（该源不支持按被引过滤），"
-                    f"剔除 {removed} 条"
+                    f"剔除 {removed} 条；可提高 --limit 补充候选"
                 )
         if plan.language:
             wanted = plan.language.strip().lower()
@@ -762,7 +899,7 @@ class CrossrefProvider(Provider):
             removed = before - len(records)
             warnings.append(
                 f"crossref: --language 为本地过滤，剔除 {removed} 条"
-                "（该源 language 字段稀疏，召回不可靠）"
+                "（该源 language 字段稀疏，召回不可靠；可提高 --limit 补充候选）"
             )
         records = records[:plan.limit]
         return ProviderResult(total=total, records=records, warnings=warnings)
@@ -791,6 +928,12 @@ def search_all(plan: QueryPlan, cfg: "Config", http: Http,
             totals.append((f"{source_name} · {query}", result.total))
             warnings.extend(result.warnings)
             records.extend(result.records)
+            # 抓取窗口被远端总量截断时提示：否则召回天花板是隐形的
+            if result.total > len(result.records):
+                warnings.append(
+                    f"{source_name}: 「{query}」远端共 {result.total} 篇，"
+                    f"只考察了前 {len(result.records)} 篇（提高 --limit 可取更多候选）"
+                )
     # 同样的警告只报一次（逐查询会重复 N 遍）
     seen: set[str] = set()
     unique: list[str] = []
@@ -827,7 +970,9 @@ def render_markdown(report: Report, records: list[Record]) -> str:
     lines.append("")
     lines.append(f"- 数据来源：{'、'.join(plan.sources)}")
     lines.append(f"- 年份范围：{plan.year or '不限'}")
-    lines.append(f"- 每个查询抓取上限：{plan.limit} 条")
+    lines.append(f"- 每个查询抓取候选：{plan.limit} 条")
+    if plan.max_results is not None:
+        lines.append(f"- 产出上限：{plan.max_results} 条")
     if plan.min_citations is not None:
         lines.append(f"- 最低被引数：{plan.min_citations}")
     for label, value in (("作者", plan.author), ("机构", plan.institution),
@@ -844,7 +989,8 @@ def render_markdown(report: Report, records: list[Record]) -> str:
         lines.append(f"- 相关性分组过滤（须命中全部组）：{groups}")
     if plan.exclude:
         lines.append(f"- 排除词：{'、'.join(plan.exclude)}")
-    lines.append(f"- 排序：{plan.sort}")
+    lines.append(f"- 远端抓取排序：{plan.fetch_sort}")
+    lines.append(f"- 展示排序：{plan.sort}")
     lines.append("")
 
     lines.append("各查询命中数（远端原始 total）：")
@@ -854,6 +1000,7 @@ def render_markdown(report: Report, records: list[Record]) -> str:
     lines.append("")
 
     stats = report.stats
+    fstats = report.filters
     lines.append("合并与过滤：")
     lines.append("")
     lines.append(f"- 抓取到 {stats.total_in} 条")
@@ -863,7 +1010,18 @@ def render_markdown(report: Report, records: list[Record]) -> str:
         lines.append(f"- 按标题合并掉 {stats.title_merged} 条（同一论文的不同版本）")
     if stats.dropped_no_id:
         lines.append(f"- 丢弃 {stats.dropped_no_id} 条（既无 DOI 也无标题）")
+    if plan.exclude:
+        lines.append(f"- 排除词刷掉 {fstats.excluded} 条，剩 {fstats.passed_exclude} 条")
+    for index, (group, kept) in enumerate(zip(plan.require, fstats.per_group), 1):
+        lines.append(f"- 单看第 {index} 组「{' 或 '.join(group)}」可留 {kept} 条")
+    if plan.require:
+        lines.append(f"- 命中全部 require 组后剩 {fstats.after} 条")
     lines.append(f"- 过滤后保留 **{len(records)} 篇**（{plan.sort} 降序）")
+    if report.truncated:
+        lines.append(
+            f"- 另有 {report.truncated} 篇被 --max-results {plan.max_results} 截断"
+            "（提高该值可放出）"
+        )
     lines.append("")
 
     multi_source = len(plan.sources) > 1
@@ -914,6 +1072,7 @@ def render_json(report: Report, records: list[Record]) -> str:
         "filters": {
             "year": plan.year,
             "limit": plan.limit,
+            "max_results": plan.max_results,
             "min_citations": plan.min_citations,
             "author": plan.author,
             "institution": plan.institution,
@@ -926,6 +1085,7 @@ def render_json(report: Report, records: list[Record]) -> str:
             "exclude": plan.exclude,
             "sources": plan.sources,
             "sort": plan.sort,
+            "fetch_sort": plan.fetch_sort,
         },
         "merge_stats": {
             "total_in": report.stats.total_in,
@@ -934,6 +1094,14 @@ def render_json(report: Report, records: list[Record]) -> str:
             "dropped_no_id": report.stats.dropped_no_id,
             "total_out": report.stats.total_out,
         },
+        "filter_stats": {
+            "before": report.filters.before,
+            "excluded": report.filters.excluded,
+            "passed_exclude": report.filters.passed_exclude,
+            "per_group": report.filters.per_group,
+            "after": report.filters.after,
+        },
+        "truncated": report.truncated,
         "count": len(records),
         "results": [
             {"source": rec.source,
@@ -1175,6 +1343,16 @@ def build_plan(args: argparse.Namespace, preset: dict | None,
     if limit < 1:
         raise UsageError("--limit 必须 >= 1")
 
+    max_results_raw = _resolve(args.max_results, preset, "max_results", None)
+    max_results = None
+    if max_results_raw is not None:
+        try:
+            max_results = int(max_results_raw)
+        except (TypeError, ValueError) as exc:
+            raise UsageError(f"--max-results 必须是整数：{max_results_raw!r}") from exc
+        if max_results < 1:
+            raise UsageError("--max-results 必须 >= 1")
+
     min_cit_raw = _resolve(args.min_citations, preset, "min_citations", None)
     min_citations = None
     if min_cit_raw is not None:
@@ -1182,6 +1360,8 @@ def build_plan(args: argparse.Namespace, preset: dict | None,
             min_citations = int(min_cit_raw)
         except (TypeError, ValueError) as exc:
             raise UsageError(f"--min-citations 必须是整数：{min_cit_raw!r}") from exc
+        if min_citations < 0:
+            raise UsageError("--min-citations 必须 >= 0")
 
     year = _resolve(args.year, preset, "year", None)
     if year is not None:
@@ -1215,6 +1395,8 @@ def build_plan(args: argparse.Namespace, preset: dict | None,
         require=require_groups,
         exclude=exclude_terms,
         sort=str(_resolve(args.sort, preset, "sort", "citations")),
+        fetch_sort=str(_resolve(args.fetch_sort, preset, "fetch_sort", "relevance")),
+        max_results=max_results,
         title=_resolve(args.title, preset, "title", None),
     )
 
@@ -1262,9 +1444,26 @@ def write_outputs(main_path: Path | None, doi_path: Path | None,
 # --------------------------------------------------------------------------- #
 
 EPILOG = """\
+检索式写法：
+  OpenAlex 的 search 是词袋匹配，多词术语请加英文双引号，否则召回量会失控
+  （实测 "low nucleic acid content" 加引号 156 篇，不加 99869 篇）。
+
 过滤语法：
   --require "a,b" --require "c,d"   组内 OR、组间 AND，须命中全部组
   --exclude "x,y"                   命中任一即剔除
+  单词默认按词首前缀匹配（protist 命中 protists，sea 不再命中 research）；
+  '=sea' 整词精确；'*bacteri*' 任意位置子串（cyanobacteria 这类复合词需要它）。
+  作用范围是「标题 + 摘要」，在合并去重之后执行。
+
+排序：
+  --fetch-sort 决定抓哪一批候选，--sort 只改变展示顺序。默认按相关度抓取，
+  因此单给 --sort citations 是在「相关度最高的 N 条」内部按被引重排。
+  想要全网最高被引的 N 条：--fetch-sort citations --sort citations
+
+抓取量与产出量：
+  --limit 决定每个查询从远端抓多少候选，--max-results 决定最终写进清单多少条。
+  过滤在抓取之后执行，所以 --limit 要给得比目标产出大：
+  --limit 100 --require "..." --max-results 30  即「多抓候选、少出结果」。
 
 默认输出：
   <output_dir>/litsearch_<检索词slug>_<日期>.md   人读清单
@@ -1274,7 +1473,7 @@ EPILOG = """\
 示例：
   litsearch "marine protist prokaryote interaction" --year 2021-2026 --limit 30
   litsearch --preset marine_amplicon --stdout
-  litsearch "grazing nanoflagellate" --source openalex,crossref --oa-only
+  litsearch '"low nucleic acid content" bacteria' --limit 100 --require "protist*"
 """
 
 
@@ -1293,7 +1492,10 @@ def build_parser() -> argparse.ArgumentParser:
                         help="数据源，逗号分隔（默认 openalex）；可选 openalex,crossref")
     parser.add_argument("--year", default=None, help="年份过滤：2024 或 2021-2026")
     parser.add_argument("--limit", type=int, default=None,
-                        help="每个查询抓取条数上限（默认 25，可超过 100，自动分页）")
+                        help="每个查询从远端抓取的候选条数上限（默认 25，可超过 100，自动分页）")
+    parser.add_argument("--max-results", dest="max_results", type=int, default=None,
+                        help="最终写入清单的条数上限（默认不限）；"
+                             "配合 --limit 可「多抓候选、少出结果」")
     parser.add_argument("--min-citations", type=int, default=None, help="最低被引数")
     parser.add_argument("--author", default=None, help="作者（姓名或 OpenAlex 作者 ID）")
     parser.add_argument("--institution", default=None,
@@ -1311,7 +1513,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--exclude", action="append", default=None, metavar="X,Y",
                         help="排除词，可重复；命中任一即剔除")
     parser.add_argument("--sort", choices=["citations", "year", "relevance"],
-                        default=None, help="排序（默认 citations）")
+                        default=None, help="展示排序（默认 citations）")
+    parser.add_argument("--fetch-sort", dest="fetch_sort",
+                        choices=list(FETCH_SORT_CHOICES), default=None,
+                        help="远端抓取排序，决定取到哪一批候选（默认 relevance）")
     parser.add_argument("--title", default=None, help="Markdown 清单标题")
     parser.add_argument("--output", default=None,
                         help="覆盖主输出路径；后缀 .md/.csv/.json 决定格式")
@@ -1366,12 +1571,22 @@ def run(args: argparse.Namespace, cwd: Path, http: Http,
         plan, cfg, http, policy, sleep_fn=sleep_fn
     )
     merged, stats = merge_records(raw_records)
-    filtered = apply_filters(merged, plan.require, plan.exclude)
+    filtered, filter_stats = apply_filters(merged, plan.require, plan.exclude)
     ordered = sort_records(filtered, plan.sort)
-    report = Report(plan=plan, totals=totals, stats=stats)
+
+    truncated = 0
+    if plan.max_results is not None and len(ordered) > plan.max_results:
+        truncated = len(ordered) - plan.max_results
+        ordered = ordered[:plan.max_results]
+
+    report = Report(plan=plan, totals=totals, stats=stats,
+                    filters=filter_stats, truncated=truncated)
 
     for warning in warnings:
         print(f"[warn] {warning}", file=sys.stderr)
+    if truncated:
+        print(f"[warn] 过滤后 {filter_stats.after} 篇，按 --max-results "
+              f"{plan.max_results} 截断掉 {truncated} 篇", file=sys.stderr)
 
     if args.stdout:
         print(render_json(report, ordered))

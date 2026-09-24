@@ -34,7 +34,8 @@ class FakeResponse:
 
 
 class FakeOpener:
-    """队列驱动的 urllib opener。元素为 bytes → 200；为 int → 抛对应 HTTPError。"""
+    """队列驱动的 urllib opener。元素为 bytes → 200；为 int → 抛对应 HTTPError；
+    为异常实例 → 原样抛出（用于模拟连接截断等传输层故障）。"""
 
     def __init__(self, responses: Sequence[Any]) -> None:
         self.remaining = list(responses)
@@ -45,6 +46,8 @@ class FakeOpener:
         if not self.remaining:
             raise AssertionError(f"未预期的额外请求：{req.full_url}")
         item = self.remaining.pop(0)
+        if isinstance(item, BaseException):
+            raise item
         if isinstance(item, int):
             raise urllib.error.HTTPError(
                 req.full_url, item, f"HTTP {item}", {}, io.BytesIO(b"")

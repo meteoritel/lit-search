@@ -111,6 +111,27 @@ def test_run_reports_records_without_doi_on_stderr(tmp_path, monkeypatch, capsys
     assert "无 DOI" in capsys.readouterr().err
 
 
+def test_run_honours_max_results(tmp_path, monkeypatch, capsys):
+    """--limit 决定抓多少候选，--max-results 决定最终出多少条。"""
+    code, _, _ = run_cli(["q", "--limit", "2", "--max-results", "1"],
+                         [load_fixture("openalex_page1.json")],
+                         tmp_path, monkeypatch)
+    assert code == litsearch.EXIT_OK
+    assert "--max-results" in capsys.readouterr().err
+    markdown = next((tmp_path / "output").glob("*.md")).read_text(encoding="utf-8")
+    assert "过滤后保留 **1 篇**" in markdown
+    assert "另有 1 篇被 --max-results 1 截断" in markdown
+
+
+def test_run_warns_when_the_fetch_window_was_truncated(tmp_path, monkeypatch, capsys):
+    """远端 137 篇，只考察前 2 篇 —— 召回天花板不能是隐形的。"""
+    run_cli(["q", "--limit", "2"], [load_fixture("openalex_page1.json")],
+            tmp_path, monkeypatch)
+    err = capsys.readouterr().err
+    assert "远端共 137 篇" in err
+    assert "只考察了前 2 篇" in err
+
+
 def test_run_require_is_applied_after_merge_not_per_source(tmp_path, monkeypatch):
     """OpenAlex 与 Crossref 命中同一篇；require 只在合并结果上跑，
     所以 Crossref 那份缺摘要不会导致该论文被误删。"""

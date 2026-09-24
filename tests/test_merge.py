@@ -46,8 +46,8 @@ def test_openalex_wins_tie_on_citations():
 
 
 def test_title_merge_collapses_preprint_and_published():
-    pre = make_record(doi="10.1000/pre", title="Deep sea protists", citation_count=1)
-    pub = make_record(doi="10.2000/pub", title="Deep-sea protists!", citation_count=9)
+    pre = make_record(doi="10.1000/pre", title="Deep sea protists of the abyss", citation_count=1)
+    pub = make_record(doi="10.2000/pub", title="Deep-sea protists of the abyss!", citation_count=9)
     merged, stats = litsearch.merge_records([pre, pub])
     assert len(merged) == 1
     assert stats.doi_merged == 0
@@ -56,9 +56,9 @@ def test_title_merge_collapses_preprint_and_published():
 
 
 def test_transitive_chain_reaches_a_fixed_point():
-    a = make_record(doi="10.1/a", title="Alpha")
-    b = make_record(doi="10.1/b", title="Alpha")
-    c = make_record(doi="10.1/b", title="Beta")
+    a = make_record(doi="10.1/a", title="Alpha protist grazing study")
+    b = make_record(doi="10.1/b", title="Alpha protist grazing study")
+    c = make_record(doi="10.1/b", title="Beta bacterioplankton survey")
     merged, _ = litsearch.merge_records([a, b, c])
     assert len(merged) == 1
 
@@ -81,8 +81,8 @@ def test_dropped_when_neither_doi_nor_title():
 
 
 def test_distinct_records_are_not_merged():
-    records = [make_record(doi="10.1/a", title="Alpha"),
-               make_record(doi="10.1/b", title="Beta")]
+    records = [make_record(doi="10.1/a", title="Alpha protist grazing study"),
+               make_record(doi="10.1/b", title="Beta bacterioplankton survey")]
     merged, stats = litsearch.merge_records(records)
     assert len(merged) == 2
     assert stats.doi_merged == 0
@@ -90,9 +90,28 @@ def test_distinct_records_are_not_merged():
 
 
 def test_merge_is_idempotent():
-    records = [make_record(doi="10.1/a", title="Alpha"),
-               make_record(doi="10.1/a", title="Alpha"),
-               make_record(doi=None, title="Beta")]
+    records = [make_record(doi="10.1/a", title="Alpha protist grazing study"),
+               make_record(doi="10.1/a", title="Alpha protist grazing study"),
+               make_record(doi=None, title="Beta bacterioplankton survey")]
     once, _ = litsearch.merge_records(records)
     twice, _ = litsearch.merge_records(once)
     assert len(once) == len(twice) == 2
+
+
+def test_generic_short_titles_are_not_title_merged():
+    """'Editorial' / 'Correction' 这类通用短标题不能跨论文合并，否则静默丢数据。"""
+    editorial_a = make_record(doi="10.1/a", title="Editorial")
+    editorial_b = make_record(doi="10.2/b", title="Editorial")
+    merged, stats = litsearch.merge_records([editorial_a, editorial_b])
+    assert len(merged) == 2
+    assert stats.title_merged == 0
+
+
+def test_title_merge_still_works_at_the_length_threshold():
+    """归一化后正好等于阈值（15）的真实短标题仍要能合并。"""
+    assert len(litsearch.norm_title("Deep sea protists")) == 15
+    a = make_record(doi="10.1/a", title="Deep sea protists", citation_count=1)
+    b = make_record(doi="10.2/b", title="Deep-sea protists!", citation_count=9)
+    merged, stats = litsearch.merge_records([a, b])
+    assert len(merged) == 1
+    assert stats.title_merged == 1

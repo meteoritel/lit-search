@@ -85,12 +85,16 @@ limit = 50
 sort = "citations"
 language = "en"
 require = ["amplicon,asv,16s,18s,metabarcoding",
-           "protist,eukaryot,prokaryot,bacteria,flagellate"]
+           "protist*,eukaryot*,prokaryot*,*bacteri*"]
 exclude = ["retraction", "corrigendum"]
 ```
 
 用 `--preset marine_amplicon` 调用。命令行上显式给出的参数会覆盖预设里的同名项；像 `--require`
-这样的可重复参数，只要命令行出现过，就**整体替换**预设里的那组，不做追加。
+这样的可重复参数，只要命令行出现过，就**整体替换**预设里的那组，不做追加。预设里同样可以写
+`fetch_sort`、`min_citations` 等任意结构化选项。
+
+注意 `protist*` / `*bacteri*` 里的 `*`：匹配规则是词首前缀，`bacteria` 匹配不到 `cyanobacteria` /
+`bacterium` 这类复合词与异体，要子串匹配就得显式写 `*bacteri*`，详见下面的匹配规则表。
 
 ## 用法
 
@@ -98,10 +102,18 @@ exclude = ["retraction", "corrigendum"]
 # 基本检索：在 output/ 下生成 .md 与 .doi.txt
 litsearch "marine protist prokaryote interaction" --year 2021-2026 --limit 30
 
+# 多词术语务必加英文双引号 —— OpenAlex 的 search 是词袋匹配，不加引号召回会失控
+# （实测 "low nucleic acid content" 156 篇，不加引号 99869 篇）
+litsearch '"low nucleic acid content" bacteria' --year 2022-2026 --limit 100
+
 # 相关性分组过滤：--require 组内 OR、组间 AND
-litsearch "marine protist prokaryote interaction" \
-    --require "amplicon,asv,16s,18s" --require "protist,eukaryot,bacteria" \
+litsearch '"low nucleic acid content" bacteria' \
+    --require "bacteri*,prokaryot*" --require "marine,coastal,seawater,ocean" \
     --exclude "review,meta-analysis" --limit 200
+
+# 要「全网最高被引的 N 篇」，而不只是「相关度最高的 N 篇」里再排序
+litsearch '"low nucleic acid content" bacteria' \
+    --fetch-sort citations --sort citations --limit 50
 
 # 按作者 / 机构 / 期刊 / 类型 / 语言筛，只要开放获取
 litsearch "grazing nanoflagellate" --author "Jane Smith" \
@@ -122,8 +134,9 @@ litsearch "grazing nanoflagellate" --source openalex,crossref --limit 20
 | `--preset NAME` | 使用配置中的命名预设 |
 | `--source openalex,crossref` | 数据源，逗号分隔。默认 `openalex` |
 | `--year 2024` / `--year 2021-2026` | 年份范围 |
-| `--limit N` | 每个查询抓取条数上限（默认 25）。**可超过 100**，自动 cursor 分页 |
-| `--min-citations N` | 最低被引数 |
+| `--limit N` | 每个查询从远端抓取的**候选**条数上限（默认 25）。**可超过 100**，自动 cursor 分页 |
+| `--max-results N` | 最终写入清单的条数上限（默认不限）。配合 `--limit` 可「多抓候选、少出结果」 |
+| `--min-citations N` | 最低被引数（`0` 与不写同义＝不限） |
 | `--author` | 作者姓名，或 OpenAlex 作者 ID（形如 `A1234567`） |
 | `--institution` | 机构名称、OpenAlex 机构 ID（`I...`）或 ROR 链接 |
 | `--journal-issn` | 期刊 ISSN |
@@ -131,15 +144,35 @@ litsearch "grazing nanoflagellate" --source openalex,crossref --limit 20
 | `--language` | 语言，如 `en` |
 | `--oa-only` / `--no-oa-only` | 仅开放获取 |
 | `--oa-filter STR` | 直接透传给 OpenAlex 的原始 filter 字符串（逃生舱） |
-| `--require "a,b"` | 相关性分组过滤，可重复。组内 `,` 为 OR，组间为 AND，须命中全部组 |
-| `--exclude "x,y"` | 排除词，可重复。命中任一即剔除 |
-| `--sort citations\|year\|relevance` | 排序，默认 `citations` |
+| `--require "a,b"` | 相关性分组过滤，可重复。组内 `,` 为 OR，组间为 AND，须命中全部组；匹配规则见下 |
+| `--exclude "x,y"` | 排除词，可重复。命中任一即剔除；匹配规则同 `--require` |
+| `--sort citations\|year\|relevance` | **展示**排序，默认 `citations`。只改变清单顺序 |
+| `--fetch-sort relevance\|citations\|year` | **远端抓取**排序，默认 `relevance`。决定取到哪一批候选 |
 | `--title` | Markdown 清单标题 |
 | `--output PATH` | 覆盖主输出路径，后缀 `.md` / `.csv` / `.json` 决定格式 |
 | `--doi-list PATH` | 覆盖 DOI 列表输出路径 |
 | `--stdout` | 把 JSON 打到 stdout，不写任何文件 |
 
-`--require` / `--exclude` 的作用范围是「标题 + 摘要」，在**合并去重之后**执行。
+`--require` / `--exclude` 的作用范围是「标题 + 摘要」，在**合并去重之后**执行 —— 因此 `--limit`
+要给得比目标产出大得多（实测 `--limit 100` × 4 查询 → 抓 394 → 去重 243 → 过滤后只剩 15）。
+想「多抓候选、少出结果」就配 `--max-results`：`--limit 100 --max-results 30`。
+
+产出的 markdown 会按阶段列出计数 —— 排除词刷掉多少、**每个 require 组单独能留多少**、
+取交集后剩多少 —— 哪一组是瓶颈一眼可见，不必自己写脚本排查。远端总量超过抓取窗口时还会在
+stderr 提示「共 N 篇，只考察了前 M 篇」，召回天花板不会是隐形的。
+
+匹配前会把文本归一化（小写、标点统一成空格），所以标题里写作 `Nucleic Acid-Content` 的论文
+能被检索词 `nucleic acid content` 命中：
+
+| 写法 | 语义 | 例子 |
+|---|---|---|
+| `protist` | 词首前缀（默认） | 命中 `protists`；`sea` 不再命中 `research` / `disease` |
+| `=sea` | 整词精确 | 只命中独立的 `sea`，不命中 `seawater` / `seasonality` |
+| `*bacteri*` | 任意位置子串 | 命中 `cyanobacteria` 这类复合词 |
+| `海洋` | 含非 ASCII 时退回子串 | 中文无空格，不做词边界 |
+
+`--sort` 与 `--fetch-sort` 是两个独立旋钮。默认按相关度抓取，所以单给 `--sort citations`
+只是在「相关度最高的 N 条」这个切片内部按被引重排；要拿全网最高被引的那批，两个都设 `citations`。
 
 ### 输出
 
