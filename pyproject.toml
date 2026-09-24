@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -8,6 +8,8 @@ version = "0.2.0"
 description = "多源文献检索 CLI（OpenAlex + Crossref），零第三方运行时依赖"
 readme = "README.md"
 requires-python = ">=3.12"
+license = "MIT"
+license-files = ["LICENSE"]
 dependencies = []
 keywords = ["openalex", "crossref", "literature", "cli", "bibliography"]
 classifiers = [
