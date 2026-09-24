@@ -1,0 +1,22 @@
+{
+  "meta": { "count": 137, "next_cursor": null },
+  "results": [
+    {
+      "id": "https://openalex.org/W1003",
+      "doi": "https://doi.org/10.1000/DDD",
+      "title": "Protist community assembly in shelf seas",
+      "publication_year": 2021,
+      "publication_date": "2021-09-15",
+      "cited_by_count": 7,
+      "primary_location": { "source": { "display_name": "Estuarine Science" } },
+      "authorships": [
+        { "author": { "display_name": "Feng Gao" } }
+      ],
+      "abstract_inverted_index": { "Protist": [0], "community": [1] },
+      "open_access": { "is_oa": true, "oa_url": "https://example.org/d.pdf" },
+      "type": "article",
+      "relevance_score": 6.0,
+      "language": "en"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "status": "ok",
+  "message-type": "work-list",
+  "message": {
+    "total-results": 88,
+    "items": [
+      {
+        "DOI": "10.1000/aaa",
+        "title": ["MARINE PROTIST GRAZING ON BACTERIA."],
+        "author": [
+          { "given": "Alice", "family": "Chen" },
+          { "given": "Bo", "family": "Liu" }
+        ],
+        "container-title": ["Journal of Marine Ecology"],
+        "published": { "date-parts": [[2023, 5, 1]] },
+        "type": "journal-article",
+        "is-referenced-by-count": 39,
+        "abstract": "<jats:p>Marine protist grazing on bacteria across shelf seas.</jats:p>",
+        "link": [
+          { "content-type": "application/pdf", "URL": "https://example.org/a.pdf" }
+        ],
+        "language": "en"
+      },
+      {
+        "DOI": "10.1000/CCC",
+        "title": ["Viral shunt in coastal waters"],
+        "author": [{ "given": "Dana", "family": "Kim" }],
+        "container-title": ["Limnology Letters"],
+        "issued": { "date-parts": [[2021]] },
+        "type": "journal-article",
+        "is-referenced-by-count": 3
+      },
+      {
+        "author": [{ "name": "Anonymous Collective" }],
+        "type": "journal-article"
+      }
+    ]
+  }
+}

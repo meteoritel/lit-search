@@ -1,0 +1,18 @@
+.git
+.idea
+.venv
+.pytest_cache
+__pycache__/
+*.pyc
+venv/
+
+# 构建产物
+dist/
+build/
+*.egg-info/
+
+# 密钥：.env 里有 API key，绝不入库（.env.example 是模板，保留）
+.env
+
+# 检索生成的清单（产物，不入库；需要归档时手动加）
+output/
