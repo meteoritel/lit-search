@@ -553,6 +553,11 @@ class OpenAlexProvider(Provider):
         primary = work.get("primary_location") or {}
         source = primary.get("source") or {}
         oa = work.get("open_access") or {}
+        authors: list[str] = []
+        for authorship in work.get("authorships") or []:
+            name = ((authorship.get("author") or {}).get("display_name") or "").strip()
+            if name:
+                authors.append(name)
         return Record(
             doi=norm_doi(work.get("doi")),
             title=work.get("title"),
@@ -562,11 +567,7 @@ class OpenAlexProvider(Provider):
             work_type=work.get("type"),
             citation_count=work.get("cited_by_count"),
             abstract=reconstruct_abstract(work.get("abstract_inverted_index")),
-            authors=[
-                (a.get("author") or {}).get("display_name")
-                for a in (work.get("authorships") or [])
-                if (a.get("author") or {}).get("display_name")
-            ],
+            authors=authors,
             is_open_access=oa.get("is_oa"),
             open_access_pdf=oa.get("oa_url") or None,
             language=work.get("language"),
@@ -582,9 +583,11 @@ class OpenAlexProvider(Provider):
         api_key = cfg.api_keys.get(self.name, "")
         records: list[Record] = []
         total = 0
-        cursor = "*"
+        cursor: str | None = "*"
         remaining = plan.limit
-        while remaining > 0:
+        # 循环条件里显式要求 cursor 非空：只有真拿到 next_cursor 才翻下一页，
+        # 否则 None 会被拼进 URL。
+        while remaining > 0 and cursor:
             url = self.build_url(query, plan, api_key, cursor,
                                  min(MAX_PER_PAGE, remaining))
             payload = json.loads(
@@ -597,9 +600,9 @@ class OpenAlexProvider(Provider):
             for work in page:
                 records.append(self.map_work(work))
             remaining -= len(page)
-            cursor = meta.get("next_cursor")
-            if not page or not cursor:
+            if not page:          # 空页不减少 remaining，必须显式退出以免死循环
                 break
+            cursor = meta.get("next_cursor")
         # 远端若返回多于请求的条数（或首页超发），按 --limit 截断
         records = records[:plan.limit]
         return ProviderResult(total=total, records=records, warnings=warnings)
@@ -654,22 +657,21 @@ class CrossrefProvider(Provider):
         doi = norm_doi(item.get("DOI"))
         if not title and not doi:
             return None
-        date_parts = None
-        for key in ("published", "issued"):
-            block = item.get(key) or {}
+        # date-parts 是 [[Y, M, D]]，取内层数组；没有就是空列表，避免 Optional 空值判断
+        date: list[Any] = []
+        for date_key in ("published", "issued"):
+            block = item.get(date_key) or {}
             parts = block.get("date-parts") or []
             if parts and parts[0]:
-                date_parts = parts[0]
+                date = list(parts[0])
                 break
-        year = None
+        numbers = [int(v) for v in date if isinstance(v, int)]
+        year = numbers[0] if numbers else None
         pub_date = None
-        if date_parts:
-            year = date_parts[0]
-            numbers = [int(v) for v in date_parts if isinstance(v, int)]
-            if len(numbers) >= 1:
-                month = numbers[1] if len(numbers) > 1 else 1
-                day = numbers[2] if len(numbers) > 2 else 1
-                pub_date = f"{numbers[0]:04d}-{month:02d}-{day:02d}"
+        if numbers:
+            month = numbers[1] if len(numbers) > 1 else 1
+            day = numbers[2] if len(numbers) > 2 else 1
+            pub_date = f"{numbers[0]:04d}-{month:02d}-{day:02d}"
         containers = item.get("container-title") or []
         authors: list[str] = []
         for author in item.get("author") or []:
@@ -1048,21 +1050,21 @@ def load_config(cwd: Path, env: dict[str, str] | None = None) -> Config:
         except (OSError, tomllib.TOMLDecodeError) as exc:
             raise ConfigError(f"配置文件无法解析：{path}（{exc}）") from exc
 
-    def scalar(key: str) -> Any:
-        for _, doc in documents:            # documents 已按优先级降序
-            value = doc.get(key)
-            if value is not None:
-                return value
+    def scalar(toml_key: str) -> Any:
+        for _, candidate in documents:      # documents 已按优先级降序
+            found = candidate.get(toml_key)
+            if found is not None:
+                return found
         return None
 
     api_section: dict[str, Any] = {}
-    for _, doc in documents:
-        for key, value in (doc.get("api_keys") or {}).items():
-            api_section.setdefault(key, value)
+    for _, loaded in documents:
+        for source, credential in (loaded.get("api_keys") or {}).items():
+            api_section.setdefault(source, credential)
 
     presets: dict[str, dict] = {}
-    for _, doc in reversed(documents):      # 低优先级先写，高优先级覆盖同名预设
-        presets.update(doc.get("presets") or {})
+    for _, loaded in reversed(documents):   # 低优先级先写，高优先级覆盖同名预设
+        presets.update(loaded.get("presets") or {})
 
     dotenv = parse_env_file(cwd / ".env")
 
@@ -1085,13 +1087,16 @@ def load_config(cwd: Path, env: dict[str, str] | None = None) -> Config:
         scalar("output_dir"),
         dotenv.get("LITSEARCH_OUTPUT_DIR"),
     )
-    default_sources = scalar("default_sources") or None
+    default_sources: list[str] | None = None
+    sources_default = scalar("default_sources")
+    if sources_default:
+        default_sources = list(sources_default)
 
     return Config(
         api_keys=api_keys,
         mailto=str(mailto) if mailto else None,
         output_dir=Path(str(output_dir_raw)).expanduser() if output_dir_raw else None,
-        default_sources=list(default_sources) if default_sources else None,
+        default_sources=default_sources,
         presets=presets,
         config_path=documents[0][0] if documents else None,
     )
@@ -1328,8 +1333,8 @@ def _force_utf8_stdio() -> None:
             pass
 
 
-def render_main(args: argparse.Namespace, main_path: Path | None,
-                report: Report, records: list[Record]) -> str:
+def render_main(main_path: Path | None, report: Report,
+                records: list[Record]) -> str:
     suffix = main_path.suffix.lower() if main_path else ".md"
     if suffix == ".csv":
         return render_csv(records)
@@ -1381,7 +1386,7 @@ def run(args: argparse.Namespace, cwd: Path, http: Http,
     doi_text, missing_doi = render_doi_list(ordered)
     written = write_outputs(
         main_path, doi_path,
-        render_main(args, main_path, report, ordered), doi_text,
+        render_main(main_path, report, ordered), doi_text,
     )
     if missing_doi:
         print(f"[warn] {missing_doi} 条无 DOI，未写入 DOI 列表", file=sys.stderr)
