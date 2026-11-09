@@ -102,7 +102,7 @@ raise SystemExit(litsearch.main(["q", "--source", "crossref", "--limit", "1", "-
                                 cwd=temporary, env=env, check=True, capture_output=True,
                                 text=True, encoding="utf-8")
         assert json.loads(copied.stdout)["version"] == version
-    print("wheel、sdist、安装后离线检索与单文件交付检查通过")
+    print("Wheel, sdist, installed offline search and standalone checks passed.")
 
 
 def main() -> None:
@@ -113,7 +113,7 @@ def main() -> None:
         ["uv", "build"],
     ]
     for command in commands:
-        print(f"执行：{' '.join(command)}", flush=True)
+        print(f"Running: {' '.join(command)}", flush=True)
         subprocess.run(command, cwd=ROOT, check=True)
     check_distribution()
 
