@@ -38,15 +38,17 @@ def check_distribution() -> None:
         assert not any(line.startswith("Requires-Dist:") and "extra ==" not in line
                        for line in metadata.splitlines())
         assert "litsearch.py" in archive.namelist()
+        assert not any(name.startswith(("examples/", ".local/")) for name in archive.namelist())
     with tarfile.open(sdist) as archive:
         names = set(archive.getnames())
         for relative in ("tests/conftest.py", "tests/fixtures/openalex_page1.json",
                          "tests/fixtures/retrieval_replay.json", "tests/fixtures/retrieval_gold.json",
-                         "scripts/check.py", "docs/python.md", "docs/usage.md", "uv.lock",
-                         "examples/marine-timeseries.toml", "examples/marine-lna-hna.toml"):
+                         "scripts/check.py", "docs/python.md", "docs/usage.md", "uv.lock"):
             assert f"litsearch-{version}/{relative}" in names, relative
         assert not any(name.startswith((f"litsearch-{version}/docs/archive/",
-                                        f"litsearch-{version}/docs/plans/")) for name in names)
+                                        f"litsearch-{version}/docs/plans/",
+                                        f"litsearch-{version}/examples/",
+                                        f"litsearch-{version}/.local/")) for name in names)
 
     with tempfile.TemporaryDirectory(prefix="litsearch-distribution-") as directory:
         temporary = Path(directory)

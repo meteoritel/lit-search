@@ -99,13 +99,7 @@ litsearch "marine bacteria" --source crossref --output output/marine.json --doi-
 
 `--year` 可省略；`--limit` 控制每个来源、每个查询的候选窗口，`--max-results` 控制最终结果上限。`require` 组内按 OR、组间按 AND 匹配标题与摘要；缺失摘要会影响保留结果。
 
-专题预设见 [南海时间序列](examples/marine-timeseries.toml) 和 [海洋 LNA/HNA](examples/marine-lna-hna.toml)。PowerShell 中可这样加载：
-
-```powershell
-$env:LITSEARCH_CONFIG = (Resolve-Path examples/marine-lna-hna.toml).Path
-litsearch --preset marine_lna_hna --explain
-litsearch --preset marine_lna_hna --stdout
-```
+可在自己的 TOML 配置中定义命名预设，通过 `--preset NAME` 调用；配置格式见 [CLI 文档](docs/usage.md#配置发现与优先级)。
 
 ## Python 调用
 

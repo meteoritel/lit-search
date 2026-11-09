@@ -2,6 +2,7 @@ include .env.example uv.lock AGENTS.md
 recursive-include tests *.py *.json
 recursive-include scripts *.py
 recursive-include docs *.md
-recursive-include examples *.toml
+prune examples
+prune .local
 prune docs/plans
 prune docs/archive

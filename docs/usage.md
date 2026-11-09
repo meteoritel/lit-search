@@ -32,14 +32,14 @@ default_sources = ["openalex"]
 [api_keys]
 openalex = "your-key"
 
-[presets.marine]
-queries = ["marine protist grazing", "nanoflagellate bacterivory"]
+[presets.topic]
+queries = ["time series forecasting", "forecasting models"]
 year = "2022-2026"
 limit = 100
 max_results = 30
 sort = "hybrid"
 fetch_sort = "relevance"
-require = ["marine,coastal,seawater"]
+require = ["forecast,prediction"]
 exclude = ["retraction,corrigendum"]
 enrich_abstracts = 0
 merge_policy = "doi"
@@ -51,8 +51,8 @@ strict_filters = false
 命令行显式值覆盖预设，可重复选项整体替换预设数组。调用示例：
 
 ```bash
-litsearch --preset marine --explain
-litsearch --preset marine --require "marine,ocean" --stdout
+litsearch --preset topic --explain
+litsearch --preset topic --require "forecast,prediction" --stdout
 ```
 
 配置文件里的相对 `output_dir` 锚定该配置文件所在目录；环境变量、`.env` 与命令行相对路径锚定调用目录。Python 调用 `load_config(cwd)` 时，以传入目录为项目配置与环境路径基准。
@@ -135,17 +135,7 @@ litsearch --concept "South China Sea,Daya Bay" --concept "protist,ciliate" --con
 
 OpenAlex 将组内词编译为带引号的 OR 条件，组间用 AND；Europe PMC 在词前加 `TITLE_ABS:`。概念组至少为三组时，额外生成只含前两组的宽查询，因此将基本地理与研究对象放在前面。Crossref 按同义词位置轮换生成普通文本查询，并增加相同的宽查询，使用其自身的查询语义。`--explain` 的 compiled_queries 显示实际查询与来源筛选条件。
 
-中文主题可使用可审阅的英文术语预设。将[南海时间序列示例](../examples/marine-timeseries.toml)中的预设表复制到项目 `litsearch.toml`，或将该文件作为 `LITSEARCH_CONFIG`：
-
-```powershell
-$env:LITSEARCH_CONFIG = (Resolve-Path examples/marine-timeseries.toml).Path
-litsearch --preset marine_timeseries --explain
-litsearch --preset marine_timeseries --stdout
-```
-
-该示例使用宽查询保留候选，再由 hybrid 排序；需要确定的筛选门槛时显式添加 require，并核对摘要缺失与过滤统计。
-
-[海洋 LNA/HNA 示例](../examples/marine-lna-hna.toml)使用手工查询、hybrid 和两组 require，分别检查海洋词与核酸分组词；预设名为 `marine_lna_hna`。该预设默认不补摘要，可显式添加 `--enrich-abstracts N`。require 匹配现有标题/摘要中的文字；生境与研究对象仍按文献内容复核。
+预设由用户在 TOML 配置中定义，格式见[配置发现与优先级](#配置发现与优先级)。可先使用 `--explain` 核对实际查询，再根据检索结果调整 concepts、require 和排序方式。
 
 | 排序 | 计算与用途 |
 |---|---|
