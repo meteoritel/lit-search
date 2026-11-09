@@ -9,3 +9,17 @@
 - 版本以源码 __version__ 为准；分发包检查使用 scripts/check_distribution.py。
 - 凭据保留在环境变量或受忽略配置中，结果与错误中的请求地址脱敏。
 - 正式文档描述当前契约；实施计划完成后归档到 docs/plans/archive 并更新索引。
+
+## Agent skills
+
+### Issue tracker
+
+创建、读取或更新 issue/spec 时，使用 `.scratch/<feature-slug>/` 下的本地 Markdown；规则见 [issue tracker 配置](docs/agents/issue-tracker.md)。
+
+### Triage labels
+
+分诊使用默认 triage 状态名；映射见 [triage 标签配置](docs/agents/triage-labels.md)。
+
+### Domain docs
+
+采用 single-context；探索代码库时，按 [领域文档规则](docs/agents/domain.md) 读取术语表与相关 ADR。
