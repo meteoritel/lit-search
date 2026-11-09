@@ -1,0 +1,187 @@
+{
+  "topic": "钙钛矿太阳能电池的耐湿稳定性",
+  "method": "Agent 逐条阅读固定标题/摘要；非独立人员盲审。tier 1=太阳能电池直接研究/综述，2=可迁移薄膜降解机制，3=其他器件或应用。",
+  "candidate_snapshot": "retrieval_perovskite_mixed.json",
+  "records": [
+    {
+      "doi": "10.29363/nanoge.hopv.2021.100",
+      "tier": 1,
+      "topic_relevance": "direct",
+      "reason": "标题讨论钙钛矿耐湿稳定性，会议名称明确为 Hybrid and Organic Photovoltaics；按光伏直接相关判读，摘要缺失"
+    },
+    {
+      "doi": "10.1039/d3ma00828b",
+      "tier": 1,
+      "topic_relevance": "direct",
+      "reason": "标题/摘要直接研究太阳能电池或其吸收层的耐湿稳定性、制备与改进"
+    },
+    {
+      "doi": "10.1002/adma.202211317",
+      "tier": 1,
+      "topic_relevance": "direct",
+      "reason": "标题/摘要直接研究太阳能电池或其吸收层的耐湿稳定性、制备与改进"
+    },
+    {
+      "doi": "10.1038/s41467-022-32482-y",
+      "tier": 1,
+      "topic_relevance": "direct",
+      "reason": "标题/摘要直接研究太阳能电池或其吸收层的耐湿稳定性、制备与改进"
+    },
+    {
+      "doi": "10.1002/ente.202201475",
+      "tier": 1,
+      "topic_relevance": "direct",
+      "reason": "标题/摘要直接研究太阳能电池或其吸收层的耐湿稳定性、制备与改进"
+    },
+    {
+      "doi": "10.1016/j.cej.2021.132701",
+      "tier": 1,
+      "topic_relevance": "direct",
+      "reason": "标题/摘要直接研究太阳能电池或其吸收层的耐湿稳定性、制备与改进"
+    },
+    {
+      "doi": "10.1002/adma.202100625",
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "reason": "光探测器的机械自修复器件"
+    },
+    {
+      "doi": "10.1038/s41467-024-45047-y",
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "reason": "热致变色智能窗"
+    },
+    {
+      "doi": "10.1038/s43246-021-00200-8",
+      "tier": 1,
+      "topic_relevance": "direct",
+      "reason": "标题/摘要直接研究太阳能电池或其吸收层的耐湿稳定性、制备与改进"
+    },
+    {
+      "doi": "10.1002/adma.202210611",
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "reason": "可重构光电器件与防伪显示"
+    },
+    {
+      "doi": "10.1021/acsomega.1c06989",
+      "tier": 2,
+      "topic_relevance": "background",
+      "reason": "二维钙钛矿水分降解机制，同时适用于光伏与光电器件"
+    },
+    {
+      "doi": "10.1021/acs.chemmater.1c00773",
+      "tier": 1,
+      "topic_relevance": "direct",
+      "reason": "标题/摘要直接研究太阳能电池或其吸收层的耐湿稳定性、制备与改进"
+    },
+    {
+      "doi": "10.1016/j.matt.2021.04.023",
+      "tier": 2,
+      "topic_relevance": "background",
+      "reason": "无机卤化物水分相变机制，标题支持材料背景"
+    },
+    {
+      "doi": "10.1038/s43246-020-00104-z",
+      "tier": 1,
+      "topic_relevance": "direct",
+      "reason": "标题/摘要直接研究太阳能电池或其吸收层的耐湿稳定性、制备与改进"
+    },
+    {
+      "doi": "10.1021/acsenergylett.4c01150",
+      "tier": 1,
+      "topic_relevance": "direct",
+      "reason": "标题/摘要直接研究太阳能电池或其吸收层的耐湿稳定性、制备与改进"
+    },
+    {
+      "doi": "10.1021/acs.jpclett.1c01482",
+      "tier": 1,
+      "topic_relevance": "direct",
+      "reason": "标题/摘要直接研究太阳能电池或其吸收层的耐湿稳定性、制备与改进"
+    },
+    {
+      "doi": "10.1002/aenm.202401320",
+      "tier": 1,
+      "topic_relevance": "direct",
+      "reason": "标题/摘要直接研究太阳能电池或其吸收层的耐湿稳定性、制备与改进"
+    },
+    {
+      "doi": "10.1088/1755-1315/655/1/012049",
+      "tier": 1,
+      "topic_relevance": "direct",
+      "reason": "标题/摘要直接研究太阳能电池或其吸收层的耐湿稳定性、制备与改进"
+    },
+    {
+      "doi": "10.1038/s41467-022-34426-y",
+      "tier": 2,
+      "topic_relevance": "background",
+      "reason": "钙钛矿薄膜结构异质性与湿度降解机制"
+    },
+    {
+      "doi": "10.1126/sciadv.ady5703",
+      "tier": 1,
+      "topic_relevance": "direct",
+      "reason": "标题/摘要直接研究太阳能电池或其吸收层的耐湿稳定性、制备与改进"
+    },
+    {
+      "doi": "10.1063/5.0154047",
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "reason": "卤化双钙钛矿电阻与缺陷钝化，摘要未研究太阳能电池"
+    },
+    {
+      "doi": "10.1002/adom.202201888",
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "reason": "手性白光圆偏振发光"
+    },
+    {
+      "doi": "10.1002/solr.202100351",
+      "tier": 1,
+      "topic_relevance": "direct",
+      "reason": "标题/摘要直接研究太阳能电池或其吸收层的耐湿稳定性、制备与改进"
+    },
+    {
+      "doi": "10.1021/acsenergylett.4c01817",
+      "tier": 2,
+      "topic_relevance": "background",
+      "reason": "水分吸附、应力与材料稳定性机制"
+    },
+    {
+      "doi": "10.1039/d0ta12509a",
+      "tier": 1,
+      "topic_relevance": "direct",
+      "reason": "标题/摘要直接研究太阳能电池或其吸收层的耐湿稳定性、制备与改进"
+    },
+    {
+      "doi": "10.1021/acsami.4c08313",
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "reason": "电化学储能、电池与水分解"
+    },
+    {
+      "doi": "10.3390/molecules26247570",
+      "tier": 1,
+      "topic_relevance": "direct",
+      "reason": "标题/摘要直接研究太阳能电池或其吸收层的耐湿稳定性、制备与改进"
+    },
+    {
+      "doi": "10.1002/ente.202402310",
+      "tier": 1,
+      "topic_relevance": "direct",
+      "reason": "标题/摘要直接研究太阳能电池或其吸收层的耐湿稳定性、制备与改进"
+    },
+    {
+      "doi": "10.1021/acsenergylett.3c00023",
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "reason": "湿度驱动离子伏发电，而非光伏太阳能电池"
+    },
+    {
+      "doi": "10.1088/1361-6463/ad31e2",
+      "tier": 2,
+      "topic_relevance": "background",
+      "reason": "CsPbI2Br 薄膜湿度相变机制"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "require": [
+    ["marine", "ocean", "sea", "coastal", "estuary", "estuarine"],
+    ["low nucleic acid", "high nucleic acid", "LNA", "HNA"]
+  ],
+  "exclude": []
+}

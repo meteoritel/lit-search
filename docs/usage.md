@@ -37,7 +37,7 @@ queries = ["marine protist grazing", "nanoflagellate bacterivory"]
 year = "2022-2026"
 limit = 100
 max_results = 30
-sort = "citations"
+sort = "hybrid"
 fetch_sort = "relevance"
 require = ["marine,coastal,seawater"]
 exclude = ["retraction,corrigendum"]
@@ -56,6 +56,8 @@ litsearch --preset marine --require "marine,ocean" --stdout
 ```
 
 配置文件里的相对 `output_dir` 锚定该配置文件所在目录；环境变量、`.env` 与命令行相对路径锚定调用目录。Python 调用 `load_config(cwd)` 时，以传入目录为项目配置与环境路径基准。
+
+CLI `--explain` 的 output.directory 为解析后的绝对默认输出目录，output.origin 为配置来源。解释过程不创建目录，也不检查目标冲突。Python `SearchClient.explain` 只解释检索计划与来源能力。
 
 ## 参数
 
@@ -123,7 +125,9 @@ litsearch "marine bacteria" --fetch-sort citations --sort citations --stdout
 
 ## 概念查询与主题排序
 
-概念组表达主题的不同要素，组内放近义词。手工 queries 与生成查询合并去重；concepts 用于软证据，require 用于硬过滤。只有 concepts 时也可以检索：
+概念组表达主题的不同要素，组内放近义词。手工 queries 与生成查询合并去重；concepts 用于软证据，require 用于硬过滤。
+
+规范化先去除词项两端空白和组内重复词，再移除词项及词序均相同的重复组，保留首次出现的位置。组内同义词顺序保留；词序不同的组仍分别参与查询与排序。只有 concepts 时也可以检索：
 
 ```bash
 litsearch --concept "South China Sea,Daya Bay" --concept "protist,ciliate" --concept "seasonal,monthly" --source openalex,europepmc --sort hybrid --stdout
@@ -141,6 +145,8 @@ litsearch --preset marine_timeseries --stdout
 
 该示例使用宽查询保留候选，再由 hybrid 排序；需要确定的筛选门槛时显式添加 require，并核对摘要缺失与过滤统计。
 
+[海洋 LNA/HNA 示例](../examples/marine-lna-hna.toml)使用手工查询、hybrid 和两组 require，分别检查海洋词与核酸分组词；预设名为 `marine_lna_hna`。该预设默认不补摘要，可显式添加 `--enrich-abstracts N`。require 匹配现有标题/摘要中的文字；生境与研究对象仍按文献内容复核。
+
 | 排序 | 计算与用途 |
 |---|---|
 | citations / year | 按被引数或年份排序 |
@@ -151,13 +157,13 @@ litsearch --preset marine_timeseries --stdout
 
 字段 BM25 使用 `k1=1.2`、`b=0.75`，IDF 为 `log(1+(N-df+0.5)/(df+0.5))`，统计来自过滤后的当前候选池。排序词组优先使用 concepts，其次 require，否则从 queries 提取非停用词。此实现为字段加权 BM25。概念覆盖比例为命中组占全部组的比例，摘要缺失会在证据中标明。
 
-可选排序对标题明确标为补充材料、评议回复或推荐记录的条目设置 ancillary 标记，并将得分乘 0.5；条目保留在结果中。分数相同时按被引数和规范化身份确定次序。JSON 的 retrieval_hits、ranking_score 和 ranking_evidence 便于核对来源名次、字段命中与降权原因。默认排序维持 citations；专题对照见[评测说明](research/retrieval-quality-evaluation.md)。
+可选排序对标题明确标为补充材料、评议回复或推荐记录的条目设置 ancillary 标记，并将得分乘 0.5；条目保留在结果中。分数相同时按被引数和规范化身份确定次序。JSON 的 retrieval_hits、ranking_score 和 ranking_evidence 用于核对来源名次、字段命中与降权原因。默认排序为 citations。
 
 ## 去重与来源差异
 
 相同 DOI 或同一来源身份会合并，字段优先选择被引数较高的记录，平手时 OpenAlex 优先，并从另一条记录补齐空值。跨源被引数统计口径不同。
 
-默认 title 策略继续合并足够长的归一化同名标题；doi 策略保留不同 DOI 的同名条目，并将其 DOI 写入 related_dois 供人工核对。两种策略都保留来源身份、DOI 别名与合并依据。通用短标题不参与标题关联或合并。
+默认 title 策略合并足够长的归一化同名标题；doi 策略保留不同 DOI 的同名条目，并将其 DOI 写入 related_dois 供人工核对。两种策略都保留来源身份、DOI 别名与合并依据。通用短标题不参与标题关联或合并。
 
 Crossref 的机构、OA、OpenAlex 作者 ID 和 OpenAlex 原始 filter 条件不受支持；被引数和语言在本地处理。所有被忽略条件进入结构化诊断。严格模式会在发送任何请求前拒绝被忽略或覆盖的条件。
 
@@ -173,6 +179,8 @@ Europe PMC 无需 API key，年份、OA、作者姓名和 ISSN 在远端执行�
 
 默认提交会原子地拒绝并发创建的同名目标。POSIX 上的默认提交使用同目录硬链接；文件系统不支持该操作时返回输出错误，有意替换目标时可使用 `--overwrite`。
 
+`--overwrite` 对各目标分别替换；多进程写入同一目标时最后提交者胜出。主结果与 DOI 文件分别提交，可能来自不同运行。需要隔离运行产物时使用独立输出路径。
+
 | 退出码 | 含义 |
 |---|---|
 | 0 | 成功，允许合法空结果 |
@@ -182,3 +190,5 @@ Europe PMC 无需 API key，年份、OA、作者姓名和 ISSN 在远端执行�
 | 5 | 文件输出失败 |
 
 任一来源请求失败时整个检索失败。stdout JSON 包含诊断；文件模式的 stdout 为成功路径，日志与诊断走 stderr。
+
+stdout、stderr 和结果文件均为 UTF-8；管道、子进程和日志读取端应显式使用 UTF-8，例如 subprocess.run(..., text=True, encoding="utf-8")。合法空结果保持退出码 0，empty_results 诊断说明筛空阶段，fetch_window_limited 说明已扫描窗口。

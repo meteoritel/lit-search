@@ -1,0 +1,1771 @@
+{
+  "candidate_stage": "source_candidates",
+  "version": "0.5.0",
+  "captured_at": "2026-11-09T16:03:51.688793+00:00",
+  "python": "3.12.13",
+  "requested_plan": {
+    "queries": [
+      "perovskite moisture"
+    ],
+    "sources": [
+      "openalex"
+    ],
+    "year": "2021-2026",
+    "limit": 30,
+    "min_citations": null,
+    "author": null,
+    "institution": null,
+    "journal_issn": null,
+    "work_type": null,
+    "oa_only": false,
+    "language": null,
+    "raw_filter": null,
+    "require": [],
+    "exclude": [],
+    "sort": "hybrid",
+    "fetch_sort": "relevance",
+    "max_results": null,
+    "title": null,
+    "strict_filters": false,
+    "merge_policy": "doi",
+    "enrich_abstracts": 0,
+    "concepts": []
+  },
+  "filters": {
+    "queries": [
+      "perovskite moisture"
+    ],
+    "sources": [
+      "openalex"
+    ],
+    "year": "2021-2026",
+    "limit": 30,
+    "min_citations": null,
+    "author": null,
+    "institution": null,
+    "journal_issn": null,
+    "work_type": null,
+    "oa_only": false,
+    "language": null,
+    "raw_filter": null,
+    "require": [],
+    "exclude": [],
+    "sort": "hybrid",
+    "fetch_sort": "relevance",
+    "max_results": null,
+    "title": null,
+    "strict_filters": false,
+    "merge_policy": "doi",
+    "enrich_abstracts": 0,
+    "concepts": []
+  },
+  "queries": [
+    {
+      "source": "openalex",
+      "query": "perovskite moisture",
+      "remote_total": 17961,
+      "fetched_count": 30,
+      "mapped_count": 30,
+      "returned_count": 30,
+      "stop_reason": "limit",
+      "filter_execution": {
+        "year": "remote"
+      }
+    }
+  ],
+  "results": [
+    {
+      "doi": "10.29363/nanoge.hopv.2021.100",
+      "title": "Hybrid perovskite moisture stability: challenges and solutions",
+      "year": 2021,
+      "publication_date": "2021-05-11",
+      "venue": "International Conference on Hybrid and Organic Photovoltaics (HOPV)",
+      "work_type": "conference-paper",
+      "citation_count": 0,
+      "abstract": null,
+      "authors": [
+        "Pablo Docampo"
+      ],
+      "is_open_access": false,
+      "open_access_pdf": null,
+      "language": "en",
+      "relevance_score": 119.76396,
+      "source": "openalex",
+      "sources": [
+        "openalex"
+      ],
+      "source_id": "https://openalex.org/W3172054001",
+      "source_ids": {
+        "openalex": [
+          "https://openalex.org/W3172054001"
+        ]
+      },
+      "doi_aliases": [
+        "10.29363/nanoge.hopv.2021.100"
+      ],
+      "raw_work_types": {
+        "openalex": [
+          "conference-paper"
+        ]
+      },
+      "landing_page_url": "https://doi.org/10.29363/nanoge.hopv.2021.100",
+      "pdf_url": null,
+      "oa_url": null,
+      "merge_reasons": [],
+      "related_dois": [],
+      "abstract_source": null,
+      "retrieval_hits": [
+        {
+          "source": "openalex",
+          "query": "perovskite moisture",
+          "rank": 1,
+          "score": 119.76396
+        }
+      ],
+      "ranking_score": null,
+      "ranking_evidence": {}
+    },
+    {
+      "doi": "10.1039/d3ma00828b",
+      "title": "The impact of moisture on the stability and degradation of perovskites in solar cells",
+      "year": 2024,
+      "publication_date": "2024-01-01",
+      "venue": "Materials Advances",
+      "work_type": "article",
+      "citation_count": 268,
+      "abstract": "Efficiency and stability are the two most important factors in commercially scalable solar cells.",
+      "authors": [
+        "Bhushan P. Kore",
+        "Mahboubeh Jamshidi",
+        "James M. Gardner"
+      ],
+      "is_open_access": true,
+      "open_access_pdf": "https://pubs.rsc.org/en/content/articlepdf/2024/ma/d3ma00828b",
+      "language": "en",
+      "relevance_score": 93.816795,
+      "source": "openalex",
+      "sources": [
+        "openalex"
+      ],
+      "source_id": "https://openalex.org/W4391758769",
+      "source_ids": {
+        "openalex": [
+          "https://openalex.org/W4391758769"
+        ]
+      },
+      "doi_aliases": [
+        "10.1039/d3ma00828b"
+      ],
+      "raw_work_types": {
+        "openalex": [
+          "article"
+        ]
+      },
+      "landing_page_url": "https://doi.org/10.1039/d3ma00828b",
+      "pdf_url": "https://pubs.rsc.org/en/content/articlepdf/2024/ma/d3ma00828b",
+      "oa_url": "https://pubs.rsc.org/en/content/articlepdf/2024/ma/d3ma00828b",
+      "merge_reasons": [],
+      "related_dois": [],
+      "abstract_source": "openalex",
+      "retrieval_hits": [
+        {
+          "source": "openalex",
+          "query": "perovskite moisture",
+          "rank": 2,
+          "score": 93.816795
+        }
+      ],
+      "ranking_score": null,
+      "ranking_evidence": {}
+    },
+    {
+      "doi": "10.1002/adma.202211317",
+      "title": "Moisture‐Resilient Perovskite Solar Cells for Enhanced Stability",
+      "year": 2023,
+      "publication_date": "2023-04-19",
+      "venue": "Advanced Materials",
+      "work_type": "review",
+      "citation_count": 138,
+      "abstract": "With the rapid rise in device performance of perovskite solar cells (PSCs), overcoming instabilities under outdoor operating conditions has become the most crucial obstacle toward their commercialization. Among stressors such as light, heat, voltage bias, and moisture, the latter is arguably the most critical, as it can decompose metal-halide perovskite (MHP) photoactive absorbers instantly through its hygroscopic components (organic cations and metal halides). In addition, most charge transport layers (CTLs) commonly employed in PSCs also degrade in the presence of water. Furthermore, photovoltaic module fabrication encompasses several steps, such as laser processing, subcell interconnection, and encapsulation, during which the device layers are exposed to the ambient atmosphere. Therefore, as a first step toward long-term stable perovskite photovoltaics, it is vital to engineer device materials toward maximizing moisture resilience, which can be accomplished by passivating the bulk of the MHP film, introducing passivation interlayers at the top contact, exploiting hydrophobic CTLs, and encapsulating finished devices with hydrophobic barrier layers, without jeopardizing device performance. Here, existing strategies for enhancing the performance stability of PSCs are reviewed and pathways toward moisture-resilient commercial perovskite devices are formulated.",
+      "authors": [
+        "Randi Azmi",
+        "Shynggys Zhumagali",
+        "Helen L. Bristow",
+        "Shanshan Zhang",
+        "Aren Yazmaciyan",
+        "Anil Reddy Pininti",
+        "Drajad Satrio Utomo",
+        "Anand Selvin Subbiah",
+        "Stefaan De Wolf"
+      ],
+      "is_open_access": true,
+      "open_access_pdf": "https://onlinelibrary.wiley.com/doi/pdfdirect/10.1002/adma.202211317",
+      "language": "en",
+      "relevance_score": 88.2826,
+      "source": "openalex",
+      "sources": [
+        "openalex"
+      ],
+      "source_id": "https://openalex.org/W4366371459",
+      "source_ids": {
+        "openalex": [
+          "https://openalex.org/W4366371459"
+        ]
+      },
+      "doi_aliases": [
+        "10.1002/adma.202211317"
+      ],
+      "raw_work_types": {
+        "openalex": [
+          "review"
+        ]
+      },
+      "landing_page_url": "https://doi.org/10.1002/adma.202211317",
+      "pdf_url": "https://onlinelibrary.wiley.com/doi/pdfdirect/10.1002/adma.202211317",
+      "oa_url": "https://onlinelibrary.wiley.com/doi/pdfdirect/10.1002/adma.202211317",
+      "merge_reasons": [],
+      "related_dois": [],
+      "abstract_source": "openalex",
+      "retrieval_hits": [
+        {
+          "source": "openalex",
+          "query": "perovskite moisture",
+          "rank": 3,
+          "score": 88.2826
+        }
+      ],
+      "ranking_score": null,
+      "ranking_evidence": {}
+    },
+    {
+      "doi": "10.1038/s41467-022-32482-y",
+      "title": "Moisture-triggered fast crystallization enables efficient and stable perovskite solar cells",
+      "year": 2022,
+      "publication_date": "2022-08-19",
+      "venue": "Nature Communications",
+      "work_type": "article",
+      "citation_count": 226,
+      "abstract": "Abstract Understanding the function of moisture on perovskite is challenging since the random environmental moisture strongly disturbs the perovskite structure. Here, we develop various N 2 -protected characterization techniques to comprehensively study the effect of moisture on the efficient cesium, methylammonium, and formamidinium triple-cation perovskite (Cs 0.05 FA 0.75 MA 0.20 )Pb(I 0.96 Br 0.04 ) 3 . In contrast to the secondary measurements, the established air-exposure-free techniques allow us directly monitor the influence of moisture during perovskite crystallization. We find a controllable moisture treatment for the intermediate perovskite can promote the mass transportation of organic salts, and help them enter the buried bottom of the films. This process accelerates the quasi-solid-solid reaction between organic salts and PbI 2 , enables a spatially homogeneous intermediate phase, and translates to high-quality perovskites with much-suppressed defects. Consequently, we obtain a champion device efficiency of approaching 24% with negligible hysteresis. The devices exhibit an average T 80 -lifetime of 852 h (maximum 1210 h) working at the maximum power point.",
+      "authors": [
+        "Kaikai Liu",
+        "Yujie Luo",
+        "Yongbin Jin",
+        "Tianxiao Liu",
+        "Yuming Liang",
+        "Yang Liu",
+        "Peiquan Song",
+        "Zhiyong Liu",
+        "Chengbo Tian",
+        "Liqiang Xie",
+        "Zhanhua Wei"
+      ],
+      "is_open_access": true,
+      "open_access_pdf": "https://www.nature.com/articles/s41467-022-32482-y.pdf",
+      "language": "en",
+      "relevance_score": 82.871284,
+      "source": "openalex",
+      "sources": [
+        "openalex"
+      ],
+      "source_id": "https://openalex.org/W4292361671",
+      "source_ids": {
+        "openalex": [
+          "https://openalex.org/W4292361671"
+        ]
+      },
+      "doi_aliases": [
+        "10.1038/s41467-022-32482-y"
+      ],
+      "raw_work_types": {
+        "openalex": [
+          "article"
+        ]
+      },
+      "landing_page_url": "https://doi.org/10.1038/s41467-022-32482-y",
+      "pdf_url": "https://www.nature.com/articles/s41467-022-32482-y.pdf",
+      "oa_url": "https://www.nature.com/articles/s41467-022-32482-y.pdf",
+      "merge_reasons": [],
+      "related_dois": [],
+      "abstract_source": "openalex",
+      "retrieval_hits": [
+        {
+          "source": "openalex",
+          "query": "perovskite moisture",
+          "rank": 4,
+          "score": 82.871284
+        }
+      ],
+      "ranking_score": null,
+      "ranking_evidence": {}
+    },
+    {
+      "doi": "10.1002/ente.202201475",
+      "title": "Shedding Light on the Moisture Stability of Halide Perovskite Thin Films",
+      "year": 2023,
+      "publication_date": "2023-02-08",
+      "venue": "Energy Technology",
+      "work_type": "article",
+      "citation_count": 68,
+      "abstract": "To date, remarkable progress has been achieved in the power conversion efficiency of perovskite solar cells (PSCs). Nevertheless, the instability and degradation of PSCs under external stimuli still shadow the prospectus of their commercialization. As a notorious culprit deteriorating the stability of PSCs, moisture‐induced degradation is thereby an important aspect. Herein, a comprehensive review of moisture effects on the halide perovskite film, in particular the moisture‐induced degradation mechanism and methods toward enhancing the stability, is discussed. In detail, the benefits for perovskite films having a certain amount of water incorporation are elucidated, and the underlying moisture‐induced structural degradation and decomposition process of perovskites are summarized. Light is also shed on the methods to enhance the moisture stability of perovskites, particularly a 3D/2D heterostructure. Thereby, this review will enlighten the readers of understanding moisture‐induced degradation and the development of stable perovskites.",
+      "authors": [
+        "Kun Sun",
+        "Peter Müller‐Buschbaum"
+      ],
+      "is_open_access": true,
+      "open_access_pdf": "https://onlinelibrary.wiley.com/doi/pdfdirect/10.1002/ente.202201475",
+      "language": "en",
+      "relevance_score": 79.553665,
+      "source": "openalex",
+      "sources": [
+        "openalex"
+      ],
+      "source_id": "https://openalex.org/W4319595448",
+      "source_ids": {
+        "openalex": [
+          "https://openalex.org/W4319595448"
+        ]
+      },
+      "doi_aliases": [
+        "10.1002/ente.202201475"
+      ],
+      "raw_work_types": {
+        "openalex": [
+          "article"
+        ]
+      },
+      "landing_page_url": "https://doi.org/10.1002/ente.202201475",
+      "pdf_url": "https://onlinelibrary.wiley.com/doi/pdfdirect/10.1002/ente.202201475",
+      "oa_url": "https://onlinelibrary.wiley.com/doi/pdfdirect/10.1002/ente.202201475",
+      "merge_reasons": [],
+      "related_dois": [],
+      "abstract_source": "openalex",
+      "retrieval_hits": [
+        {
+          "source": "openalex",
+          "query": "perovskite moisture",
+          "rank": 5,
+          "score": 79.553665
+        }
+      ],
+      "ranking_score": null,
+      "ranking_evidence": {}
+    },
+    {
+      "doi": "10.1016/j.cej.2021.132701",
+      "title": "A critical review on the moisture stability of halide perovskite films and solar cells",
+      "year": 2021,
+      "publication_date": "2021-09-28",
+      "venue": "Chemical Engineering Journal",
+      "work_type": "article",
+      "citation_count": 118,
+      "abstract": null,
+      "authors": [
+        "Bin Chen",
+        "Shurong Wang",
+        "Yuheng Song",
+        "Chengbo Li",
+        "Feng Hao"
+      ],
+      "is_open_access": false,
+      "open_access_pdf": null,
+      "language": "en",
+      "relevance_score": 79.51995,
+      "source": "openalex",
+      "sources": [
+        "openalex"
+      ],
+      "source_id": "https://openalex.org/W3203738243",
+      "source_ids": {
+        "openalex": [
+          "https://openalex.org/W3203738243"
+        ]
+      },
+      "doi_aliases": [
+        "10.1016/j.cej.2021.132701"
+      ],
+      "raw_work_types": {
+        "openalex": [
+          "article"
+        ]
+      },
+      "landing_page_url": "https://doi.org/10.1016/j.cej.2021.132701",
+      "pdf_url": null,
+      "oa_url": null,
+      "merge_reasons": [],
+      "related_dois": [],
+      "abstract_source": null,
+      "retrieval_hits": [
+        {
+          "source": "openalex",
+          "query": "perovskite moisture",
+          "rank": 6,
+          "score": 79.51995
+        }
+      ],
+      "ranking_score": null,
+      "ranking_evidence": {}
+    },
+    {
+      "doi": "10.1002/adma.202100625",
+      "title": "Moisture‐Triggered Self‐Healing Flexible Perovskite Photodetectors with Excellent Mechanical Stability",
+      "year": 2021,
+      "publication_date": "2021-03-18",
+      "venue": "Advanced Materials",
+      "work_type": "article",
+      "citation_count": 138,
+      "abstract": "Abstract Flexible devices are urgently required to meet the demands of next‐generation optoelectronic devices and metal halide perovskites are proven to be suitable materials for realizing flexible photovoltaic devices. However, the tolerance to moisture corrosion and repeated mechanical bending remains a critical challenge for flexible perovskite devices. Herein, a self‐healing formamidinium lead iodide (FAPbI 3 ) film is fabricated to cure mechanical damage by absorbing moisture from the surrounding environment. A poly(vinyl alcohol) microscaffold is designed not only to stabilize the black phase of the FAPbI 3 film but also to endow it with self‐healing ability in a humid environment. The photodetector based on a self‐healing film exhibits a high responsivity of 11.3 A W −1 and recovers to over 90% of the initial responsivity after the self‐healing process. This work provides an effective self‐healing strategy to stabilize the operation of flexible perovskite devices under normal high‐humidity environmental conditions.",
+      "authors": [
+        "Meng Wang",
+        "Haoxuan Sun",
+        "Fengren Cao",
+        "Wei Tian",
+        "Liang Li"
+      ],
+      "is_open_access": false,
+      "open_access_pdf": null,
+      "language": "en",
+      "relevance_score": 76.72759,
+      "source": "openalex",
+      "sources": [
+        "openalex"
+      ],
+      "source_id": "https://openalex.org/W3137558498",
+      "source_ids": {
+        "openalex": [
+          "https://openalex.org/W3137558498"
+        ]
+      },
+      "doi_aliases": [
+        "10.1002/adma.202100625"
+      ],
+      "raw_work_types": {
+        "openalex": [
+          "article"
+        ]
+      },
+      "landing_page_url": "https://doi.org/10.1002/adma.202100625",
+      "pdf_url": null,
+      "oa_url": null,
+      "merge_reasons": [],
+      "related_dois": [],
+      "abstract_source": "openalex",
+      "retrieval_hits": [
+        {
+          "source": "openalex",
+          "query": "perovskite moisture",
+          "rank": 7,
+          "score": 76.72759
+        }
+      ],
+      "ranking_score": null,
+      "ranking_evidence": {}
+    },
+    {
+      "doi": "10.1038/s41467-024-45047-y",
+      "title": "Mask-inspired moisture-transmitting and durable thermochromic perovskite smart windows",
+      "year": 2024,
+      "publication_date": "2024-01-30",
+      "venue": "Nature Communications",
+      "work_type": "article",
+      "citation_count": 80,
+      "abstract": "Thermochromic perovskite smart windows (TPWs) are a cutting-edge energy-efficient window technology. However, like most perovskite-based devices, humidity-related degradation limits their widespread application. Herein, inspired by the structure of medical masks, a unique triple-layer thermochromic perovskite window (MTPW) that enable sufficient water vapor transmission to trigger the thermochromism but effectively repel detrimental water and moisture to extend its lifespan is developed. The MTPW demonstrates superhydrophobicity and maintains a solar modulation ability above 20% during a 45-day aging test, with a decay rate 37 times lower than that of a pristine TPW. It can also immobilize lead ions and significantly reduce lead leakage by 66 times. Furthermore, a significant haze reduction from 90% to 30% is achieved, overcoming the blurriness problem of TPWs. Benefiting from the improved optical performance, extended lifespan, suppressed lead leakage, and facile fabrication, the MTPW pushes forward the wide applications of smart windows in green buildings.",
+      "authors": [
+        "Sai Liu",
+        "Yang Li",
+        "Ying Wang",
+        "Yuwei Du",
+        "Kin Man Yu",
+        "Hin‐Lap Yip",
+        "Alex K.‐Y. Jen",
+        "Baoling Huang",
+        "Chi Yan Tso"
+      ],
+      "is_open_access": true,
+      "open_access_pdf": "https://www.nature.com/articles/s41467-024-45047-y.pdf",
+      "language": "en",
+      "relevance_score": 75.92258,
+      "source": "openalex",
+      "sources": [
+        "openalex"
+      ],
+      "source_id": "https://openalex.org/W4391351258",
+      "source_ids": {
+        "openalex": [
+          "https://openalex.org/W4391351258"
+        ]
+      },
+      "doi_aliases": [
+        "10.1038/s41467-024-45047-y"
+      ],
+      "raw_work_types": {
+        "openalex": [
+          "article"
+        ]
+      },
+      "landing_page_url": "https://doi.org/10.1038/s41467-024-45047-y",
+      "pdf_url": "https://www.nature.com/articles/s41467-024-45047-y.pdf",
+      "oa_url": "https://www.nature.com/articles/s41467-024-45047-y.pdf",
+      "merge_reasons": [],
+      "related_dois": [],
+      "abstract_source": "openalex",
+      "retrieval_hits": [
+        {
+          "source": "openalex",
+          "query": "perovskite moisture",
+          "rank": 8,
+          "score": 75.92258
+        }
+      ],
+      "ranking_score": null,
+      "ranking_evidence": {}
+    },
+    {
+      "doi": "10.1038/s43246-021-00200-8",
+      "title": "Moisture tolerant solar cells by encapsulating 3D perovskite with long-chain alkylammonium cation-based 2D perovskite",
+      "year": 2021,
+      "publication_date": "2021-09-23",
+      "venue": "Communications Materials",
+      "work_type": "article",
+      "citation_count": 50,
+      "abstract": "Abstract Long-term stability is an essential requirement for perovskite solar cells to be commercially viable. Encapsulating 3D perovskites with 2D perovskite structures is an effective strategy for improving resistance to moisture. However, long-chain alkylammonium cation-based 2D perovskites have been rarely studied in solar cells. Here, we study three different alkyl chain length organic cation-based 2D perovskite coatings for 3D perovskites. The 2D perovskite incorporated solar cells show significant improvement in solar cell stability with limited compromise in solar cell efficiency, with the longest alkyl chain length sample showing only a 20% drop in power conversion efficiency after 6 months at a relative humidity of 25-80%, and could be completely immersed in water for a few minutes before degradation started. The 2D perovskite coating also mitigated non-radiative recombination in the light-absorbing 3D perovskite, leading to an enhancement in the open circuit voltage. These findings suggest that long-chain alkylammonium cation based 2D perovskites can improve the environmental stability of 3D based perovskites without significant losses to device performance.",
+      "authors": [
+        "Bhushan P. Kore",
+        "Wei Zhang",
+        "Billy W. Hoogendoorn",
+        "Majid Safdari",
+        "James M. Gardner"
+      ],
+      "is_open_access": true,
+      "open_access_pdf": "https://www.nature.com/articles/s43246-021-00200-8.pdf",
+      "language": "en",
+      "relevance_score": 74.481094,
+      "source": "openalex",
+      "sources": [
+        "openalex"
+      ],
+      "source_id": "https://openalex.org/W3204322886",
+      "source_ids": {
+        "openalex": [
+          "https://openalex.org/W3204322886"
+        ]
+      },
+      "doi_aliases": [
+        "10.1038/s43246-021-00200-8"
+      ],
+      "raw_work_types": {
+        "openalex": [
+          "article"
+        ]
+      },
+      "landing_page_url": "https://doi.org/10.1038/s43246-021-00200-8",
+      "pdf_url": "https://www.nature.com/articles/s43246-021-00200-8.pdf",
+      "oa_url": "https://www.nature.com/articles/s43246-021-00200-8.pdf",
+      "merge_reasons": [],
+      "related_dois": [],
+      "abstract_source": "openalex",
+      "retrieval_hits": [
+        {
+          "source": "openalex",
+          "query": "perovskite moisture",
+          "rank": 9,
+          "score": 74.481094
+        }
+      ],
+      "ranking_score": null,
+      "ranking_evidence": {}
+    },
+    {
+      "doi": "10.1002/adma.202210611",
+      "title": "Moisture‐Tailored 2D Dion–Jacobson Perovskites for Reconfigurable Optoelectronics",
+      "year": 2023,
+      "publication_date": "2023-04-14",
+      "venue": "Advanced Materials",
+      "work_type": "article",
+      "citation_count": 39,
+      "abstract": "Humidity- and moisture-induced degradation has been a longstanding problem in perovskite materials, affecting their long-term stability during applications. Counterintuitively, the moisture is leveraged to tailor the reversible hydrochromic behaviors of a new series of 2D Dion-Jacobson (DJ) perovskites for reconfigurable optoelectronics. In particular, the hydrogen bonds between organic cations and water molecules can be dynamically modulated via moisture removal/exposure. Remarkably, such modulation confines the movement of the organic cations close to the original position, preventing their escape from crystal lattices. Furthermore, this mechanism is elucidated by theoretical analysis using first-principles calculations and confirmed with the experimental characterizations. The reversible fluorescent transition 2D DJ perovskites show excellent cyclical properties, presenting untapped opportunities for reconfigurable optoelectronic applications. As a proof-of-concept demonstration, an anti-counterfeiting display is shown based on patterned reversible 2D DJ perovskites. The results represent a new avenue of reconfigurable optoelectronic application with 2D DJ perovskites for humidity detection, anti-counterfeiting, sensing, and other emerging photoelectric intelligent technologies.",
+      "authors": [
+        "Mengyu Guan",
+        "Yunlong Xie",
+        "Yang Zhang",
+        "Zixin Gu",
+        "Lei Qiu",
+        "Zhuojie He",
+        "Bingkun Ye",
+        "Ady Suwardi",
+        "Zhigao Dai",
+        "Guogang Li",
+        "Guangwei Hu"
+      ],
+      "is_open_access": false,
+      "open_access_pdf": null,
+      "language": "en",
+      "relevance_score": 74.049194,
+      "source": "openalex",
+      "sources": [
+        "openalex"
+      ],
+      "source_id": "https://openalex.org/W4365479069",
+      "source_ids": {
+        "openalex": [
+          "https://openalex.org/W4365479069"
+        ]
+      },
+      "doi_aliases": [
+        "10.1002/adma.202210611"
+      ],
+      "raw_work_types": {
+        "openalex": [
+          "article"
+        ]
+      },
+      "landing_page_url": "https://doi.org/10.1002/adma.202210611",
+      "pdf_url": null,
+      "oa_url": null,
+      "merge_reasons": [],
+      "related_dois": [],
+      "abstract_source": "openalex",
+      "retrieval_hits": [
+        {
+          "source": "openalex",
+          "query": "perovskite moisture",
+          "rank": 10,
+          "score": 74.049194
+        }
+      ],
+      "ranking_score": null,
+      "ranking_evidence": {}
+    },
+    {
+      "doi": "10.1021/acsomega.1c06989",
+      "title": "Imaging the Moisture-Induced Degradation Process of 2D Organolead Halide Perovskites",
+      "year": 2022,
+      "publication_date": "2022-03-16",
+      "venue": "ACS Omega",
+      "work_type": "article",
+      "citation_count": 48,
+      "abstract": "High Resolution Image Download MS PowerPoint Slide Two-dimensional (2D) and quasi-2D Ruddlesden–Popper (RP) phase organolead halide perovskites are promising materials for both photovoltaic and optoelectronic devices. Although they are known to be more stable when exposed to moisture than their 3D counterpart, chemical degradation of these materials under moisture, which not only leads to a significant drop in device performance but also leads to lead leakage, yet remains one of the most serious hurdles for their practical applications. To gain insight into the degradation mechanism of 2D/quasi-2D perovskites under moisture conditions, the degradation pathway of 2D/quasi-2D (PEA) 2 (MA) n −1 Pb n I 3 n +1 (PEA = C 6 H 5 C 2 H 4 NH 3 +, MA = CH 3 NH 3 +, and n is the number of perovskite layers between adjacent organic spacer layers) perovskite single crystals (SCs) and thin film are explored. We observe the degradation process by mapping the photoluminescence of the 2D perovskites and demonstrate that the larger- n phases all directly degrade into the relative stable n = 1 phase and MAI and PbI 2, which is a mechanism different from that in previous reports and further confirmed in the 2D perovskite thin film. This degradation process is also found to be independent of the boundary and morphology of the SCs. This discovery provides a new perspective for understanding the chemical degradation of the 2D perovskite materials and may inspire new solutions for improving their moisture stability.",
+      "authors": [
+        "Jianbo Tang",
+        "Wenming Tian",
+        "Chunyi Zhao",
+        "Qi Sun",
+        "Chunyang Zhang",
+        "Hui Cheng",
+        "Yantao Shi",
+        "Shengye Jin"
+      ],
+      "is_open_access": true,
+      "open_access_pdf": "https://doi.org/10.1021/acsomega.1c06989",
+      "language": "en",
+      "relevance_score": 72.844864,
+      "source": "openalex",
+      "sources": [
+        "openalex"
+      ],
+      "source_id": "https://openalex.org/W4220992660",
+      "source_ids": {
+        "openalex": [
+          "https://openalex.org/W4220992660"
+        ]
+      },
+      "doi_aliases": [
+        "10.1021/acsomega.1c06989"
+      ],
+      "raw_work_types": {
+        "openalex": [
+          "article"
+        ]
+      },
+      "landing_page_url": "https://doi.org/10.1021/acsomega.1c06989",
+      "pdf_url": null,
+      "oa_url": "https://doi.org/10.1021/acsomega.1c06989",
+      "merge_reasons": [],
+      "related_dois": [],
+      "abstract_source": "openalex",
+      "retrieval_hits": [
+        {
+          "source": "openalex",
+          "query": "perovskite moisture",
+          "rank": 11,
+          "score": 72.844864
+        }
+      ],
+      "ranking_score": null,
+      "ranking_evidence": {}
+    },
+    {
+      "doi": "10.1021/acs.chemmater.1c00773",
+      "title": "Achieving Resistance against Moisture and Oxygen for Perovskite Solar Cells with High Efficiency and Stability",
+      "year": 2021,
+      "publication_date": "2021-05-28",
+      "venue": "Chemistry of Materials",
+      "work_type": "article",
+      "citation_count": 114,
+      "abstract": "Realization of high efficiency along with long-term stability of perovskites solar cells has been a goal of researchers in this field. Breakthroughs in efficiency have been achieved in the past decade, exceeding those of most thin film solar cells. However, the challenge of degradation and instability of perovskite solar cells is currently the bottleneck for their real-life application. Extensive research has been conducted to achieve simultaneously high efficiency and high stability, leading to considerable progress in device performance. A significant source causing degradation is the ingression of external materials, such as moisture and oxygen. In this review, the mechanisms of moisture and oxygen degradation occurring in perovskite absorber and charge transporting layers are interpreted. Primary approaches to simultaneously achieve high efficiency and high stability focus on encapsulation, interfacial layer engineering, process engineering, ion engineering, and dopant and alternative engineering. In brief, we review the materials development and engineering strategies to improve performance and identify the obstacles that hinder the realization of high stability along with high efficiency.",
+      "authors": [
+        "Weiguang Chi",
+        "S. Banerjee"
+      ],
+      "is_open_access": false,
+      "open_access_pdf": null,
+      "language": "en",
+      "relevance_score": 72.541985,
+      "source": "openalex",
+      "sources": [
+        "openalex"
+      ],
+      "source_id": "https://openalex.org/W3167454140",
+      "source_ids": {
+        "openalex": [
+          "https://openalex.org/W3167454140"
+        ]
+      },
+      "doi_aliases": [
+        "10.1021/acs.chemmater.1c00773"
+      ],
+      "raw_work_types": {
+        "openalex": [
+          "article"
+        ]
+      },
+      "landing_page_url": "https://doi.org/10.1021/acs.chemmater.1c00773",
+      "pdf_url": null,
+      "oa_url": null,
+      "merge_reasons": [],
+      "related_dois": [],
+      "abstract_source": "openalex",
+      "retrieval_hits": [
+        {
+          "source": "openalex",
+          "query": "perovskite moisture",
+          "rank": 12,
+          "score": 72.541985
+        }
+      ],
+      "ranking_score": null,
+      "ranking_evidence": {}
+    },
+    {
+      "doi": "10.1016/j.matt.2021.04.023",
+      "title": "Kinetics of moisture-induced phase transformation in inorganic halide perovskite",
+      "year": 2021,
+      "publication_date": "2021-05-27",
+      "venue": "Matter",
+      "work_type": "article",
+      "citation_count": 76,
+      "abstract": null,
+      "authors": [
+        "Zhenni Lin",
+        "Ye Zhang",
+        "Mengyu Gao",
+        "Julian A. Steele",
+        "Sheena Louisia",
+        "Sunmoon Yu",
+        "Li Na Quan",
+        "Chung-Kuan Lin",
+        "David T. Limmer",
+        "Peidong Yang"
+      ],
+      "is_open_access": true,
+      "open_access_pdf": "http://www.cell.com/article/S2590238521002150/pdf",
+      "language": "en",
+      "relevance_score": 72.31129,
+      "source": "openalex",
+      "sources": [
+        "openalex"
+      ],
+      "source_id": "https://openalex.org/W3165469158",
+      "source_ids": {
+        "openalex": [
+          "https://openalex.org/W3165469158"
+        ]
+      },
+      "doi_aliases": [
+        "10.1016/j.matt.2021.04.023"
+      ],
+      "raw_work_types": {
+        "openalex": [
+          "article"
+        ]
+      },
+      "landing_page_url": "https://doi.org/10.1016/j.matt.2021.04.023",
+      "pdf_url": "http://www.cell.com/article/S2590238521002150/pdf",
+      "oa_url": "http://www.cell.com/article/S2590238521002150/pdf",
+      "merge_reasons": [],
+      "related_dois": [],
+      "abstract_source": null,
+      "retrieval_hits": [
+        {
+          "source": "openalex",
+          "query": "perovskite moisture",
+          "rank": 13,
+          "score": 72.31129
+        }
+      ],
+      "ranking_score": null,
+      "ranking_evidence": {}
+    },
+    {
+      "doi": "10.1038/s43246-020-00104-z",
+      "title": "Moisture resistance in perovskite solar cells attributed to a water-splitting layer",
+      "year": 2021,
+      "publication_date": "2021-01-04",
+      "venue": "Communications Materials",
+      "work_type": "article",
+      "citation_count": 41,
+      "abstract": "Abstract Commercialization of lead halide perovskite-based devices is hindered by their instability towards environmental conditions. In particular, water promotes fast decomposition, leading to a drastic decrease in device performance. Integrating water-splitting active species within ancillary layers to the perovskite absorber might be a solution to this, as they could convert incoming water into oxygen and hydrogen, preserving device performance. Here, we suggest that a CuSCN nanoplatelete/p-type semiconducting polymer composite, combining hole extraction and transport properties with water oxidation activity, transforms incoming water molecules and triggers the in situ p-doping of the conjugated polymer, improving transport of photocharges. Insertion of the nanocomposite into a lead perovskite solar cell with a direct photovoltaic architecture causes stable device performance for 28 days in high-moisture conditions. Our findings demonstrate that the engineering of a hole extraction layer with possible water-splitting additives could be a viable strategy to reduce the impact of moisture in perovskite devices.",
+      "authors": [
+        "Minkwan Kim",
+        "Antonio Alfano",
+        "Giovanni Perotto",
+        "Michele Serri",
+        "Nicola Dengo",
+        "Alessandro Mezzetti",
+        "Silvia Gross",
+        "Mirko Prato",
+        "Marco Salerno",
+        "Antonio Rizzo",
+        "Roberto Sorrentino",
+        "Enrico Cescon",
+        "Gaudenzio Meneghesso",
+        "Fabio Di Fonzo",
+        "Annamaria Petrozza",
+        "Teresa Gatti",
+        "Francesco Lamberti"
+      ],
+      "is_open_access": true,
+      "open_access_pdf": "https://www.nature.com/articles/s43246-020-00104-z.pdf",
+      "language": "en",
+      "relevance_score": 72.233475,
+      "source": "openalex",
+      "sources": [
+        "openalex"
+      ],
+      "source_id": "https://openalex.org/W3127960326",
+      "source_ids": {
+        "openalex": [
+          "https://openalex.org/W3127960326"
+        ]
+      },
+      "doi_aliases": [
+        "10.1038/s43246-020-00104-z"
+      ],
+      "raw_work_types": {
+        "openalex": [
+          "article"
+        ]
+      },
+      "landing_page_url": "https://doi.org/10.1038/s43246-020-00104-z",
+      "pdf_url": "https://www.nature.com/articles/s43246-020-00104-z.pdf",
+      "oa_url": "https://www.nature.com/articles/s43246-020-00104-z.pdf",
+      "merge_reasons": [],
+      "related_dois": [],
+      "abstract_source": "openalex",
+      "retrieval_hits": [
+        {
+          "source": "openalex",
+          "query": "perovskite moisture",
+          "rank": 14,
+          "score": 72.233475
+        }
+      ],
+      "ranking_score": null,
+      "ranking_evidence": {}
+    },
+    {
+      "doi": "10.1021/acsenergylett.4c01150",
+      "title": "Microencapsulation of Grain Boundaries for Moisture-Stable Perovskite Solar Cells",
+      "year": 2024,
+      "publication_date": "2024-07-09",
+      "venue": "ACS Energy Letters",
+      "work_type": "article",
+      "citation_count": 30,
+      "abstract": "Enhancing the long-term moisture stability of perovskite solar cells remains a formidable challenge. In this study, we introduce an innovative approach involving in situ microencapsulation of grain boundaries using the polymeric epoxy curing reaction. This process involves the interaction between the epoxy resin of bisphenol A diglycidyl ether and the hardener of isophorone diamine to create a protective barrier at the perovskite grain boundaries. The microencapsulation serves a dual purpose: acting as a primary barrier for defect passivation and concurrently functioning as a secondary polymer spacer, effectively shielding the perovskite layer from water molecule intrusion. Consequently, the perovskite phase stability exhibits a remarkable 95-fold improvement against δ-FAPbI 3 and the accelerated formation of PbIOH under a relative humidity of 94%. The in situ microencapsulation not only improved the power conversion efficiency but also maintained 80% of the initial efficiency for 165 h under relative humidity of 70%.",
+      "authors": [
+        "Yeon-Woo Choi",
+        "Yun‐Sung Jeon",
+        "Dong‐Nam Lee",
+        "Nam‐Gyu Park"
+      ],
+      "is_open_access": false,
+      "open_access_pdf": null,
+      "language": "en",
+      "relevance_score": 71.70942,
+      "source": "openalex",
+      "sources": [
+        "openalex"
+      ],
+      "source_id": "https://openalex.org/W4400459578",
+      "source_ids": {
+        "openalex": [
+          "https://openalex.org/W4400459578"
+        ]
+      },
+      "doi_aliases": [
+        "10.1021/acsenergylett.4c01150"
+      ],
+      "raw_work_types": {
+        "openalex": [
+          "article"
+        ]
+      },
+      "landing_page_url": "https://doi.org/10.1021/acsenergylett.4c01150",
+      "pdf_url": null,
+      "oa_url": null,
+      "merge_reasons": [],
+      "related_dois": [],
+      "abstract_source": "openalex",
+      "retrieval_hits": [
+        {
+          "source": "openalex",
+          "query": "perovskite moisture",
+          "rank": 15,
+          "score": 71.70942
+        }
+      ],
+      "ranking_score": null,
+      "ranking_evidence": {}
+    },
+    {
+      "doi": "10.1021/acs.jpclett.1c01482",
+      "title": "Moisture-Stable FAPbI3 Perovskite Achieved by Atomic Structure Negotiation",
+      "year": 2021,
+      "publication_date": "2021-06-01",
+      "venue": "The Journal of Physical Chemistry Letters",
+      "work_type": "article",
+      "citation_count": 30,
+      "abstract": "Broad impact in the research community may be anticipated when a material’s properties are capable of being manipulated artificially. Such a possibility has been explored here in the FAPbI 3 perovskite structure of perovskite solar cells, which involves undesirable phase transition at working temperature, despite many attempts to resolve the issue. Essential steps have been taken here toward solving this problem by adopting an opposite strategy to incorporate the water molecules into the perovskite structure under the current materials framework by new structural physics maneuvering. The secondary bonding of the perovskite structure has been relocated, which altered the microstructure to remove the internal strain that caused the phase transition, resulting in not only a 10-fold enhancement in the moisture/structure stability but also a bandgap comparable to that of the favored α-FAPbI 3 . All this opens an unprecedented avenue in perovskite research, which will hopefully be of intrinsic interest to the broad materials research community as well.",
+      "authors": [
+        "Ryan Taoran Wang",
+        "Fan Xu",
+        "Wuqi Li",
+        "Yuning Li",
+        "Gu Xu"
+      ],
+      "is_open_access": false,
+      "open_access_pdf": null,
+      "language": "en",
+      "relevance_score": 71.47899,
+      "source": "openalex",
+      "sources": [
+        "openalex"
+      ],
+      "source_id": "https://openalex.org/W3165043208",
+      "source_ids": {
+        "openalex": [
+          "https://openalex.org/W3165043208"
+        ]
+      },
+      "doi_aliases": [
+        "10.1021/acs.jpclett.1c01482"
+      ],
+      "raw_work_types": {
+        "openalex": [
+          "article"
+        ]
+      },
+      "landing_page_url": "https://doi.org/10.1021/acs.jpclett.1c01482",
+      "pdf_url": null,
+      "oa_url": null,
+      "merge_reasons": [],
+      "related_dois": [],
+      "abstract_source": "openalex",
+      "retrieval_hits": [
+        {
+          "source": "openalex",
+          "query": "perovskite moisture",
+          "rank": 16,
+          "score": 71.47899
+        }
+      ],
+      "ranking_score": null,
+      "ranking_evidence": {}
+    },
+    {
+      "doi": "10.1002/aenm.202401320",
+      "title": "Intercepting the Chelation of Perovskites with Ambient Moisture through Active Addition Reaction for Full‐Air‐Processed Perovskite Solar Cells",
+      "year": 2024,
+      "publication_date": "2024-06-22",
+      "venue": "Advanced Energy Materials",
+      "work_type": "article",
+      "citation_count": 37,
+      "abstract": "Abstract The fabrication of perovskite solar cells (PSCs) under full‐air conditions accelerates their scalable production and industrialization. However, ambient moisture interacts with perovskites during the film formation that disturbs their crystallization and triggers structural imperfections. Here, a formamidine (FA) active addition reaction (FAAR) strategy is devised to intercept the deleterious chemical coordination. The simultaneous incorporation of 2, 6‐bis(aminomethyl)pyridine (BAMPy) molecule into tin oxide surface and perovskite bulk ameliorates the interface contact and film interior. It is found that the tail amino group from BAMPy selectively reacts with FA cation, occupying A site of perovskite crystals, increasing binding energy of perovskite with H2O molecule even in a defective surface, thereby strengthening moisture tolerance. This strategy effectively modifies perovskite crystallization in ambient air, favors structural uniformity, and forms the compressive‐strained films. The FAAR‐modified PSC devices fabricated under full‐air conditions deliver the highest efficiencies of 24.11% and 21.68% with aperture areas of 0.06 and 1 cm2, respectively. The favorable moisture impediment property contributes to perovskite crystallization enhancement and structural uniformity, maintaining 90.8% of their initial performance for the encapsulated devices after 2400 h storage under accelerating damp‐heat measurements (85 °C and 85% relative humidity).",
+      "authors": [
+        "Lei Ning",
+        "Lixin Song",
+        "Zhengzheng Yao",
+        "Wei‐Hsiang Chen",
+        "Pingfan Du",
+        "Pei‐Cheng Jiang",
+        "Jie Xiong"
+      ],
+      "is_open_access": false,
+      "open_access_pdf": null,
+      "language": "en",
+      "relevance_score": 70.418686,
+      "source": "openalex",
+      "sources": [
+        "openalex"
+      ],
+      "source_id": "https://openalex.org/W4399918741",
+      "source_ids": {
+        "openalex": [
+          "https://openalex.org/W4399918741"
+        ]
+      },
+      "doi_aliases": [
+        "10.1002/aenm.202401320"
+      ],
+      "raw_work_types": {
+        "openalex": [
+          "article"
+        ]
+      },
+      "landing_page_url": "https://doi.org/10.1002/aenm.202401320",
+      "pdf_url": null,
+      "oa_url": null,
+      "merge_reasons": [],
+      "related_dois": [],
+      "abstract_source": "openalex",
+      "retrieval_hits": [
+        {
+          "source": "openalex",
+          "query": "perovskite moisture",
+          "rank": 17,
+          "score": 70.418686
+        }
+      ],
+      "ranking_score": null,
+      "ranking_evidence": {}
+    },
+    {
+      "doi": "10.1088/1755-1315/655/1/012049",
+      "title": "Humidity and Moisture Degradation of Perovskite Material in Solar Cells: Effects on Efficiency",
+      "year": 2021,
+      "publication_date": "2021-02-01",
+      "venue": "IOP Conference Series Earth and Environmental Science",
+      "work_type": "conference-paper",
+      "citation_count": 26,
+      "abstract": "Abstract Humidity is the concentration of water vapor in air and moisture is the relatively small amount of water in a material. The two both have positive and negative influences on the development of perovskite solar cells. It is becoming increasingly clear that the effects of humidity will be a key factor to drive the commercialization of this promising new solar cell technology. The interface amid MAPbI3 and water vapor has been explored and studied by different researchers through optical absorption spectrometry, morphological and crystallographic studies. These studies have helped to demystify the complex interactions going on in the system. A particular study reported the possibility of a perovskite molecule forming a hydrate compound when exposed to H2O vapor in the dark coupled with its dissolution of MAPbI3. Some researchers have said that to improve the stability of this device in moisture. The device must be studied as a whole system rather than studying just the individual components. This review paper explores the works done on perovskite stability highlighting how humidity and moisture affect both the preparation and performance of perovskite material and perovskite solar cell.",
+      "authors": [
+        "Kehinde Olurotimi Ogunniran",
+        "Nlebemuo T. Martins"
+      ],
+      "is_open_access": true,
+      "open_access_pdf": "https://iopscience.iop.org/article/10.1088/1755-1315/655/1/012049/pdf",
+      "language": "en",
+      "relevance_score": 70.12431,
+      "source": "openalex",
+      "sources": [
+        "openalex"
+      ],
+      "source_id": "https://openalex.org/W3131170601",
+      "source_ids": {
+        "openalex": [
+          "https://openalex.org/W3131170601"
+        ]
+      },
+      "doi_aliases": [
+        "10.1088/1755-1315/655/1/012049"
+      ],
+      "raw_work_types": {
+        "openalex": [
+          "conference-paper"
+        ]
+      },
+      "landing_page_url": "https://doi.org/10.1088/1755-1315/655/1/012049",
+      "pdf_url": "https://iopscience.iop.org/article/10.1088/1755-1315/655/1/012049/pdf",
+      "oa_url": "https://iopscience.iop.org/article/10.1088/1755-1315/655/1/012049/pdf",
+      "merge_reasons": [],
+      "related_dois": [],
+      "abstract_source": "openalex",
+      "retrieval_hits": [
+        {
+          "source": "openalex",
+          "query": "perovskite moisture",
+          "rank": 18,
+          "score": 70.12431
+        }
+      ],
+      "ranking_score": null,
+      "ranking_evidence": {}
+    },
+    {
+      "doi": "10.1038/s41467-022-34426-y",
+      "title": "Mapping structure heterogeneities and visualizing moisture degradation of perovskite films with nano-focus WAXS",
+      "year": 2022,
+      "publication_date": "2022-11-05",
+      "venue": "Nature Communications",
+      "work_type": "article",
+      "citation_count": 51,
+      "abstract": "Extensive attention has focused on the structure optimization of perovskites, whereas rare research has mapped the structure heterogeneity within mixed hybrid perovskite films. Overlooked aspects include material and structure variations as a function of depth. These depth-dependent local structure heterogeneities dictate their long-term stabilities and efficiencies. Here, we use a nano-focused wide-angle X-ray scattering method for the mapping of film heterogeneities over several micrometers across lateral and vertical directions. The relative variations of characteristic perovskite peak positions show that the top film region bears the tensile strain. Through a texture orientation map of the perovskite (100) peak, we find that the perovskite grains deposited by sequential spray-coating grow along the vertical direction. Moreover, we investigate the moisture-induced degradation products in the perovskite film, and the underlying mechanism for its structure-dependent degradation. The moisture degradation along the lateral direction primarily initiates at the perovskite-air interface and grain boundaries. The tensile strain on the top surface has a profound influence on the moisture degradation.",
+      "authors": [
+        "Nian Li",
+        "Shambhavi Pratap",
+        "Volker Körstgens",
+        "Sundeep Vema",
+        "Lin Yun Song",
+        "Suzhe Liang",
+        "Anton Davydok",
+        "Christina Krywka",
+        "Peter Müller‐Buschbaum"
+      ],
+      "is_open_access": true,
+      "open_access_pdf": "https://www.nature.com/articles/s41467-022-34426-y.pdf",
+      "language": "en",
+      "relevance_score": 69.06899,
+      "source": "openalex",
+      "sources": [
+        "openalex"
+      ],
+      "source_id": "https://openalex.org/W4308451803",
+      "source_ids": {
+        "openalex": [
+          "https://openalex.org/W4308451803"
+        ]
+      },
+      "doi_aliases": [
+        "10.1038/s41467-022-34426-y"
+      ],
+      "raw_work_types": {
+        "openalex": [
+          "article"
+        ]
+      },
+      "landing_page_url": "https://doi.org/10.1038/s41467-022-34426-y",
+      "pdf_url": "https://www.nature.com/articles/s41467-022-34426-y.pdf",
+      "oa_url": "https://www.nature.com/articles/s41467-022-34426-y.pdf",
+      "merge_reasons": [],
+      "related_dois": [],
+      "abstract_source": "openalex",
+      "retrieval_hits": [
+        {
+          "source": "openalex",
+          "query": "perovskite moisture",
+          "rank": 19,
+          "score": 69.06899
+        }
+      ],
+      "ranking_score": null,
+      "ranking_evidence": {}
+    },
+    {
+      "doi": "10.1126/sciadv.ady5703",
+      "title": "Crystallization-activated moisture barrier for high-tolerance manufacturing of perovskite solar cells",
+      "year": 2025,
+      "publication_date": "2025-10-24",
+      "venue": "Science Advances",
+      "work_type": "article",
+      "citation_count": 34,
+      "abstract": "Moisture promotes perovskite crystallization during annealing but only within a narrow humidity range, hindering the stable mass production of perovskite solar cells, especially for formamidinium lead iodide. To overcome this, we integrated a \"crystallization-activated moisture barrier\" into the perovskite film, which can exist in a liquid state/crystallization phase during the initial annealing to allow moisture to enter and promote crystallization, then migrate upward, and form a dense hydrophobic layer on the film surface to protect the perovskite from high humidity-caused damage. Such a \"moisture barrier\" enables the manufacturing of perovskite films to be insensitive to a wide range of relative humidity from 20% to over 90%. The barrier also regulates bulk crystallization and passivates surface defects. The crystallization-activated moisture barrier effectively reduces the sensitivity of perovskite films to humidity during annealing, which paves the way for high-tolerance manufacturing of perovskite photovoltaic devices.",
+      "authors": [
+        "Yabin Ma",
+        "Chao Luo",
+        "Changling Zhan",
+        "Keli Wang",
+        "Jiandong He",
+        "Peng Gao",
+        "Zhuye Bi",
+        "Yingzhuang Ma",
+        "Qing Zhao"
+      ],
+      "is_open_access": true,
+      "open_access_pdf": "https://doi.org/10.1126/sciadv.ady5703",
+      "language": "en",
+      "relevance_score": 68.58523,
+      "source": "openalex",
+      "sources": [
+        "openalex"
+      ],
+      "source_id": "https://openalex.org/W4415525483",
+      "source_ids": {
+        "openalex": [
+          "https://openalex.org/W4415525483"
+        ]
+      },
+      "doi_aliases": [
+        "10.1126/sciadv.ady5703"
+      ],
+      "raw_work_types": {
+        "openalex": [
+          "article"
+        ]
+      },
+      "landing_page_url": "https://doi.org/10.1126/sciadv.ady5703",
+      "pdf_url": null,
+      "oa_url": "https://doi.org/10.1126/sciadv.ady5703",
+      "merge_reasons": [],
+      "related_dois": [],
+      "abstract_source": "openalex",
+      "retrieval_hits": [
+        {
+          "source": "openalex",
+          "query": "perovskite moisture",
+          "rank": 20,
+          "score": 68.58523
+        }
+      ],
+      "ranking_score": null,
+      "ranking_evidence": {}
+    },
+    {
+      "doi": "10.1063/5.0154047",
+      "title": "Oxygen and moisture-induced healing of halide double perovskite surface defects",
+      "year": 2023,
+      "publication_date": "2023-08-23",
+      "venue": "The Journal of Chemical Physics",
+      "work_type": "article",
+      "citation_count": 3,
+      "abstract": "In this work, we studied the impact of environmental constituents such as oxygen (O2) and moisture on halide double perovskite (HDP) films. The transport measurements indicate that an increment in O2 concentration enhances the resistivity of a Cs2AgBiBr6 film by two orders of magnitude. The adsorption of O2 on the film's surface helps in passivation of defects (∼50% reduction in defect density on O2 exposure), which inhibits ion migration and results in an increased resistivity of the film. The process of adsorption and desorption of O2 on the film surface is found to be fully reversible. In contrast, the resistivity of double perovskite films decreases by an order of magnitude in the presence of moisture. This is attributed to the generation of free protons as a result of the dissociation of water molecules at the films' surface, hence exhibiting an increase in current under external bias. The HDP films possess high resistivity (for T < 100 °C) due to the desorption of physisorbed water layers from the surface, which gradually decreases with an increase in the operating temperature. This work demonstrates that O2 and moisture are a good combination for defect passivation in any HDPs, in general.",
+      "authors": [
+        "Bhawna Bhawna",
+        "Aftab Alam",
+        "Mohammed Aslam"
+      ],
+      "is_open_access": false,
+      "open_access_pdf": null,
+      "language": "en",
+      "relevance_score": 68.53357,
+      "source": "openalex",
+      "sources": [
+        "openalex"
+      ],
+      "source_id": "https://openalex.org/W4386083828",
+      "source_ids": {
+        "openalex": [
+          "https://openalex.org/W4386083828"
+        ]
+      },
+      "doi_aliases": [
+        "10.1063/5.0154047"
+      ],
+      "raw_work_types": {
+        "openalex": [
+          "article"
+        ]
+      },
+      "landing_page_url": "https://doi.org/10.1063/5.0154047",
+      "pdf_url": null,
+      "oa_url": null,
+      "merge_reasons": [],
+      "related_dois": [],
+      "abstract_source": "openalex",
+      "retrieval_hits": [
+        {
+          "source": "openalex",
+          "query": "perovskite moisture",
+          "rank": 21,
+          "score": 68.53357
+        }
+      ],
+      "ranking_score": null,
+      "ranking_evidence": {}
+    },
+    {
+      "doi": "10.1002/adom.202201888",
+      "title": "Moisture‐Resistant Chiral Perovskites for White‐Light Circularly Polarized Photoluminescence",
+      "year": 2022,
+      "publication_date": "2022-11-06",
+      "venue": "Advanced Optical Materials",
+      "work_type": "article",
+      "citation_count": 25,
+      "abstract": "Abstract Circularly polarized luminescence (CPL) has recently caught increasing attention owing to its widespread applications from 3D display to quantum‐based optical computation. Among various CPL‐active materials, low‐dimensional hybrid perovskites have risen to prominence, benefiting from their excellent structural flexibility and optoelectronic properties. However, the exploration of hybrid perovskites with white‐CPL remains a challenge and most of them suffer from moisture instability. Here, a pair of moisture‐resistant 1D hybrid perovskites, (R‐C5H14N2)PbBr4·H2O (1R) and (S‐C5H14N2)PbBr4·H2O (2S), are reported in which [PbBr42−]∞ double chains are surrounded by chiral cations and water molecules forming the bulk assembled quantum‐helix structures. The strong quantum confinement in these unique structures facilitates exciton self‐trapping, which further synergizes the effect of chiral cations, endowing 1R and 2S with opposite broadband yellowish white‐CPL with a luminescence dissymmetry factor (glum) of 1.8 × 10−3 and a color rendering index up to 81. Notably, the dehydrated 1R can be recovered in humid air (60% relative humidity) within a few minutes via reabsorption of water molecules, exhibiting excellent moisture resistance, which is much better than most reported hybrid perovskites. A new path is paved here to further exploration of moisture‐resistant CPL‐active materials for multifunctional applications.",
+      "authors": [
+        "Peng Yu",
+        "Xing Wang",
+        "Lina Li",
+        "Huang Ye",
+        "Shuang Yang",
+        "Hua Gui Yang",
+        "Junhua Luo",
+        "Yu Hou"
+      ],
+      "is_open_access": true,
+      "open_access_pdf": "http://hdl.handle.net/10072/422021",
+      "language": "en",
+      "relevance_score": 68.46494,
+      "source": "openalex",
+      "sources": [
+        "openalex"
+      ],
+      "source_id": "https://openalex.org/W4308314663",
+      "source_ids": {
+        "openalex": [
+          "https://openalex.org/W4308314663"
+        ]
+      },
+      "doi_aliases": [
+        "10.1002/adom.202201888"
+      ],
+      "raw_work_types": {
+        "openalex": [
+          "article"
+        ]
+      },
+      "landing_page_url": "http://hdl.handle.net/10072/422021",
+      "pdf_url": null,
+      "oa_url": "http://hdl.handle.net/10072/422021",
+      "merge_reasons": [],
+      "related_dois": [],
+      "abstract_source": "openalex",
+      "retrieval_hits": [
+        {
+          "source": "openalex",
+          "query": "perovskite moisture",
+          "rank": 22,
+          "score": 68.46494
+        }
+      ],
+      "ranking_score": null,
+      "ranking_evidence": {}
+    },
+    {
+      "doi": "10.1002/solr.202100351",
+      "title": "Inner Encapsulating Approach for Moisture‐Stable Perovskite Solar Cells",
+      "year": 2021,
+      "publication_date": "2021-07-13",
+      "venue": "Solar RRL",
+      "work_type": "article",
+      "citation_count": 9,
+      "abstract": "The degradation of the perovskite layer in atmospheric air is a critical bottleneck for the commercialization of perovskite solar cells (PSCs). As the moisture and oxygen in air penetrate the charge transport layer/top metal electrode interface, both adjacent layers and perovskite layers decompose in the PSCs. Herein, moisture‐stable inverted PSCs (I‐PSCs) based on methylammonium lead triiodide (MAPbI3) by introducing amine‐functionalized small molecules as metal adhesive layers (MALs) between the electron transport layer (ETL) and metal electrode (here, Cu) are demonstrated. A strong coordination bond of CuN forms at the Cu/MAL interface, leading to the layer–layer growth mode for the dense formation of Cu electrodes with a strong adhesion to the ETL. Thus, this modified electrode prevents the ingress of moisture into the I‐PSCs, resulting in outstanding moisture stability; the efficiency of I‐PSCs retains 90% of the initial efficiency after 200 days of exposure to atmospheric air (25 °C, relative humidity [RH] ≈20–40%). Under harsher conditions (e.g., 25 °C/RH65%, 25 °C/RH85% and immersion in water) for a considerable time period, the modified I‐PSCs manifest relatively no degradation compared with the pristine I‐PSCs. It is believed that this breakthrough provides a significant impact on improving the stability of I‐PSCs.",
+      "authors": [
+        "Yong Ryun Kim",
+        "Juae Kim",
+        "Heejoo Kim",
+        "Chang-Jae Yoon",
+        "Jun-Tae Yun",
+        "Ju‐Hyeon Kim",
+        "Ayeong Gu",
+        "Hongsuk Suh",
+        "Kwanghee Lee"
+      ],
+      "is_open_access": false,
+      "open_access_pdf": null,
+      "language": "en",
+      "relevance_score": 67.31315,
+      "source": "openalex",
+      "sources": [
+        "openalex"
+      ],
+      "source_id": "https://openalex.org/W3182486663",
+      "source_ids": {
+        "openalex": [
+          "https://openalex.org/W3182486663"
+        ]
+      },
+      "doi_aliases": [
+        "10.1002/solr.202100351"
+      ],
+      "raw_work_types": {
+        "openalex": [
+          "article"
+        ]
+      },
+      "landing_page_url": "https://doi.org/10.1002/solr.202100351",
+      "pdf_url": null,
+      "oa_url": null,
+      "merge_reasons": [],
+      "related_dois": [],
+      "abstract_source": "openalex",
+      "retrieval_hits": [
+        {
+          "source": "openalex",
+          "query": "perovskite moisture",
+          "rank": 23,
+          "score": 67.31315
+        }
+      ],
+      "ranking_score": null,
+      "ranking_evidence": {}
+    },
+    {
+      "doi": "10.1021/acsenergylett.4c01817",
+      "title": "Moisture Uptake Relaxes Stress in Metal Halide Perovskites at the Expense of Stability",
+      "year": 2024,
+      "publication_date": "2024-07-30",
+      "venue": "ACS Energy Letters",
+      "work_type": "article",
+      "citation_count": 15,
+      "abstract": "Previous studies have shown that the degradation rate of metal halide perovskites in an ambient atmosphere increases with the amount of tensile stress, which primarily arises from the coefficient of thermal expansion mismatch with the substrate. In this work, we show the first evidence of tensile stress relaxation in perovskite films resulting from moisture uptake. Indeed, for multiple perovskite compositions we observe that tension relaxes rapidly in ambient conditions, as compared to inert conditions, with quartz crystal microbalance measurements showing a mass density increase on a similar time scale indicative of moisture uptake. The uptake of moisture at free surfaces, including grain boundaries, can reduce tension in a constrained film, similar to how adatom diffusion reduces residual stress following thin film formation. Unfortunately, the uptake of moisture can catalyze other degradation mechanisms such as PbI 2 formation or a transition to a nonperovskite structural phase. Stress-induced uptake of moisture is an especially important problem for all-inorganic perovskites because they are annealed at much higher temperatures, causing high tensile stress. It explains the unusually poor ambient stability of these perovskites. Using a diethyl ether antisolvent bath to attach CsPbI 2 Br to the substrate at a much lower temperature, we reduced the initial tensile strain from 0.43 ± 0.04% to 0.12 ± 0.05%, thus reducing the driving force for moisture uptake and improving its ambient phase stability by over a factor of 15.",
+      "authors": [
+        "Gabriel R. McAndrews",
+        "Boyu Guo",
+        "Samantha C. Kaczaral",
+        "Karen Fukuda",
+        "Matteo R. S. Poma",
+        "Rebecca A. Belisle",
+        "Aram Amassian",
+        "Michael D. McGehee"
+      ],
+      "is_open_access": false,
+      "open_access_pdf": null,
+      "language": "en",
+      "relevance_score": 66.96459,
+      "source": "openalex",
+      "sources": [
+        "openalex"
+      ],
+      "source_id": "https://openalex.org/W4401126789",
+      "source_ids": {
+        "openalex": [
+          "https://openalex.org/W4401126789"
+        ]
+      },
+      "doi_aliases": [
+        "10.1021/acsenergylett.4c01817"
+      ],
+      "raw_work_types": {
+        "openalex": [
+          "article"
+        ]
+      },
+      "landing_page_url": "https://doi.org/10.1021/acsenergylett.4c01817",
+      "pdf_url": null,
+      "oa_url": null,
+      "merge_reasons": [],
+      "related_dois": [],
+      "abstract_source": "openalex",
+      "retrieval_hits": [
+        {
+          "source": "openalex",
+          "query": "perovskite moisture",
+          "rank": 24,
+          "score": 66.96459
+        }
+      ],
+      "ranking_score": null,
+      "ranking_evidence": {}
+    },
+    {
+      "doi": "10.1039/d0ta12509a",
+      "title": "Polyacetylene derivatives in perovskite solar cells: from defect passivation to moisture endurance",
+      "year": 2021,
+      "publication_date": "2021-01-01",
+      "venue": "Journal of Materials Chemistry A",
+      "work_type": "article",
+      "citation_count": 25,
+      "abstract": "Polyacetylene derivatives as additives in perovskite films not only improve the efficiency but also the moisture endurance of perovskite solar cells.",
+      "authors": [
+        "Jiexuan Jiang",
+        "Xianhua Lang",
+        "Qiugui Zeng",
+        "M. Bilal Faheem",
+        "Shanshan Rong",
+        "Hui Chuan Zhao",
+        "Yanbo Li"
+      ],
+      "is_open_access": false,
+      "open_access_pdf": null,
+      "language": "en",
+      "relevance_score": 66.28915,
+      "source": "openalex",
+      "sources": [
+        "openalex"
+      ],
+      "source_id": "https://openalex.org/W3157526788",
+      "source_ids": {
+        "openalex": [
+          "https://openalex.org/W3157526788"
+        ]
+      },
+      "doi_aliases": [
+        "10.1039/d0ta12509a"
+      ],
+      "raw_work_types": {
+        "openalex": [
+          "article"
+        ]
+      },
+      "landing_page_url": "https://doi.org/10.1039/d0ta12509a",
+      "pdf_url": null,
+      "oa_url": null,
+      "merge_reasons": [],
+      "related_dois": [],
+      "abstract_source": "openalex",
+      "retrieval_hits": [
+        {
+          "source": "openalex",
+          "query": "perovskite moisture",
+          "rank": 25,
+          "score": 66.28915
+        }
+      ],
+      "ranking_score": null,
+      "ranking_evidence": {}
+    },
+    {
+      "doi": "10.1021/acsami.4c08313",
+      "title": "Moisture-Stable CsSnBr2Cl Halide Perovskite: Electrochemical Insights in Aqueous Environments",
+      "year": 2024,
+      "publication_date": "2024-08-29",
+      "venue": "ACS Applied Materials & Interfaces",
+      "work_type": "article",
+      "citation_count": 24,
+      "abstract": "In this investigation, moisture-stable CsSnBr 2 Cl nanoparticles were synthesized by incorporating Cl into CsSnBr 3 halide perovskite using the hot injection method. Various analyses including XRD, XPS, UV–vis absorbance, photoluminescence, and Mott–Schottky have confirmed that the structural properties, chemical states, optical properties, and electronic band structure of CsSnBr 2 Cl nanoparticles remain intact even after 75 days of water immersion, thereby conclusively demonstrating their moisture stability. In a three-electrode system, the comparative electrochemical performance of pristine CsSnBr 3 nanoparticles and moisture-stable Cl-incorporated CsSnBr 2 Cl nanoparticles was evaluated in various aqueous electrolytes, including HCl, Na 2 SO 4, and KOH. The results indicate that the CsSnBr 2 Cl electrode material exhibits superior electrochemical properties, such as a larger integrated cyclic voltammetry (CV) area, a wider potential window, longer charge–discharge times, and lower impedance parameters compared to the pristine CsSnBr 3 nanoparticles. The electrochemical performance of CsSnBr 2 Cl nanoparticles was evaluated for potential applications in batteries, supercapacitors, fuel cells, and water splitting, with a focus on reaction kinetics, charge storage mechanisms, and impedance parameters. The electrochemical properties of the nanoparticles were assessed using a three-electrode configuration across various 0.5 M aqueous electrolytes (HCl, Na 2 SO 4, and KOH). In HCl, the nanoparticles demonstrated impressive charge storage capability, achieving a capacitance of 474 F g –1 at 1 A g –1, affirming their suitability for energy storage devices. In Na 2 SO 4 (aq.), the nanoparticles exhibited excellent stability for supercapacitors, operating up to 1.6 V without significant oxygen evolution. Notably, in KOH, they demonstrated potential as effective water-splitting electrodes. The practical applicability of the nanoparticles was evaluated using a symmetric two-electrode configuration with HCl and Na 2 SO 4 electrolytes. The capacitance values were 117 F g –1 in HCl and 70 F g –1 in Na 2 SO 4 at 1 A g –1 . Notably, after 5000 GCD cycles in HCl(aq.), the nanoparticles retained 93% of their capacitance and maintained 91% Coulombic efficiency. They also demonstrated stable operation across a temperature range of 3 to 60 °C, achieving an energy density of 5.83 W h kg –1 at a power density of 600 W kg –1 . This study emphasizes the considerable potential of CsSnBr 2 Cl nanoparticles in advancing electrochemical energy storage technologies and sets a solid foundation for future research and development in metal halide perovskites.",
+      "authors": [
+        "Ferdous Yasmeen",
+        "Mohasin Tarek",
+        "M. A. Basith"
+      ],
+      "is_open_access": false,
+      "open_access_pdf": null,
+      "language": "en",
+      "relevance_score": 66.13481,
+      "source": "openalex",
+      "sources": [
+        "openalex"
+      ],
+      "source_id": "https://openalex.org/W4401996474",
+      "source_ids": {
+        "openalex": [
+          "https://openalex.org/W4401996474"
+        ]
+      },
+      "doi_aliases": [
+        "10.1021/acsami.4c08313"
+      ],
+      "raw_work_types": {
+        "openalex": [
+          "article"
+        ]
+      },
+      "landing_page_url": "https://doi.org/10.1021/acsami.4c08313",
+      "pdf_url": null,
+      "oa_url": null,
+      "merge_reasons": [],
+      "related_dois": [],
+      "abstract_source": "openalex",
+      "retrieval_hits": [
+        {
+          "source": "openalex",
+          "query": "perovskite moisture",
+          "rank": 26,
+          "score": 66.13481
+        }
+      ],
+      "ranking_score": null,
+      "ranking_evidence": {}
+    },
+    {
+      "doi": "10.3390/molecules26247570",
+      "title": "Moisture Stability of Perovskite Solar Cells Processed in Supercritical Carbon Dioxide",
+      "year": 2021,
+      "publication_date": "2021-12-14",
+      "venue": "Molecules",
+      "work_type": "article",
+      "citation_count": 11,
+      "abstract": "Performance degradation under environmental conditions currently limits the practical utility of perovskite-based solar cells. The moisture stability of CH3NH3PbI3 perovskite films and solar cells was measured during exposure to three different levels of relative humidity. The films were crystallized at two different temperatures with and without simultaneous exposure to supercritical carbon dioxide. The film crystallinity, optical absorption, and device photoconversion efficiency was measured over time for three relative humidity levels and both crystallization methods. It was determined that film crystallization in supercritical CO2 resulted in significant improvement in moisture stability for films processed at 50 °C, but negligible improvement in stability for films processed at 100 °C.",
+      "authors": [
+        "Gilbert Annohene",
+        "Gary C. Tepper"
+      ],
+      "is_open_access": true,
+      "open_access_pdf": "https://www.mdpi.com/1420-3049/26/24/7570/pdf?version=1639470651",
+      "language": "en",
+      "relevance_score": 65.70279,
+      "source": "openalex",
+      "sources": [
+        "openalex"
+      ],
+      "source_id": "https://openalex.org/W4200276405",
+      "source_ids": {
+        "openalex": [
+          "https://openalex.org/W4200276405"
+        ]
+      },
+      "doi_aliases": [
+        "10.3390/molecules26247570"
+      ],
+      "raw_work_types": {
+        "openalex": [
+          "article"
+        ]
+      },
+      "landing_page_url": "https://doi.org/10.3390/molecules26247570",
+      "pdf_url": "https://www.mdpi.com/1420-3049/26/24/7570/pdf?version=1639470651",
+      "oa_url": "https://www.mdpi.com/1420-3049/26/24/7570/pdf?version=1639470651",
+      "merge_reasons": [],
+      "related_dois": [],
+      "abstract_source": "openalex",
+      "retrieval_hits": [
+        {
+          "source": "openalex",
+          "query": "perovskite moisture",
+          "rank": 27,
+          "score": 65.70279
+        }
+      ],
+      "ranking_score": null,
+      "ranking_evidence": {}
+    },
+    {
+      "doi": "10.1002/ente.202402310",
+      "title": "Moisture‐Resistant Thermoplastic Polyurethane Encapsulation for Flexible Perovskite Solar Cells",
+      "year": 2025,
+      "publication_date": "2025-03-21",
+      "venue": "Energy Technology",
+      "work_type": "article",
+      "citation_count": 13,
+      "abstract": "With increasing global energy demand and environmental challenges, advancing efficient and stable renewable energy technologies is critical. Flexible perovskite solar cells (FPSCs) have emerged as a prominent research focus due to their exceptional power conversion efficiency (PCE) and cost effectiveness. However, the susceptibility of perovskite materials to moisture and oxygen hinders their commercial viability. This study proposes a novel encapsulation technique using transparent thermoplastic polyurethane (TPU) with low moisture permeability to enhance the stability and durability of FPSC. First, it is demonstrated that the TPU encapsulation process is compatible with the perovskite solar cells (PSC) module and lossless encapsulation can be achieved without degradation in efficiency. Second, through micromorphological characterization analysis, it is confirmed that TPU encapsulation can effectively prevent water–oxygen ingress, retard the decomposition of perovskite materials, and improve the stability of the film. The experimental results demonstrate that TPU‐encapsulated PSCs retain 95% of their original PCE after 1000 h at 25 °C and 50% relative humidity (RH) and sustain 80% of the original efficiency after 200 h of underwater immersion. Finally, it is demonstrated that the TPU encapsulation has a significant advantage in terms of manufacture cost, which positively contributes to the commercialization of PSC.",
+      "authors": [
+        "Yuqing Yue",
+        "Yang Zhang",
+        "Yifan Zheng",
+        "Yuchuan Shao",
+        "Bin Wei",
+        "Wei Min Shi"
+      ],
+      "is_open_access": false,
+      "open_access_pdf": null,
+      "language": "en",
+      "relevance_score": 65.25516,
+      "source": "openalex",
+      "sources": [
+        "openalex"
+      ],
+      "source_id": "https://openalex.org/W4408762774",
+      "source_ids": {
+        "openalex": [
+          "https://openalex.org/W4408762774"
+        ]
+      },
+      "doi_aliases": [
+        "10.1002/ente.202402310"
+      ],
+      "raw_work_types": {
+        "openalex": [
+          "article"
+        ]
+      },
+      "landing_page_url": "https://doi.org/10.1002/ente.202402310",
+      "pdf_url": null,
+      "oa_url": null,
+      "merge_reasons": [],
+      "related_dois": [],
+      "abstract_source": "openalex",
+      "retrieval_hits": [
+        {
+          "source": "openalex",
+          "query": "perovskite moisture",
+          "rank": 28,
+          "score": 65.25516
+        }
+      ],
+      "ranking_score": null,
+      "ranking_evidence": {}
+    },
+    {
+      "doi": "10.1021/acsenergylett.3c00023",
+      "title": "Moisture-Induced Ionovoltaic Electricity Generation by Manipulating Organic–Inorganic Hybrid Halide Perovskites",
+      "year": 2023,
+      "publication_date": "2023-04-17",
+      "venue": "ACS Energy Letters",
+      "work_type": "article",
+      "citation_count": 42,
+      "abstract": "Attempts to satisfy the vast demands for electric power in our daily lives and to address the depletion of existing fossil fuels have led to the development of new energy conversion technologies. Herein, we present a different type of electric generation, called ionovoltaic electricity generation (IEG), that results from manipulating organic–inorganic hybrid halide perovskite structures with moisture. This IEG can generate an open-circuit voltage of up to ∼0.5 V and a short-circuit current density of ∼0.1 mA cm –2, which is sufficient to power small electronic devices. In this work we have utilized the transformation of structurally zero-dimensional perovskite, specifically MA 4 PbBr 6 ·2H 2 O, to three-dimensional MAPbBr 3 in the presence of humidity. Flexible power supply devices made of organic–inorganic hybrid perovskite layers are designed and fabricated for harvesting the energy from human breath and some other real-life conditions. This work opens a new direction in the field of organic–inorganic hybrid halide perovskites and offers an extremely simple method for energy conversion of practical importance.",
+      "authors": [
+        "Sumit Kumar Sharma",
+        "Monika Salesh",
+        "Mohan Raj Subramaniam",
+        "Burhanuddin Attarwala",
+        "Aswani Yella"
+      ],
+      "is_open_access": false,
+      "open_access_pdf": null,
+      "language": "en",
+      "relevance_score": 65.08833,
+      "source": "openalex",
+      "sources": [
+        "openalex"
+      ],
+      "source_id": "https://openalex.org/W4366158606",
+      "source_ids": {
+        "openalex": [
+          "https://openalex.org/W4366158606"
+        ]
+      },
+      "doi_aliases": [
+        "10.1021/acsenergylett.3c00023"
+      ],
+      "raw_work_types": {
+        "openalex": [
+          "article"
+        ]
+      },
+      "landing_page_url": "https://doi.org/10.1021/acsenergylett.3c00023",
+      "pdf_url": null,
+      "oa_url": null,
+      "merge_reasons": [],
+      "related_dois": [],
+      "abstract_source": "openalex",
+      "retrieval_hits": [
+        {
+          "source": "openalex",
+          "query": "perovskite moisture",
+          "rank": 29,
+          "score": 65.08833
+        }
+      ],
+      "ranking_score": null,
+      "ranking_evidence": {}
+    },
+    {
+      "doi": "10.1088/1361-6463/ad31e2",
+      "title": "Phase transition mechanism of CsPbI2Br perovskite films induced by moisture",
+      "year": 2024,
+      "publication_date": "2024-03-08",
+      "venue": "Journal of Physics D Applied Physics",
+      "work_type": "article",
+      "citation_count": 5,
+      "abstract": "Abstract The humidity stability and phase transition mechanism of the all-inorganic perovskite CsPbI2Br based on an optimized dual-source co-evaporation preparation process are investigated at the film interface level. It is found that the CsPbI2Br films annealed at 300 °C for several minutes exhibit a best crystallinity and photoelectric properties. The as-grown CsPbI2Br film is confirmed to be a α phase with a dark brown cubic crystal structure and an average visible transparency of 35.9%. But it will be transformed into its δ phase with a transparent orthorhombic crystal structure and an average visible transparency of 80.3% after a certain amount of moisture exposure. Compared with the α phase film, the electronic structure of the δ phase has also changed significantly with a VBM shift of about 0.32 eV to high binding energy. The results of AR-XPS show that the water molecules in perovskite CsPbI2Br after a moisture exposure only adsorb on the surface rather than penetrate the interior of the lattice. When water molecules adsorb on the lattice surface, halide ions should migrate towards the lattice surface due to their high hydration enthalpy, resulting in halide vacancies within the lattice and causing the reduction of energy barrier for phase transition from α phase to δ phase. So the CsPbI2Br film will transform from its α phase to δ phase induced by water vapor, and this phase transition will be reversed to some extent after another annealing.",
+      "authors": [
+        "Yufei Liu",
+        "Jianting Lin",
+        "Qiang Han",
+        "Chenggang Yang",
+        "Lin Li",
+        "Jianrong Xiao",
+        "Rongnan Yi",
+        "Xiaoliang Liu"
+      ],
+      "is_open_access": false,
+      "open_access_pdf": null,
+      "language": "en",
+      "relevance_score": 64.85319,
+      "source": "openalex",
+      "sources": [
+        "openalex"
+      ],
+      "source_id": "https://openalex.org/W4392603316",
+      "source_ids": {
+        "openalex": [
+          "https://openalex.org/W4392603316"
+        ]
+      },
+      "doi_aliases": [
+        "10.1088/1361-6463/ad31e2"
+      ],
+      "raw_work_types": {
+        "openalex": [
+          "article"
+        ]
+      },
+      "landing_page_url": "https://doi.org/10.1088/1361-6463/ad31e2",
+      "pdf_url": null,
+      "oa_url": null,
+      "merge_reasons": [],
+      "related_dois": [],
+      "abstract_source": "openalex",
+      "retrieval_hits": [
+        {
+          "source": "openalex",
+          "query": "perovskite moisture",
+          "rank": 30,
+          "score": 64.85319
+        }
+      ],
+      "ranking_score": null,
+      "ranking_evidence": {}
+    }
+  ]
+}

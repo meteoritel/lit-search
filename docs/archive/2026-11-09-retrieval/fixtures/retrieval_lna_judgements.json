@@ -1,0 +1,868 @@
+{
+  "topic": "海洋或河口 LNA/HNA 细菌生态与功能",
+  "method": "Agent 逐条阅读固定标题/摘要；非独立人员盲审。marine 指研究生境，提及海洋背景不计海洋研究；null 表示元数据未确认。tier 1=直接海洋研究，2=混合生境或生境待确认的直接研究/综述/方法/海洋细菌背景/配套数据，3=已确认非海洋直接研究或偏题。未列身份为未判读。",
+  "candidate_snapshot": "retrieval_lna_candidates.json",
+  "records": [
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "单细胞蛋白营养综述",
+      "doi": "10.3390/su13169284"
+    },
+    {
+      "tier": 2,
+      "topic_relevance": "background",
+      "marine": true,
+      "reason": "近岸潟湖细菌增温实验，摘要未分述 LNA/HNA",
+      "doi": "10.1007/s10452-021-09852-7"
+    },
+    {
+      "tier": 2,
+      "topic_relevance": "background",
+      "marine": null,
+      "reason": "纳米流式细胞术通用方法",
+      "doi": "10.1146/annurev-anchem-061318-115042"
+    },
+    {
+      "tier": 1,
+      "topic_relevance": "direct",
+      "marine": true,
+      "reason": "地中海潟湖增温实验明确比较低/高核酸细菌",
+      "doi": "10.3389/fmars.2022.878938"
+    },
+    {
+      "tier": 2,
+      "topic_relevance": "background",
+      "marine": "mixed",
+      "reason": "水生 LNA 综述同时涉及海洋与淡水",
+      "doi": "10.3389/fmicb.2022.900669"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "单细胞蛋白生产底物综述",
+      "doi": "10.19045/bspab.2020.90185"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "direct",
+      "marine": false,
+      "reason": "饮用水处理中的高核酸细菌",
+      "identity": "openalex:https://openalex.org/W2890288820"
+    },
+    {
+      "tier": 2,
+      "topic_relevance": "background",
+      "marine": true,
+      "reason": "海湾养殖区细菌流式监测，摘要未分述 LNA/HNA",
+      "doi": "10.1371/journal.pone.0313271"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "direct",
+      "marine": false,
+      "reason": "淡水低核酸细菌",
+      "doi": "10.1038/s41396-018-0070-8"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "水产饲料单细胞蛋白",
+      "doi": "10.3390/biology14070764"
+    },
+    {
+      "tier": 2,
+      "topic_relevance": "background",
+      "marine": true,
+      "reason": "英吉利海峡观测数据库含细菌流式分组",
+      "doi": "10.5194/essd-15-5701-2023"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "direct",
+      "marine": false,
+      "reason": "外流河高低核酸细菌",
+      "doi": "10.1371/journal.pone.0153678"
+    },
+    {
+      "tier": 2,
+      "topic_relevance": "background",
+      "marine": true,
+      "reason": "潟湖贻贝施肥与浮游细菌背景",
+      "doi": "10.1371/journal.pone.0156411"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "单细胞蛋白食品原料法规",
+      "doi": "10.4014/jmb.2606.06024"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "direct",
+      "marine": false,
+      "reason": "冰芯 HNA/LNA",
+      "doi": "10.3389/fmicb.2022.844432"
+    },
+    {
+      "tier": 1,
+      "topic_relevance": "direct",
+      "marine": true,
+      "reason": "盐度波动下海洋 HNA/LNA 群落与功能",
+      "doi": "10.1016/j.scitotenv.2024.173186"
+    },
+    {
+      "tier": 1,
+      "topic_relevance": "direct",
+      "marine": true,
+      "reason": "中国近岸海水 HNA/LNA 群落",
+      "doi": "10.3389/fmicb.2023.1219655"
+    },
+    {
+      "tier": 1,
+      "topic_relevance": "direct",
+      "marine": true,
+      "reason": "极地海洋细菌生理分类模型",
+      "doi": "10.5194/bg-19-117-2022"
+    },
+    {
+      "tier": 1,
+      "topic_relevance": "direct",
+      "marine": true,
+      "reason": "海洋细菌增温与核酸含量",
+      "doi": "10.3389/fmicb.2016.00730"
+    },
+    {
+      "tier": 1,
+      "topic_relevance": "direct",
+      "marine": true,
+      "reason": "西北太平洋涡旋边缘 LNA 生产力",
+      "doi": "10.1029/2024jc021414"
+    },
+    {
+      "tier": 1,
+      "topic_relevance": "direct",
+      "marine": true,
+      "reason": "红海海洋微生物 PAH 敏感性与 LNA/HNA",
+      "doi": "10.1016/j.chemosphere.2022.136490"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "direct",
+      "marine": false,
+      "reason": "厌氧膜生物反应器 HNA/LNA",
+      "doi": "10.1021/acs.est.3c07702"
+    },
+    {
+      "tier": 2,
+      "topic_relevance": "background",
+      "marine": true,
+      "reason": "海洋 SAR11 与细胞/基因组精简背景",
+      "doi": "10.1146/annurev-marine-010814-015934"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "direct",
+      "marine": false,
+      "reason": "松花江流域 HNA/LNA，海洋仅作为前人背景",
+      "doi": "10.1071/mf16068"
+    },
+    {
+      "tier": 1,
+      "topic_relevance": "direct",
+      "marine": true,
+      "reason": "河口到外海梯度 LNA 与病毒裂解",
+      "doi": "10.3389/fmicb.2020.612053"
+    },
+    {
+      "tier": 2,
+      "topic_relevance": "direct",
+      "marine": null,
+      "reason": "藻际 HNA/LNA，摘要未给出海洋生境；主题直接相关，海洋生境待确认，列相关背景",
+      "doi": "10.1016/j.envres.2023.117060"
+    },
+    {
+      "tier": 2,
+      "topic_relevance": "background",
+      "marine": true,
+      "reason": "阿拉伯海代谢活跃浮游细菌，缺摘要，仅作背景",
+      "doi": "10.1007/s00027-018-0590-3"
+    },
+    {
+      "tier": 1,
+      "topic_relevance": "direct",
+      "marine": true,
+      "reason": "红树林河口 HNA/LNA 日变化，标题直接提供对象与生境",
+      "doi": "10.1016/j.csr.2020.104256"
+    },
+    {
+      "tier": 1,
+      "topic_relevance": "direct",
+      "marine": true,
+      "reason": "红海 HNA/LNA 选择性摄食",
+      "doi": "10.25781/kaust-1p3fo"
+    },
+    {
+      "tier": 1,
+      "topic_relevance": "direct",
+      "marine": true,
+      "reason": "海岸长期增温与 LNA/HNA 大小响应",
+      "doi": "10.1098/rspb.2015.0371"
+    },
+    {
+      "tier": 1,
+      "topic_relevance": "direct",
+      "marine": true,
+      "reason": "深圳近岸 HNA/LNA 时空分布",
+      "doi": "10.5846/stxb201611122308"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "direct",
+      "marine": false,
+      "reason": "淡水湖 HNA 与生长效率",
+      "doi": "10.3390/microorganisms12102061"
+    },
+    {
+      "tier": 2,
+      "topic_relevance": "background",
+      "marine": true,
+      "reason": "东地中海细菌丰度与生产力背景",
+      "doi": "10.1371/journal.pone.0140690"
+    },
+    {
+      "tier": 1,
+      "topic_relevance": "direct",
+      "marine": true,
+      "reason": "红海高低核酸群的病毒及摄食控制",
+      "doi": "10.1093/femsec/fiaa033"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "direct",
+      "marine": false,
+      "reason": "淡水入侵贻贝摄食 HNA/LNA",
+      "doi": "10.1111/1462-2920.13953"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "direct",
+      "marine": false,
+      "reason": "酸性水库细菌单细胞特征",
+      "doi": "10.1111/1758-2229.13255"
+    },
+    {
+      "tier": 2,
+      "topic_relevance": "background",
+      "marine": true,
+      "reason": "红海按核酸含量区分生理群的季节控制，摘要未给 HNA/LNA 直接结论",
+      "doi": "10.1111/1462-2920.16439"
+    },
+    {
+      "tier": 2,
+      "topic_relevance": "background",
+      "marine": true,
+      "reason": "海洋增温 LNA/HNA 论文配套数据集",
+      "doi": "10.5061/dryad.kh7nt"
+    },
+    {
+      "tier": 2,
+      "topic_relevance": "background",
+      "marine": true,
+      "reason": "波罗的海增温与细菌生产背景",
+      "doi": "10.3389/fmars.2018.00231"
+    },
+    {
+      "tier": 2,
+      "topic_relevance": "background",
+      "marine": true,
+      "reason": "红海细菌生理群及生长控制学位研究",
+      "doi": "10.25781/kaust-1l6tv"
+    },
+    {
+      "tier": 1,
+      "topic_relevance": "direct",
+      "marine": true,
+      "reason": "红海 HNA 丰度及全年群落动态",
+      "doi": "10.3389/fmicb.2022.780530"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "direct",
+      "marine": false,
+      "reason": "淡水湖浮游细菌形态框架",
+      "doi": "10.1093/ismeco/ycaf223"
+    },
+    {
+      "tier": 2,
+      "topic_relevance": "background",
+      "marine": true,
+      "reason": "海湾细菌多样性，缺摘要，仅作背景",
+      "doi": "10.1007/698_2016_32"
+    },
+    {
+      "tier": 2,
+      "topic_relevance": "background",
+      "marine": true,
+      "reason": "红海 DOM 和增温下细菌大小与生长背景",
+      "doi": "10.1002/lno.12647"
+    },
+    {
+      "tier": 1,
+      "topic_relevance": "direct",
+      "marine": true,
+      "reason": "海洋 HNA/LNA 温度与生长速率",
+      "doi": "10.1093/femsec/fiv111"
+    },
+    {
+      "tier": 1,
+      "topic_relevance": "direct",
+      "marine": true,
+      "reason": "海底火山事件中 HNA 比例与异养原核生物活性",
+      "doi": "10.1371/journal.pone.0118136"
+    },
+    {
+      "tier": 2,
+      "topic_relevance": "background",
+      "marine": true,
+      "reason": "北海细胞增殖和分类群，侧重 FISH 而非 HNA/LNA",
+      "doi": "10.3389/fmicb.2017.01771"
+    },
+    {
+      "tier": 2,
+      "topic_relevance": "background",
+      "marine": true,
+      "reason": "红海流式生理状态与 DOM 背景",
+      "doi": "10.3389/fmicb.2021.784325"
+    },
+    {
+      "tier": 2,
+      "topic_relevance": "background",
+      "marine": true,
+      "reason": "河口海洋细菌生活型与生态位背景",
+      "doi": "10.3389/fmicb.2021.690712"
+    },
+    {
+      "tier": 2,
+      "topic_relevance": "background",
+      "marine": true,
+      "reason": "亚得里亚海 AAP 生态模型使用 HNA/LNA 为环境变量",
+      "doi": "10.1186/s40793-024-00573-6"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": true,
+      "reason": "海洋病毒亚群，摘要未研究细菌核酸分组",
+      "doi": "10.1002/mbo3.70161"
+    },
+    {
+      "tier": 2,
+      "topic_relevance": "background",
+      "marine": true,
+      "reason": "南极海岸细菌捕食与裂解背景",
+      "doi": "10.1111/1462-2920.70254"
+    },
+    {
+      "tier": 1,
+      "topic_relevance": "direct",
+      "marine": true,
+      "reason": "海洋深度梯度中 HNA 与碳转化",
+      "doi": "10.3389/fmicb.2025.1677097"
+    },
+    {
+      "tier": 2,
+      "topic_relevance": "background",
+      "marine": true,
+      "reason": "海洋可滤过超小细胞与基因组精简相关背景",
+      "doi": "10.1111/mec.70434"
+    },
+    {
+      "tier": 2,
+      "topic_relevance": "background",
+      "marine": true,
+      "reason": "海洋细菌视紫红质与藻华背景",
+      "doi": "10.1038/s41467-025-67474-1"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": true,
+      "reason": "海绵资源竞争，摘要未研究细菌核酸分组",
+      "doi": "10.1002/ecy.70178"
+    },
+    {
+      "tier": 1,
+      "topic_relevance": "direct",
+      "marine": true,
+      "reason": "北大西洋 HNA/LNA 与病毒宿主动态",
+      "doi": "10.3390/microorganisms13112474"
+    },
+    {
+      "tier": 1,
+      "topic_relevance": "direct",
+      "marine": true,
+      "reason": "海洋原位燃烧对 HNA/LNA 的影响",
+      "doi": "10.1016/j.scitotenv.2024.177249"
+    },
+    {
+      "tier": 2,
+      "topic_relevance": "background",
+      "marine": true,
+      "reason": "红海营养/增温下细菌捕食控制背景",
+      "doi": "10.1111/1758-2229.70166"
+    },
+    {
+      "tier": 1,
+      "topic_relevance": "direct",
+      "marine": true,
+      "reason": "海洋盐度波动与 HNA/LNA 抗性及毒力基因",
+      "doi": "10.3390/microorganisms13071710"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "鸡粪堆肥病毒与抗性",
+      "doi": "10.3390/v18070789"
+    },
+    {
+      "tier": 2,
+      "topic_relevance": "background",
+      "marine": true,
+      "reason": "南海河口羽状流下细菌多样性与生产力背景",
+      "doi": "10.1093/ismeco/ycaf102"
+    },
+    {
+      "tier": 2,
+      "topic_relevance": "background",
+      "marine": true,
+      "reason": "海洋深层叶绿素最大值与 AAP 群落背景",
+      "doi": "10.1093/ismeco/ycag076"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "direct",
+      "marine": false,
+      "reason": "瑞士大气生物气溶胶 HNA/LNA",
+      "doi": "10.1093/ismeco/ycag167"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": true,
+      "reason": "海底铁锰结核附着菌群",
+      "doi": "10.1111/1462-2920.70390"
+    },
+    {
+      "tier": 2,
+      "topic_relevance": "background",
+      "marine": "mixed",
+      "reason": "FISH 增强流式方法，含海洋与肠道应用",
+      "doi": "10.1128/spectrum.01973-24"
+    },
+    {
+      "tier": 2,
+      "topic_relevance": "background",
+      "marine": true,
+      "reason": "微塑料改变海洋细菌与浮游植物背景",
+      "doi": "10.1002/ece3.70041"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": true,
+      "reason": "海洋无脊椎动物噪声与招募",
+      "doi": "10.1002/eap.70119"
+    },
+    {
+      "tier": 2,
+      "topic_relevance": "background",
+      "marine": "mixed",
+      "reason": "半咸水与淡水群落合并背景",
+      "doi": "10.1093/ismeco/ycag198"
+    },
+    {
+      "tier": 2,
+      "topic_relevance": "background",
+      "marine": true,
+      "reason": "大亚湾翼足类水华与附着细菌背景",
+      "doi": "10.1093/femsec/fiae034"
+    },
+    {
+      "tier": 1,
+      "topic_relevance": "direct",
+      "marine": true,
+      "reason": "比斯开湾高低核酸细菌丰度与生长",
+      "doi": "10.1016/j.marenvres.2023.106331"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": true,
+      "reason": "海洋环境 GIS 管理",
+      "doi": "10.1038/s41598-025-00206-z"
+    },
+    {
+      "tier": 2,
+      "topic_relevance": "background",
+      "marine": true,
+      "reason": "近岸细菌 DOM 利用及温度背景",
+      "doi": "10.1111/1758-2229.13123"
+    },
+    {
+      "tier": 1,
+      "topic_relevance": "direct",
+      "marine": true,
+      "reason": "大堡礁 DOM 与温度实验比较 LNA/HNA 生长",
+      "doi": "10.1111/1462-2920.15007"
+    },
+    {
+      "tier": 1,
+      "topic_relevance": "direct",
+      "marine": true,
+      "reason": "红海 LNA/HNA 生长率与生理群落",
+      "doi": "10.3389/fmicb.2018.03244"
+    },
+    {
+      "tier": 2,
+      "topic_relevance": "background",
+      "marine": true,
+      "reason": "南极海表微层污染物降解细菌背景",
+      "doi": "10.3389/fmicb.2020.571983"
+    },
+    {
+      "tier": 2,
+      "topic_relevance": "background",
+      "marine": true,
+      "reason": "潟湖食物网增温与细菌相互作用背景",
+      "doi": "10.3389/fmicb.2020.502336"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "direct",
+      "marine": false,
+      "reason": "淡水湖机器学习关联 HNA/LNA",
+      "doi": "10.1128/msystems.00093-19"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "direct",
+      "marine": false,
+      "reason": "淡水湖细菌代谢与死亡控制",
+      "doi": "10.3390/microorganisms10040715"
+    },
+    {
+      "tier": 1,
+      "topic_relevance": "direct",
+      "marine": true,
+      "reason": "季风河口高低核酸细菌及酶活性，标题明确研究对象",
+      "doi": "10.1016/j.actao.2020.103697"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "乳酸菌基因网络工程",
+      "doi": "10.1093/nar/gkv1093"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "活菌核酸分子交易",
+      "doi": "10.1016/j.bpj.2015.11.076"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "植物核酸提取协议",
+      "doi": "10.17504/protocols.io.261ge43zyv47/v1"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "亨廷顿病反义核苷酸治疗",
+      "doi": "10.1089/nat.2018.0775"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": true,
+      "reason": "海洋细菌降解聚乙烯",
+      "doi": "10.56042/ijms.v52i04.7648"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "鱼类高核酸食品抗衰老",
+      "doi": "10.1201/b22344-22"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": true,
+      "reason": "海洋细菌 DNA 结合蛋白序列",
+      "doi": "10.1093/nar/gkv1053"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "通用核酸探针方法",
+      "doi": "10.1002/9781118960608.bm00017"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": true,
+      "reason": "海洋滑行细菌脂肪酸分类",
+      "doi": "10.1099/acmi.0.000603.v1"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "甲烷氧化菌核酸制备",
+      "doi": "10.32008/geolinks2021/b1/v3/14"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "细菌核酸递送",
+      "doi": "10.1016/j.tibtech.2024.07.010"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "核酸药物递送",
+      "doi": "10.18609/nai.2024.002"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": true,
+      "reason": "海洋死亡事件测序与 AI",
+      "doi": "10.1093/9780197790847.003.0003"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "核酸药物进展",
+      "doi": "10.18609/nai.2024.007"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "核酸纯化方法",
+      "doi": "10.1101/392696"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "核酸杂交教材",
+      "doi": "10.1201/9781003076780-3"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "核酸模拟物在细菌内扩散",
+      "doi": "10.21203/rs.3.rs-4255877/v1"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "囊性纤维化核酸治疗",
+      "doi": "10.1089/nat.2017.0696"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "HNA 术语条目，未提供细菌生态含义",
+      "doi": "10.1002/9783527809080.cataz08108"
+    },
+    {
+      "tier": 2,
+      "topic_relevance": "direct",
+      "marine": null,
+      "reason": "水质生物指标 LNA/HNA，标题未提供海洋生境；主题直接相关，海洋生境待确认，列相关背景",
+      "doi": "10.1016/j.ecolind.2019.03.033"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "direct",
+      "marine": false,
+      "reason": "饮用水管网 LNA/HNA",
+      "doi": "10.2166/aqua.2017.108"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "HNa 沸石阳离子分布",
+      "doi": "10.1007/978-3-662-49337-3_5"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "Hna 蛋白二聚体结构",
+      "doi": "10.2210/pdb9ykj/pdb"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "Hna 蛋白单体结构",
+      "doi": "10.2210/pdb10uj/pdb"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "缅甸难民高等教育",
+      "doi": "10.3102/ip.25.2186737"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "Hna 蛋白单体结构",
+      "doi": "10.2210/pdb9yhn/pdb"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "人类中性粒细胞抗原 HNA",
+      "doi": "10.1093/hesc/9780198735731.003.0006"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "人类 HNA 抗原基因分型",
+      "doi": "10.1159/000525654"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "HNA 缩写词典，未提供细菌生态含义",
+      "doi": "10.1007/978-3-662-48986-4_311835"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "HNA 为烟酸配体",
+      "doi": "10.1039/c5dt00205b"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "园林硬景观奖项",
+      "doi": "10.14359/51689749"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "LNA 为锁核酸微阵列",
+      "doi": "10.1002/9783527678679.dg06896"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "中亚历史文化",
+      "doi": "10.70413/si-v02-i14-s32029"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "人类抗 HNA 自身抗体",
+      "doi": "10.1016/j.imlet.2025.107095"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "缅甸难民高等教育",
+      "doi": "10.3102/2186737"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "造血干细胞移植抗 HNA 抗体",
+      "doi": "10.1055/a-2313-1037"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "遗传性神经痛性肌萎缩 HNA",
+      "doi": "10.1007/978-3-319-66816-1_200-1"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "创业艺术",
+      "doi": "10.31948/travesiaemprendedora.vol5-2.art12"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "HNA 企业发展",
+      "doi": "10.1016/b978-0-12-816857-8.00010-0"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "HNA 抗原捕获及抗体检测",
+      "doi": "10.1007/s12185-015-1751-y"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "政治社会研究",
+      "doi": "10.4000/books.editionscnrs.56579"
+    },
+    {
+      "tier": 3,
+      "topic_relevance": "off_topic",
+      "marine": null,
+      "reason": "教育学与人文能力",
+      "doi": "10.31948/editorialunimar.151"
+    },
+    {
+      "doi": "10.1093/ismeco/ycag120",
+      "tier": 2,
+      "topic_relevance": "background",
+      "marine": true,
+      "reason": "阿尔沃兰海 AAP 自由生活/颗粒附着群落，摘要未研究 HNA/LNA 分组，列海洋细菌背景"
+    }
+  ]
+}

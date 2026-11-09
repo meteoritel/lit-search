@@ -1,4 +1,4 @@
-# Python Interface 与 JSON 契约
+# Python 接口与 JSON 契约
 
 ## 完整检索
 
@@ -26,6 +26,8 @@ for diagnostic in result.report.diagnostics:
 payload = result.to_dict()
 ```
 
+`result.count` 为当前 records 的长度，`result.version` 为源码版本；两者为只读属性，与 to_dict() 对应字段一致。构造客户端时校验 Config 结构；search 按实际 sources 检查必需凭据。Crossref、Europe PMC 可使用空 Config，OpenAlex search 需要 key；explain 可离线调用。
+
 `queries`、`sources`、`exclude` 是字符串数组；`require` 是 OR 词组数组，外层按 AND 组合。数量必须为整数，oa_only/strict_filters 为布尔值。直接 Python 调用和 CLI 共用检索意图校验。
 
 `concepts` 为同义词组数组，用于查询编译与可选主题排序，保留缺少部分概念证据的候选；`require` 用于硬过滤。至少提供一个非空 queries 或 concepts。只有概念组时显式传入 `queries=[]`。来源编译与字段过滤规则见 [CLI 文档](usage.md#概念查询与主题排序)。
@@ -36,7 +38,7 @@ payload = result.to_dict()
 
 `QueryPlan.enrich_abstracts` 为非负整数，默认 0。启用后，在身份合并之后、require/exclude 之前，对缺少摘要且有 DOI 的候选查询 Europe PMC core。只接受相同 DOI 的摘要，只填空值，并将 `abstract_source` 设为 europepmc；文献身份与检索命中证据保持原语义。
 
-预算是每次 search 中尚未缓存的 DOI 查询次数，按合并后的候选顺序消耗。相同 SearchClient 实例缓存成功摘要和未找到结果；缓存读取不占新查询预算，HTTP 重试按原策略执行。补齐的元数据来源不产生检索投票。响应错误与网络失败整体抛出 NetworkError。
+预算是每次 search 中尚未缓存的 DOI 查询次数，按合并后的候选顺序消耗。相同 SearchClient 实例缓存成功摘要和未找到结果；缓存读取不占新查询预算，HTTP 重试遵循客户端策略。补齐的元数据来源不产生检索投票。响应错误与网络失败整体抛出 NetworkError。
 
 ## Transport 与测试
 
@@ -89,13 +91,19 @@ assert result.records[0].doi == "10.1000/example"
 
 `merge_stats.total_in` 是进入合并的候选量，与远端收到的 fetched_count 分别统计。主题过滤与 max_results 发生在这些逐查询统计之后。
 
-诊断包含 code、message、source、query、field；不适用的定位值为 null。code 当前包括 unsupported_filter、filter_override、provider_warning、fetch_window_limited、results_truncated、missing_doi、abstract_not_found、enrichment_budget_limited。程序按 code 分支，message 用于展示。
+诊断包含 code、message、source、query、field；不适用的定位值为 null。code 当前包括 unsupported_filter、filter_override、provider_warning、fetch_window_limited、empty_results、results_truncated、missing_doi、abstract_not_found、enrichment_budget_limited。程序按 code 分支，message 用于展示。
+
+fetch_window_limited 区分 limit 候选窗口与 scan_budget 扫描预算，展示扫描、映射、保留量及来源本地条件。empty_results 在最终为空时说明远端无命中、映射无有效记录、来源本地条件筛空或 require/exclude 主题过滤筛空；逐查询原因可并存。filter_stats 始终只统计合并后的主题过滤。
 
 ## 记录与溯源
 
 缺失标量为 None/JSON null，缺失集合为空集合；citation_count 为 0、is_open_access 为 False 都是有效值。
 
-原有 doi、title、year、authors、venue、abstract、citation_count、source、sources、source_id 等字段继续保留。新增来源与语义字段：
+Crossref 日期按 published、issued 优先级选取有年份的分支。空日期保留记录，显式 null 日期元素产生带 DOI 或记录位置及 field 的 provider_warning；缺失日期为 null。年或年月部分日期补 1，内部空位保留 year、publication_date 为 null。错误的日期结构仍抛 NetworkError。
+
+Crossref 和 Europe PMC 的标题、摘要，以及补齐摘要，共用 HTML/JATS 纯文本处理：实体预解码一层，再解析已知标签；段落转为空白，上下标保留文字，保留 Unicode 与科学比较符。更深层编码保留为文本，避免无界解码。OpenAlex 使用原始标题与倒排摘要重建。
+
+记录包含 doi、title、year、authors、venue、abstract、citation_count、source、sources、source_id 等字段。来源与溯源字段如下：
 
 | 字段 | 契约 |
 |---|---|
@@ -110,12 +118,12 @@ assert result.records[0].doi == "10.1000/example"
 | related_dois | 保守策略下同标题候选的其他 DOI，供人工判断关联 |
 | abstract_source | 当前摘要来自的来源；缺失或来源未知时为 null |
 | retrieval_hits | 命中列表，每项为 source、query、rank、score；rank 从 1 开始并跨页连续，score 为来源原始相关分或 null |
-| ranking_score | rrf/bm25/hybrid 的最终排序分；旧排序为 null |
-| ranking_evidence | 可选排序的 matched_groups、rrf、bm25、concept_coverage、abstract_missing、record_flags；旧排序为空映射 |
+| ranking_score | rrf/bm25/hybrid 的最终排序分；citations/year/relevance 为 null |
+| ranking_evidence | rrf/bm25/hybrid 的 matched_groups、rrf、bm25、concept_coverage、abstract_missing、record_flags；citations/year/relevance 为空映射 |
 
-合并记录时，对相同 `(source, query)` 保留最佳 rank，独立查询分别计票。`relevance_score` 保留合并记录中的最大原始相关分，供原 relevance 排序使用；跨来源与查询的融合使用名次。排序公式见 [CLI 文档](usage.md#概念查询与主题排序)。
+合并记录时，对相同 `(source, query)` 保留最佳 rank，独立查询分别计票。`relevance_score` 保存合并记录中的最大原始相关分，供 relevance 排序使用；跨来源与查询的融合使用名次。排序公式见 [CLI 文档](usage.md#概念查询与主题排序)。
 
-`open_access_pdf` 是保留的兼容字段；新调用方使用 pdf_url、oa_url 和 is_open_access 分别处理文件地址、开放阅读入口与访问状态。
+`open_access_pdf` 是兼容字段；调用方可使用 pdf_url、oa_url 和 is_open_access 分别处理文件地址、开放阅读入口与访问状态。
 
 CSV 为记录导出，普通集合字段采用分号文本，映射字段及 retrieval_hits 使用 JSON 字符串。CSV/DOI 格式侧重条目交付，需要完整执行诊断时使用 JSON 或 Python 返回值。
 

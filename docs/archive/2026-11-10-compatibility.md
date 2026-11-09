@@ -1,5 +1,7 @@
 # 兼容性与迁移
 
+> 历史迁移说明。当前使用规则见 [CLI 文档](../usage.md)，集成规则见 [Python 契约](../python.md)。
+
 当前源码版本为 0.5.0，结果 schema_version 为 1。CLI 命令、单文件运行和 `import litsearch` 路径保持可用。新增 JSON 字段采用追加方式，现有 version、queries.label、queries.total_count、filters、results 等字段继续提供。
 
 ## 升级调用方
@@ -18,6 +20,11 @@
 | 新增 concepts、补摘要和 rrf/bm25/hybrid | 按需开启；默认来源、citations 排序与零补齐预算保持 |
 | 新增 enrichment、abstract_source、retrieval_hits、ranking_score/evidence | JSON 消费容忍追加字段；CSV 消费按列名读取，retrieval_hits 列解析 JSON |
 | require 空组联网前报错 | 移除空白值、空逗号组，使用有效术语 |
+| Crossref 空日期保留记录并给定位警告 | year 仍可省略；消费 year/publication_date 时处理 null |
+| Crossref/Europe PMC 标题与摘要统一转纯文本 | 标题合并与主题匹配使用清洗后文字；用 source_ids/merge_reasons 核对身份 |
+| concepts 移除词项及词序均相同的重复组 | 保留首次组及同义词顺序；无需手动给重复组增加权重 |
+| 新增 empty_results 与 CLI explain.output | 按诊断 code 分支，使用绝对 directory 检查输出位置 |
+| SearchResult.count/version 为只读属性 | 可直接读取，结果数量随 records 变化 |
 
 `open_access_pdf` 继续提供兼容值。默认 title 合并策略保持；需要保留不同 DOI 的同名文献时显式使用 `--merge-policy doi` 或 QueryPlan.merge_policy。保守模式仍合并相同来源身份。
 
