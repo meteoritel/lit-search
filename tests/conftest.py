@@ -65,7 +65,7 @@ class SleepRecorder:
 
 def make_http(responses: Sequence[Any]) -> tuple[litsearch.Http, FakeOpener]:
     opener = FakeOpener(responses)
-    return litsearch.Http(opener=opener), opener
+    return litsearch.Http(opener=opener, polite=0), opener
 
 
 @pytest.fixture
@@ -87,7 +87,7 @@ def make_record(**overrides: Any) -> litsearch.Record:
         "authors": [],
         "source": "openalex",
         "sources": ["openalex"],
-        "source_id": "x",
+        "source_id": "",
     }
     defaults.update(overrides)
     return litsearch.Record(**defaults)

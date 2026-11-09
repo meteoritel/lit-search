@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
 
 import litsearch
@@ -48,7 +46,7 @@ def test_env_beats_toml_beats_dotenv(tmp_path):
 
     cfg = litsearch.load_config(tmp_path, env=base_env)
     assert cfg.api_keys["openalex"] == "from-toml"
-    assert cfg.output_dir == Path("from-toml")
+    assert cfg.output_dir == tmp_path / "from-toml"
     assert cfg.mailto == "toml@example.com"
     assert cfg.config_path == config_path
     assert cfg.default_sources == ["openalex"]
@@ -56,14 +54,14 @@ def test_env_beats_toml_beats_dotenv(tmp_path):
     cfg_env = litsearch.load_config(tmp_path, env=dict(
         base_env, OPENALEX_API_KEY="from-env", LITSEARCH_OUTPUT_DIR="from-env"))
     assert cfg_env.api_keys["openalex"] == "from-env"
-    assert cfg_env.output_dir == Path("from-env")
+    assert cfg_env.output_dir == tmp_path / "from-env"
 
 
 def test_dotenv_is_the_last_fallback(tmp_path):
     (tmp_path / ".env").write_text(DOTENV, encoding="utf-8")
     cfg = litsearch.load_config(tmp_path, env={})
     assert cfg.api_keys["openalex"] == "from-dotenv"
-    assert cfg.output_dir == Path("from-dotenv")
+    assert cfg.output_dir == tmp_path / "from-dotenv"
     assert cfg.config_path is None
 
 
@@ -98,7 +96,7 @@ def test_project_local_litsearch_toml_is_used_without_a_user_config(tmp_path):
         'output_dir = "from-project"\n[presets.p]\nqueries = ["q"]\n',
         encoding="utf-8")
     cfg = litsearch.load_config(tmp_path, env={})
-    assert cfg.output_dir == Path("from-project")
+    assert cfg.output_dir == tmp_path / "from-project"
     assert "p" in cfg.presets
 
 

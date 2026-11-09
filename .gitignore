@@ -16,3 +16,6 @@ build/
 
 # 检索生成的清单（产物，不入库；需要归档时手动加）
 output/
+/.local/
+.ruff_cache/
+.mypy_cache/

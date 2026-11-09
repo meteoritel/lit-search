@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import urllib.parse
 
 import pytest
@@ -59,12 +58,12 @@ def test_openalex_truncates_when_remote_overdelivers():
     assert len(result.records) == 1
 
 
-def test_crossref_paginates_by_offset_without_extra_requests():
+def test_crossref_uses_cursor_without_extra_requests():
     http, opener = make_http([load_fixture("crossref_page1.json")])
     plan = make_plan(sources=["crossref"], limit=3)
     result = CR.search("q", plan, http, litsearch.RetryPolicy(), litsearch.Config())
     assert len(opener.urls) == 1
-    assert params_of(opener.urls[0])["offset"] == ["0"]
+    assert params_of(opener.urls[0])["cursor"] == ["*"]
     assert params_of(opener.urls[0])["rows"] == ["3"]
     assert [r.doi for r in result.records] == ["10.1000/aaa", "10.1000/ccc"]
 

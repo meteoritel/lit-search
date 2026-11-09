@@ -71,7 +71,7 @@ def test_record_without_doi_survives_by_title():
 
 
 def test_dropped_when_neither_doi_nor_title():
-    records = [make_record(doi=None, title=None),
+    records = [make_record(doi=None, title=None, source_id=""),
                make_record(doi="10.1/x", title="Kept")]
     merged, stats = litsearch.merge_records(records)
     assert len(merged) == 1
