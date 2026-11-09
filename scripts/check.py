@@ -1,4 +1,4 @@
-"""验证 wheel、sdist 与独立单文件的可交付契约。"""
+"""统一执行静态检查、离线回归、构建与分发验收。"""
 
 from __future__ import annotations
 
@@ -27,7 +27,7 @@ def source_version() -> str:
     raise AssertionError("源码缺少 __version__")
 
 
-def main() -> None:
+def check_distribution() -> None:
     version = source_version()
     wheel = ROOT / "dist" / f"litsearch-{version}-py3-none-any.whl"
     sdist = ROOT / "dist" / f"litsearch-{version}.tar.gz"
@@ -41,10 +41,12 @@ def main() -> None:
     with tarfile.open(sdist) as archive:
         names = set(archive.getnames())
         for relative in ("tests/conftest.py", "tests/fixtures/openalex_page1.json",
-                         "scripts/check_distribution.py", "docs/python.md", "uv.lock",
-                         "examples/marine-timeseries.toml", "scripts/benchmark_retrieval.py",
-                         "tests/fixtures/retrieval_candidates.json"):
+                         "tests/fixtures/retrieval_replay.json", "tests/fixtures/retrieval_gold.json",
+                         "scripts/check.py", "docs/python.md", "docs/usage.md", "uv.lock",
+                         "examples/marine-timeseries.toml", "examples/marine-lna-hna.toml"):
             assert f"litsearch-{version}/{relative}" in names, relative
+        assert not any(name.startswith((f"litsearch-{version}/docs/archive/",
+                                        f"litsearch-{version}/docs/plans/")) for name in names)
 
     with tempfile.TemporaryDirectory(prefix="litsearch-distribution-") as directory:
         temporary = Path(directory)
@@ -69,6 +71,14 @@ def main() -> None:
         explanation = subprocess.run([str(command), "q", "--explain"], cwd=temporary, env=env,
                                      check=True, capture_output=True, text=True, encoding="utf-8")
         assert json.loads(explanation.stdout)["plan"]["queries"] == ["q"]
+        encoded_env = dict(env, PYTHONIOENCODING="cp936", PYTHONUTF8="0")
+        encoded = subprocess.run([str(command), "海洋细菌", "--explain"], cwd=temporary,
+                                 env=encoded_env, capture_output=True, check=True)
+        assert json.loads(encoded.stdout.decode("utf-8"))["plan"]["queries"] == ["海洋细菌"]
+        error = subprocess.run([str(command), "--不存在的参数"], cwd=temporary,
+                               env=encoded_env, capture_output=True)
+        assert error.returncode == 2
+        assert "不存在的参数" in error.stderr.decode("utf-8")
 
         probe = '''
 import io, json, litsearch
@@ -93,6 +103,19 @@ raise SystemExit(litsearch.main(["q", "--source", "crossref", "--limit", "1", "-
                                 text=True, encoding="utf-8")
         assert json.loads(copied.stdout)["version"] == version
     print("wheel、sdist、安装后离线检索与单文件交付检查通过")
+
+
+def main() -> None:
+    commands = [
+        [sys.executable, "-m", "ruff", "check", "."],
+        [sys.executable, "-m", "mypy"],
+        [sys.executable, "-m", "pytest"],
+        ["uv", "build"],
+    ]
+    for command in commands:
+        print(f"执行：{' '.join(command)}", flush=True)
+        subprocess.run(command, cwd=ROOT, check=True)
+    check_distribution()
 
 
 if __name__ == "__main__":

@@ -19,8 +19,4 @@ jobs:
           python-version: ${{ matrix.python }}
           enable-cache: true
       - run: uv sync --locked --extra dev
-      - run: uv run --locked --extra dev ruff check .
-      - run: uv run --locked --extra dev mypy
-      - run: uv run --locked --extra dev python -m pytest
-      - run: uv build
-      - run: uv run --locked --extra dev python scripts/check_distribution.py
+      - run: uv run --locked --extra dev python scripts/check.py
