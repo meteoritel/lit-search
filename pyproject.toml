@@ -5,13 +5,13 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "litsearch"
 dynamic = ["version"]
-description = "多源文献检索 CLI（OpenAlex + Crossref），零第三方运行时依赖"
+description = "多源文献检索 CLI（OpenAlex、Crossref、Europe PMC），零第三方运行时依赖"
 readme = "README.md"
 requires-python = ">=3.12"
 license = "MIT"
 license-files = ["LICENSE"]
 dependencies = []
-keywords = ["openalex", "crossref", "literature", "cli", "bibliography"]
+keywords = ["openalex", "crossref", "europepmc", "literature", "cli", "bibliography"]
 classifiers = [
     "Environment :: Console",
     "Intended Audience :: Science/Research",

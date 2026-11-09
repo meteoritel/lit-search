@@ -138,7 +138,7 @@ def test_search_all_deduplicates_repeated_warnings():
 
 
 def test_provider_registry_has_expected_sources():
-    assert set(litsearch.PROVIDERS) == {"openalex", "crossref"}
+    assert set(litsearch.PROVIDERS) == {"openalex", "crossref", "europepmc"}
     assert litsearch.PROVIDERS["openalex"].requires_api_key is True
     assert litsearch.PROVIDERS["crossref"].requires_api_key is False
 

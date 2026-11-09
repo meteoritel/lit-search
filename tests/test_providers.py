@@ -206,7 +206,7 @@ def test_crossref_fetch_sort_mapping():
     assert params2["sort"] == ["published"]
 
     plan_rel = make_plan(sources=["crossref"], fetch_sort="relevance")
-    assert "sort" not in query_params(CR.build_url("q", plan_rel, 10, 0, None))
+    assert query_params(CR.build_url("q", plan_rel, 10, "*", None))["sort"] == ["score"]
 
 
 def test_display_sort_does_not_change_the_remote_request():

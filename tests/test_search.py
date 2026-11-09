@@ -38,6 +38,7 @@ def test_search_returns_complete_pipeline_without_terminal_or_files(tmp_path, mo
     {"queries": "q"}, {"limit": True}, {"sort": "bad"},
     {"oa_only": "false"}, {"require": ["marine"]}, {"sources": ["bad"]},
     {"strict_filters": "true"}, {"merge_policy": "bad"},
+    {"enrich_abstracts": None}, {"enrich_abstracts": -1},
 ])
 def test_python_inputs_are_validated_before_network(options):
     client, opener = make_client([])

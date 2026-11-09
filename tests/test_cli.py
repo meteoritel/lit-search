@@ -68,6 +68,15 @@ def test_main_maps_errors_to_exit_codes(monkeypatch, error, expected):
     assert litsearch.main(["query"]) == expected
 
 
+@pytest.mark.parametrize("spec", ["", " ", ",; ,"])
+def test_empty_require_is_rejected_before_network(spec, tmp_path):
+    args = litsearch.build_parser().parse_args(["q", "--require", spec, "--stdout"])
+    http, opener = make_http([])
+    with pytest.raises(litsearch.UsageError, match="require"):
+        litsearch.run(args, tmp_path, http, litsearch.RetryPolicy(), lambda _: None)
+    assert opener.urls == []
+
+
 # --------------------------------------------------------------------------- #
 # 端到端
 # --------------------------------------------------------------------------- #

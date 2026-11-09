@@ -41,7 +41,9 @@ def main() -> None:
     with tarfile.open(sdist) as archive:
         names = set(archive.getnames())
         for relative in ("tests/conftest.py", "tests/fixtures/openalex_page1.json",
-                         "scripts/check_distribution.py", "docs/python.md", "uv.lock"):
+                         "scripts/check_distribution.py", "docs/python.md", "uv.lock",
+                         "examples/marine-timeseries.toml", "scripts/benchmark_retrieval.py",
+                         "tests/fixtures/retrieval_candidates.json"):
             assert f"litsearch-{version}/{relative}" in names, relative
 
     with tempfile.TemporaryDirectory(prefix="litsearch-distribution-") as directory:

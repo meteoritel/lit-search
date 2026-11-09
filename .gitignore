@@ -19,3 +19,4 @@ output/
 /.local/
 .ruff_cache/
 .mypy_cache/
+/docs/archive/

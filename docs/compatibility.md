@@ -1,6 +1,6 @@
 # 兼容性与迁移
 
-当前源码版本为 0.4.0，结果 schema_version 为 1。CLI 命令、单文件运行和 `import litsearch` 路径保持可用。新增 JSON 字段采用追加方式，现有 version、queries.label、queries.total_count、filters、results 等字段继续提供。
+当前源码版本为 0.5.0，结果 schema_version 为 1。CLI 命令、单文件运行和 `import litsearch` 路径保持可用。新增 JSON 字段采用追加方式，现有 version、queries.label、queries.total_count、filters、results 等字段继续提供。
 
 ## 升级调用方
 
@@ -14,6 +14,10 @@
 | Crossref work_type 统一为 article/preprint | 依赖原始名称时读取 raw_work_types |
 | PDF、阅读页面和 OA 状态独立表达 | 新调用方使用 pdf_url、landing_page_url、oa_url 和 is_open_access |
 | 来源身份参与去重，Unicode 标题得到保留 | 结果集可能与旧版本不同；使用 source_ids 和 merge_reasons 核对来源与合并依据 |
+| Crossref relevance 分页显式使用 score 降序并保存原始分 | 远端候选与原 relevance 最终排序可能变化；跨来源融合可选 rrf/hybrid |
+| 新增 concepts、补摘要和 rrf/bm25/hybrid | 按需开启；默认来源、citations 排序与零补齐预算保持 |
+| 新增 enrichment、abstract_source、retrieval_hits、ranking_score/evidence | JSON 消费容忍追加字段；CSV 消费按列名读取，retrieval_hits 列解析 JSON |
+| require 空组联网前报错 | 移除空白值、空逗号组，使用有效术语 |
 
 `open_access_pdf` 继续提供兼容值。默认 title 合并策略保持；需要保留不同 DOI 的同名文献时显式使用 `--merge-policy doi` 或 QueryPlan.merge_policy。保守模式仍合并相同来源身份。
 

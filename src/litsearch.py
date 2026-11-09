@@ -33,7 +33,7 @@ from http.client import HTTPException
 from pathlib import Path
 from typing import Any, Callable, Iterable
 
-__version__ = "0.4.0"
+__version__ = "0.5.0"
 
 __all__ = [
     "Config", "QueryPlan", "Record", "SearchClient", "SearchResult", "Report",
@@ -43,6 +43,7 @@ __all__ = [
 
 API_OPENALEX = "https://api.openalex.org"
 API_CROSSREF = "https://api.crossref.org"
+API_EUROPEPMC = "https://www.ebi.ac.uk/europepmc/webservices/rest/search"
 MAX_PER_PAGE = 100
 CROSSREF_PAGE_SIZE = 100
 CROSSREF_MAX_ROWS = 1000
@@ -93,15 +94,22 @@ CROSSREF_TYPE_MAP = {
     "preprint": "posted-content",
 }
 
-# 远端抓取排序：决定「取到哪一批候选」。默认 relevance 即两个源各自的相关度序。
+# 远端抓取排序：决定「取到哪一批候选」。默认 relevance 即来源自身的相关度序。
 # 与 QueryPlan.sort（只改展示顺序）是两个独立旋钮 —— 只设 --sort citations 时，
 # 被引排序只作用在「相关度最高的 N 条」这个切片内部，并不是全网最高被引的 N 条。
 FETCH_SORT_CHOICES = ("relevance", "citations", "year")
+SORT_CHOICES = (*FETCH_SORT_CHOICES, "rrf", "bm25", "hybrid")
+RRF_K = 60
+BM25_K1 = 1.2
+BM25_B = 0.75
+TITLE_WEIGHT = 2.0
+ANCILLARY_FACTOR = 0.5
 FETCH_SORT_OPENALEX = {
     "citations": "cited_by_count:desc",
     "year": "publication_date:desc",
 }
 FETCH_SORT_CROSSREF = {
+    "relevance": "score",
     "citations": "is-referenced-by-count",
     "year": "published",
 }
@@ -166,6 +174,10 @@ class Record:
     oa_url: str | None = None
     merge_reasons: list[str] = field(default_factory=list)
     related_dois: list[str] = field(default_factory=list)
+    abstract_source: str | None = None
+    retrieval_hits: list[dict[str, Any]] = field(default_factory=list)
+    ranking_score: float | None = None
+    ranking_evidence: dict[str, Any] = field(default_factory=dict)
 
 
 RECORD_FIELDS = tuple(f.name for f in fields(Record))
@@ -173,7 +185,7 @@ RECORD_FIELDS = tuple(f.name for f in fields(Record))
 # 合并时用非空值回填的字段（sources 单独并集处理）
 MERGE_COMBINED_FIELDS = frozenset({
     "sources", "source_ids", "doi_aliases", "raw_work_types", "merge_reasons", "related_dois",
-    "source", "source_id",
+    "source", "source_id", "retrieval_hits", "ranking_score", "ranking_evidence",
 })
 MERGE_FILL_FIELDS = tuple(name for name in RECORD_FIELDS if name not in MERGE_COMBINED_FIELDS)
 
@@ -259,6 +271,17 @@ class QueryPlan:
     title: str | None = None
     strict_filters: bool = False
     merge_policy: str = DEFAULT_MERGE_POLICY
+    enrich_abstracts: int = 0
+    concepts: list[list[str]] = field(default_factory=list)
+
+
+@dataclass(slots=True)
+class EnrichmentStats:
+    requested: int = 0
+    cache_hits: int = 0
+    filled: int = 0
+    not_found: int = 0
+    budget_skipped: int = 0
 
 
 @dataclass(slots=True)
@@ -271,6 +294,7 @@ class Report:
     queries: list[QueryExecution] = field(default_factory=list)
     diagnostics: list[Diagnostic] = field(default_factory=list)
     generated: str = field(default_factory=lambda: _dt.date.today().isoformat())
+    enrichment: EnrichmentStats = field(default_factory=EnrichmentStats)
 
 
 @dataclass(slots=True)
@@ -464,11 +488,21 @@ def _merge_pair(a: Record, b: Record, reason: str) -> Record:
     for name in ("doi_aliases", "merge_reasons", "related_dois"):
         setattr(out, name, sorted(set(getattr(base, name)) | set(getattr(other, name))))
     out.merge_reasons = sorted(set(out.merge_reasons) | {reason})
+    hits: dict[tuple[str, str], dict[str, Any]] = {}
+    for hit in [*base.retrieval_hits, *other.retrieval_hits]:
+        key = (hit["source"], hit["query"])
+        if key not in hits or hit["rank"] < hits[key]["rank"]:
+            hits[key] = dict(hit)
+    out.retrieval_hits = [hits[key] for key in sorted(hits)]
     for name in MERGE_FILL_FIELDS:
         if _is_empty(getattr(out, name)) and not _is_empty(getattr(other, name)):
             setattr(out, name, getattr(other, name))
     if not out.authors and other.authors:
         out.authors = list(other.authors)
+    if base.abstract:
+        out.abstract_source = base.abstract_source or base.source or None
+    elif other.abstract:
+        out.abstract_source = other.abstract_source or other.source or None
     if out.relevance_score is None:
         out.relevance_score = other.relevance_score
     elif other.relevance_score is not None:
@@ -505,6 +539,8 @@ def title_merge_key(rec: Record) -> str | None:
 
 def _record_with_provenance(record: Record) -> Record:
     copied = Record(**asdict(record))
+    if copied.abstract and not copied.abstract_source:
+        copied.abstract_source = copied.source or None
     if copied.source and copied.source_id:
         identifiers = copied.source_ids.setdefault(copied.source, [])
         if copied.source_id not in identifiers:
@@ -637,6 +673,22 @@ def _record_text(rec: Record) -> str:
     return f"{rec.title or ''} {rec.abstract or ''}"
 
 
+def _split_field_term(term: str) -> tuple[str, str]:
+    scope, separator, body = term.partition(":")
+    return (scope, body) if separator and scope in {"title", "abstract"} else ("any", term)
+
+
+def _text_fields(record: Record) -> dict[str, str]:
+    return {"title": _normalize_text(record.title or ""),
+            "abstract": _normalize_text(record.abstract or ""),
+            "any": _normalize_text(_record_text(record))}
+
+
+def _field_hits(term: str, texts: dict[str, str]) -> bool:
+    scope, body = _split_field_term(term)
+    return _term_hits(body, texts[scope])
+
+
 def apply_filters(records: list[Record], require_groups: list[list[str]],
                   exclude_terms: list[str]) -> tuple[list[Record], FilterStats]:
     """在合并后的集合上执行 —— 绝不逐源执行，否则跨源召回不一致。
@@ -649,19 +701,18 @@ def apply_filters(records: list[Record], require_groups: list[list[str]],
         stats.passed_exclude = stats.after = len(records)
         return list(records), stats
 
-    texts = [_record_text(rec) for rec in records]
-    normalized = [_normalize_text(text) for text in texts]
-    excluded = [any(_term_hits(term, text) for term in exclude_terms)
-                for text in normalized]
+    texts = [_text_fields(rec) for rec in records]
+    excluded = [any(_field_hits(term, text) for term in exclude_terms) for text in texts]
     stats.excluded = sum(excluded)
     stats.passed_exclude = len(records) - stats.excluded
     for group in require_groups:
         stats.per_group.append(sum(
-            1 for flag, text in zip(excluded, normalized)
-            if not flag and any(_term_hits(term, text) for term in group)
+            1 for flag, text in zip(excluded, texts)
+            if not flag and any(_field_hits(term, text) for term in group)
         ))
-    out = [rec for rec, text in zip(records, texts)
-           if matches(text, require_groups, exclude_terms)]
+    out = [rec for rec, text, flag in zip(records, texts, excluded)
+           if not flag and all(any(_field_hits(term, text) for term in group)
+                               for group in require_groups)]
     stats.after = len(out)
     return out, stats
 
@@ -670,7 +721,7 @@ def _sort_key(sort: str) -> Callable[[Record], tuple]:
     if sort == "year":
         return lambda r: (r.year or 0, r.citation_count or 0)
     if sort == "relevance":
-        # 无 relevance_score 的源（Crossref）排到后段，内部按被引
+        # 缺少来源相关分的记录排到后段，内部按被引。
         def key(r: Record) -> tuple:
             if r.relevance_score is not None:
                 return (1, float(r.relevance_score))
@@ -681,6 +732,96 @@ def _sort_key(sort: str) -> Callable[[Record], tuple]:
 
 def sort_records(records: list[Record], sort: str) -> list[Record]:
     return sorted(records, key=_sort_key(sort), reverse=True)
+
+
+def _ranking_groups(plan: QueryPlan) -> list[list[str]]:
+    if plan.concepts:
+        return plan.concepts
+    if plan.require:
+        return plan.require
+    stopwords = {"and", "or", "not", "the", "of", "in", "for", "on", "a", "an", "with"}
+    terms = dict.fromkeys(_normalize_text(" ".join(plan.queries)).split())
+    return [[term] for term in terms if term not in stopwords]
+
+
+def _lexical_scores(records: list[Record], groups: list[list[str]]) -> tuple[list[float], list[dict]]:
+    texts = [_text_fields(record) for record in records]
+    lengths = [{field: len(text[field].split()) for field in ("title", "abstract")} for text in texts]
+    averages = {field: sum(length[field] for length in lengths) / len(records) or 1.0
+                for field in ("title", "abstract")}
+    scores = [0.0] * len(records)
+    evidence: list[dict] = [{"matched_groups": []} for _ in records]
+    for group in groups:
+        group_scores = [0.0] * len(records)
+        matched: list[dict[str, list[str]]] = [{} for _ in records]
+        for term in dict.fromkeys(group):
+            scope, body = _split_field_term(term)
+            pattern = _compile_term(body)
+            if pattern is None:
+                continue
+            term_fields = (scope,) if scope != "any" else ("title", "abstract")
+            frequencies = [{field: len(pattern.findall(text[field])) for field in term_fields}
+                           for text in texts]
+            df = sum(any(counts.values()) for counts in frequencies)
+            idf = math.log1p((len(records) - df + 0.5) / (df + 0.5))
+            for index, counts in enumerate(frequencies):
+                score = 0.0
+                for field_name, count in counts.items():
+                    if not count:
+                        continue
+                    normalization = 1 - BM25_B + BM25_B * lengths[index][field_name] / averages[field_name]
+                    weight = TITLE_WEIGHT if field_name == "title" else 1.0
+                    score += weight * idf * count * (BM25_K1 + 1) / (count + BM25_K1 * normalization)
+                    matched[index].setdefault(field_name, []).append(term)
+                group_scores[index] = max(group_scores[index], score)
+        for index, score in enumerate(group_scores):
+            scores[index] += score
+            if matched[index]:
+                evidence[index]["matched_groups"].append(matched[index])
+    return scores, evidence
+
+
+def rank_records(records: list[Record], plan: QueryPlan) -> list[Record]:
+    if not records or plan.sort not in {"rrf", "bm25", "hybrid"}:
+        return sort_records(records, plan.sort)
+    groups = _ranking_groups(plan)
+    lexical, evidence = _lexical_scores(records, groups)
+    rrf = []
+    for record in records:
+        ranks: dict[tuple[str, str], int] = {}
+        for hit in record.retrieval_hits:
+            key = (hit["source"], hit["query"])
+            ranks[key] = min(ranks.get(key, hit["rank"]), hit["rank"])
+        rrf.append(sum(1 / (RRF_K + rank) for rank in ranks.values()))
+    scores = rrf if plan.sort == "rrf" else lexical
+    if plan.sort == "hybrid":
+        scores = [0.0] * len(records)
+        for values in (rrf, lexical):
+            # 并列值共享名次，避免输入顺序产生额外相关性证据。
+            rank_by_score = {value: index + 1 for index, value in enumerate(sorted(set(values), reverse=True))}
+            for index, value in enumerate(values):
+                if value > 0:
+                    scores[index] += 1 / (RRF_K + rank_by_score[value])
+    ranked = []
+    for index, record in enumerate(records):
+        title = _normalize_text(record.title or "")
+        flags = ["ancillary"] if any(title.startswith(prefix) for prefix in (
+            "supplementary material", "reply on rc", "faculty opinions recommendation", "comment on ",
+        )) else []
+        details = {**evidence[index], "rrf": rrf[index], "bm25": lexical[index],
+                   "abstract_missing": not bool(record.abstract), "record_flags": flags}
+        coverage = len(evidence[index]["matched_groups"]) / len(groups) if groups else 1.0
+        details["concept_coverage"] = coverage
+        score = scores[index] if plan.sort == "rrf" else scores[index] * coverage
+        score = score * ANCILLARY_FACTOR if flags else score
+        ranked.append(replace(record, ranking_score=score, ranking_evidence=details))
+    return sorted(ranked, key=lambda r: (-(r.ranking_score or 0), -(r.citation_count or 0),
+                                         norm_doi(r.doi) or r.source_id or norm_title(r.title) or ""))
+
+
+def _add_retrieval_hit(record: Record, query: str, rank: int) -> None:
+    record.retrieval_hits.append({"source": record.source, "query": query,
+                                  "rank": rank, "score": record.relevance_score})
 
 
 # --------------------------------------------------------------------------- #
@@ -702,6 +843,23 @@ def _response_page(payload: dict, source: str) -> tuple[dict, list[dict]]:
     if not isinstance(items, list) or any(not isinstance(item, dict) for item in items):
         raise NetworkError(f"{source}: {items_name} 必须是 object 数组")
     return block, items
+
+
+def _epmc_page(payload: dict) -> list[dict]:
+    count = payload.get("hitCount")
+    block = payload.get("resultList")
+    if type(count) is not int or count < 0 or not isinstance(block, dict):
+        raise NetworkError("europepmc: 响应缺少有效的 hitCount/resultList")
+    items = block.get("result")
+    if not isinstance(items, list) or any(not isinstance(item, dict) for item in items):
+        raise NetworkError("europepmc: result 必须是 object 数组")
+    return items
+
+
+def _epmc_url(query: str, parameters: dict[str, str]) -> str:
+    return API_EUROPEPMC + "?" + urllib.parse.urlencode({
+        "query": query, "format": "json", "resultType": "core", **parameters,
+    })
 
 
 def _map_record(mapper: Callable[[dict], Record | None], item: dict, source: str) -> Record | None:
@@ -763,6 +921,9 @@ class Provider:
     env_key = ""
     requires_api_key = False
     key_help = ""
+
+    def compile_query(self, query: str, plan: QueryPlan) -> str:
+        return query
 
     def filter_execution(self, plan: QueryPlan) -> dict[str, str]:
         return {key: "remote" for key in (
@@ -908,6 +1069,7 @@ class OpenAlexProvider(Provider):
             work_type=work.get("type"),
             citation_count=work.get("cited_by_count"),
             abstract=reconstruct_abstract(work.get("abstract_inverted_index")),
+            abstract_source=self.name if work.get("abstract_inverted_index") else None,
             authors=authors,
             is_open_access=oa.get("is_oa"),
             open_access_pdf=oa.get("oa_url") or None,
@@ -943,9 +1105,10 @@ class OpenAlexProvider(Provider):
             fetched += len(page)
             if total == 0:
                 total = meta.get("count") or 0
-            for work in page:
+            for index, work in enumerate(page, fetched - len(page) + 1):
                 record = _map_record(self.map_work, work, self.name)
                 if record is not None:
+                    _add_retrieval_hit(record, query, index)
                     records.append(record)
             remaining -= len(page)
             if not page:          # 空页不减少 remaining，必须显式退出以免死循环
@@ -1069,11 +1232,12 @@ class CrossrefProvider(Provider):
                 item.get("type") or "", item.get("type")),
             citation_count=item.get("is-referenced-by-count"),
             abstract=strip_jats(item.get("abstract")),
+            abstract_source=self.name if strip_jats(item.get("abstract")) else None,
             authors=authors,
             is_open_access=None,
             open_access_pdf=pdf_url,
             language=item.get("language") or None,
-            relevance_score=None,
+            relevance_score=item.get("score"),
             source=self.name,
             sources=[self.name],
             source_id=doi or "",
@@ -1106,9 +1270,10 @@ class CrossrefProvider(Provider):
             if not items:
                 break
             fetched += len(items)
-            for item in items:
+            for index, item in enumerate(items, fetched - len(items) + 1):
                 record = _map_record(self.map_item, item, self.name)
                 if record is not None:
+                    _add_retrieval_hit(record, query, index)
                     records.append(record)
             if fetched >= total or len(items) < rows:
                 break
@@ -1145,9 +1310,138 @@ class CrossrefProvider(Provider):
         return ProviderResult(total, records, warnings, fetched, mapped, stop)
 
 
+def _epmc_integer(value: Any) -> int | None:
+    if value is None or value == "":
+        return None
+    if type(value) is int or (isinstance(value, str) and value.isascii() and value.isdigit()):
+        return int(value)
+    raise ValueError("Europe PMC 数值字段必须是整数或数字字符串")
+
+
+class EuropePMCProvider(Provider):
+    name = "europepmc"
+
+    def filter_execution(self, plan: QueryPlan) -> dict[str, str]:
+        modes = super().filter_execution(plan)
+        for key in ("institution", "raw_filter", "work_type"):
+            if key in modes:
+                modes[key] = "unsupported"
+        for key in ("min_citations", "language"):
+            if key in modes:
+                modes[key] = "local"
+        if plan.author and re.fullmatch(r"A\d+", plan.author):
+            modes["author"] = "unsupported"
+        if plan.fetch_sort != "relevance":
+            modes["fetch_sort"] = "unsupported"
+        return modes
+
+    def diagnostics(self, plan: QueryPlan, query: str) -> list[Diagnostic]:
+        return [Diagnostic("unsupported_filter", f"europepmc: {key} 不受支持，已忽略",
+                           self.name, query, key)
+                for key, mode in self.filter_execution(plan).items() if mode == "unsupported"]
+
+    def compile_query(self, query: str, plan: QueryPlan) -> str:
+        parts = [f"({query})"]
+        if plan.year:
+            lo, _, hi = plan.year.partition("-")
+            parts.append(f"PUB_YEAR:[{lo} TO {hi or lo}]")
+        if plan.oa_only:
+            parts.append("OPEN_ACCESS:Y")
+        for key, value in (("AUTH", plan.author), ("ISSN", plan.journal_issn)):
+            if value and not (key == "AUTH" and re.fullmatch(r"A\d+", value)):
+                parts.append(f"{key}:{_quote_query_term(value)}")
+        return " AND ".join(parts)
+
+    def map_item(self, item: dict) -> Record | None:
+        identifier, source = item.get("id"), item.get("source")
+        if not isinstance(identifier, str) or not isinstance(source, str) or not identifier or not source:
+            raise ValueError("Europe PMC 记录缺少 id/source")
+        doi = norm_doi(item.get("doi"))
+        abstract = strip_jats(item.get("abstractText"))
+        types = (item.get("pubTypeList") or {}).get("pubType") or []
+        if not isinstance(types, list) or any(not isinstance(t, str) for t in types):
+            raise ValueError("Europe PMC pubType 必须是字符串数组")
+        work_type = "preprint" if source == "PPR" else (
+            "review" if "Review" in types else "article" if "Journal Article" in types else None)
+        journal = ((item.get("journalInfo") or {}).get("journal") or {}).get("title")
+        return Record(
+            doi=doi, title=item.get("title"), year=_epmc_integer(item.get("pubYear")),
+            publication_date=item.get("firstPublicationDate"), venue=journal,
+            citation_count=_epmc_integer(item.get("citedByCount")),
+            abstract=abstract, abstract_source=self.name if abstract else None,
+            authors=[a["fullName"] for a in (item.get("authorList") or {}).get("author", [])
+                     if a.get("fullName")],
+            is_open_access={"Y": True, "N": False}.get(item.get("isOpenAccess") or ""),
+            language={"eng": "en", "chi": "zh", "zho": "zh"}.get(item.get("language") or "", item.get("language")),
+            work_type=work_type,
+            source=self.name, sources=[self.name], source_id=f"{source}:{identifier}",
+            source_ids={self.name: [f"{source}:{identifier}"]},
+            doi_aliases=[doi] if doi else [], raw_work_types={self.name: types} if types else {},
+            landing_page_url=f"https://europepmc.org/article/{urllib.parse.quote(source)}/{urllib.parse.quote(identifier)}",
+        )
+
+    def search(self, query: str, plan: QueryPlan, http: Http,
+               policy: RetryPolicy, cfg: "Config") -> ProviderResult:
+        budget = plan.limit * (3 if plan.min_citations or plan.language else 1)
+        fetched, total = 0, 0
+        records: list[Record] = []
+        cursor, stop = "*", "exhausted"
+        while fetched < budget:
+            size = min(MAX_PER_PAGE, budget - fetched)
+            url = _epmc_url(self.compile_query(query, plan), {"cursorMark": cursor, "pageSize": str(size)})
+            payload = decode_json(request_with_backoff(http, url, policy), self.name)
+            items = _epmc_page(payload)
+            total = payload["hitCount"]
+            fetched += len(items)
+            for index, item in enumerate(items, fetched - len(items) + 1):
+                record = _map_record(self.map_item, item, self.name)
+                if record is not None:
+                    _add_retrieval_hit(record, query, index)
+                    records.append(record)
+            if not items or len(items) < size or fetched >= total:
+                break
+            if fetched >= budget:
+                stop = "scan_budget" if budget != plan.limit else "limit"
+                break
+            next_cursor = payload.get("nextCursorMark")
+            if not isinstance(next_cursor, str) or not next_cursor or next_cursor == cursor:
+                raise NetworkError("europepmc: 分页响应缺少新的 nextCursorMark")
+            cursor = next_cursor
+        mapped = len(records)
+        records = [record for record in records
+                   if (not plan.min_citations or (record.citation_count or 0) >= plan.min_citations)
+                   and (not plan.language or record.language == plan.language)]
+        return ProviderResult(total, records[:plan.limit], [], fetched, mapped, stop)
+
+
+def _quote_query_term(term: str) -> str:
+    return '"' + term.replace("\\", "\\\\").replace('"', '\\"') + '"'
+
+
+def _queries_for(plan: QueryPlan, source: str) -> list[str]:
+    queries = list(plan.queries)
+    if plan.concepts:
+        groups = plan.concepts
+        if source == "crossref":
+            # 按同义词位置轮换，不向 query 发送另一来源的 Boolean 语法。
+            for index in range(max(map(len, groups))):
+                queries.append(" ".join(_quote_query_term(group[index % len(group)]) for group in groups))
+            if len(groups) > 2:
+                queries.append(" ".join(_quote_query_term(group[0]) for group in groups[:2]))
+        else:
+            prefix = "TITLE_ABS:" if source == "europepmc" else ""
+            clauses = ["(" + " OR ".join(prefix + _quote_query_term(term) for term in group) + ")"
+                       for group in groups]
+            queries.append(" AND ".join(clauses))
+            if len(clauses) > 2:
+                queries.append(" AND ".join(clauses[:2]))
+    return list(dict.fromkeys(queries))
+
+
 PROVIDERS: dict[str, Provider] = {
     OpenAlexProvider.name: OpenAlexProvider(),
     CrossrefProvider.name: CrossrefProvider(),
+    EuropePMCProvider.name: EuropePMCProvider(),
 }
 
 
@@ -1164,6 +1458,48 @@ class SearchClient:
         self.config = config
         self.http = http if http is not None else Http()
         self.retry = retry if retry is not None else RetryPolicy()
+        self._abstract_cache: dict[str, str | None] = {}
+
+    def _enrich(self, records: list[Record], budget: int) -> EnrichmentStats:
+        stats = EnrichmentStats()
+        if not budget:
+            return stats
+        for record in records:
+            doi = norm_doi(record.doi)
+            if record.abstract or not doi:
+                continue
+            if doi in self._abstract_cache:
+                stats.cache_hits += 1
+            elif stats.requested < budget:
+                literal = doi.replace("\\", "\\\\").replace('"', '\\"')
+                url = _epmc_url(f'DOI:"{literal}"', {"pageSize": "100"})
+                payload = decode_json(request_with_backoff(self.http, url, self.retry), "europepmc")
+                items = _epmc_page(payload)
+                abstract = None
+                for item in items:
+                    remote_doi = item.get("doi")
+                    if remote_doi is not None and not isinstance(remote_doi, str):
+                        raise NetworkError("europepmc: doi 必须是字符串或 null")
+                    if norm_doi(remote_doi) == doi:
+                        value = item.get("abstractText")
+                        if value is not None and not isinstance(value, str):
+                            raise NetworkError("europepmc: abstractText 必须是字符串或 null")
+                        abstract = strip_jats(value)
+                        if abstract:
+                            break
+                self._abstract_cache[doi] = abstract
+                stats.requested += 1
+            else:
+                stats.budget_skipped += 1
+                continue
+            abstract = self._abstract_cache[doi]
+            if abstract:
+                record.abstract = abstract
+                record.abstract_source = "europepmc"
+                stats.filled += 1
+            else:
+                stats.not_found += 1
+        return stats
 
     def explain(self, plan: QueryPlan) -> dict[str, Any]:
         plan = validate_plan(plan)
@@ -1171,13 +1507,16 @@ class SearchClient:
             "version": __version__, "schema_version": SCHEMA_VERSION,
             "plan": asdict(plan),
             "config_origins": dict(self.config.origins),
+            "compiled_queries": [{"source": name, "query": query,
+                                  "remote_query": PROVIDERS[name].compile_query(query, plan)}
+                                 for name in plan.sources for query in _queries_for(plan, name)],
             "sources": [{
                 "source": name,
                 "key_configured": bool(self.config.api_keys.get(name)),
                 "requires_api_key": PROVIDERS[name].requires_api_key,
                 "filter_execution": PROVIDERS[name].filter_execution(plan),
             } for name in plan.sources],
-            "diagnostics": [asdict(d) for name in plan.sources for query in plan.queries
+            "diagnostics": [asdict(d) for name in plan.sources for query in _queries_for(plan, name)
                             for d in PROVIDERS[name].diagnostics(plan, query)],
         }
 
@@ -1187,7 +1526,7 @@ class SearchClient:
         diagnostics: list[Diagnostic] = []
         for name in plan.sources:
             provider = PROVIDERS[name]
-            for query in plan.queries:
+            for query in _queries_for(plan, name):
                 current = provider.diagnostics(plan, query)
                 result = provider.search(query, plan, self.http, self.retry, self.config)
                 executions.append(QueryExecution(
@@ -1208,15 +1547,22 @@ class SearchClient:
 
     def search(self, plan: QueryPlan) -> SearchResult:
         plan = validate_plan(plan)
-        preflight = [d for name in plan.sources for query in plan.queries
+        preflight = [d for name in plan.sources for query in _queries_for(plan, name)
                      for d in PROVIDERS[name].diagnostics(plan, query)]
         if plan.strict_filters and preflight:
             raise UsageError("严格筛选模式拒绝忽略或覆盖条件：" + preflight[0].message)
         check_keys(plan.sources, self.config)
         raw, executions, diagnostics = self._fetch(plan)
         merged, stats = merge_records(raw, policy=plan.merge_policy)
+        enrichment = self._enrich(merged, plan.enrich_abstracts)
+        if enrichment.not_found:
+            diagnostics.append(Diagnostic("abstract_not_found",
+                f"europepmc: {enrichment.not_found} 条候选未找到可用摘要", source="europepmc"))
+        if enrichment.budget_skipped:
+            diagnostics.append(Diagnostic("enrichment_budget_limited",
+                f"摘要补全预算用尽，跳过 {enrichment.budget_skipped} 条候选", field="enrich_abstracts"))
         filtered, filter_stats = apply_filters(merged, plan.require, plan.exclude)
-        ordered = sort_records(filtered, plan.sort)
+        ordered = rank_records(filtered, plan)
         truncated = max(0, len(ordered) - plan.max_results) if plan.max_results else 0
         if truncated:
             ordered = ordered[:plan.max_results]
@@ -1231,6 +1577,7 @@ class SearchClient:
             ))
         totals = [(f"{e.source} · {e.query}", e.remote_total) for e in executions]
         report = Report(plan, totals, stats, filter_stats, truncated, executions, diagnostics)
+        report.enrichment = enrichment
         return SearchResult(ordered, report)
 
 
@@ -1362,7 +1709,7 @@ def render_csv(records: list[Record]) -> str:
         row = []
         for name in RECORD_FIELDS:
             value = getattr(rec, name)
-            if isinstance(value, dict):
+            if isinstance(value, dict) or name == "retrieval_hits":
                 value = json.dumps(value, ensure_ascii=False, sort_keys=True)
             elif isinstance(value, list):
                 value = "; ".join(str(v) for v in value)
@@ -1398,8 +1745,11 @@ def _result_payload(report: Report, records: list[Record]) -> dict[str, Any]:
             "fetch_sort": plan.fetch_sort,
             "merge_policy": plan.merge_policy,
             "strict_filters": plan.strict_filters,
+            "enrich_abstracts": plan.enrich_abstracts,
+            "concepts": plan.concepts,
         },
         "merge_stats": asdict(report.stats),
+        "enrichment": asdict(report.enrichment),
         "filter_stats": {
             "before": report.filters.before,
             "excluded": report.filters.excluded,
@@ -1633,8 +1983,8 @@ TEXT_OPTIONS = frozenset({
     "author", "institution", "journal_issn", "work_type", "language",
     "raw_filter", "sort", "fetch_sort", "title", "year", "merge_policy",
 })
-INTEGER_OPTIONS = frozenset({"limit", "max_results", "min_citations"})
-LIST_OPTIONS = frozenset({"queries", "sources", "require", "exclude"})
+INTEGER_OPTIONS = frozenset({"limit", "max_results", "min_citations", "enrich_abstracts"})
+LIST_OPTIONS = frozenset({"queries", "sources", "require", "exclude", "concepts"})
 
 
 def _normalized_year(value: str) -> str:
@@ -1678,11 +2028,12 @@ def _validate_preset(preset: dict, label: str = "preset") -> None:
                 raise ConfigError(f"{label}.{key}：{exc}") from exc
         if name == "queries" and (not value or any(not q.strip() for q in value)):
             raise ConfigError(f"{label}.{key}：必须提供非空检索词")
-        if name in {"sort", "fetch_sort"} and value not in FETCH_SORT_CHOICES:
-            raise ConfigError(f"{label}.{key}：应为 {', '.join(FETCH_SORT_CHOICES)}")
+        choices = SORT_CHOICES if name == "sort" else FETCH_SORT_CHOICES
+        if name in {"sort", "fetch_sort"} and value not in choices:
+            raise ConfigError(f"{label}.{key}：应为 {', '.join(choices)}")
         if name == "merge_policy" and value not in ("title", "doi"):
             raise ConfigError(f"{label}.{key}：应为 title 或 doi")
-        if name in INTEGER_OPTIONS and value < (0 if name == "min_citations" else 1):
+        if name in INTEGER_OPTIONS and value < (0 if name in {"min_citations", "enrich_abstracts"} else 1):
             raise ConfigError(f"{label}.{key}：超出允许范围")
         if name == "sources":
             names = value.split(",") if isinstance(value, str) else value
@@ -1721,7 +2072,13 @@ def validate_plan(plan: QueryPlan) -> QueryPlan:
         value = getattr(plan, key)
         if not isinstance(value, list) or any(not isinstance(v, str) for v in value):
             raise UsageError(f"{key} 必须是字符串数组")
-    if not plan.queries or any(not q.strip() for q in plan.queries):
+    for key in ("require", "concepts"):
+        groups = getattr(plan, key)
+        if (not isinstance(groups, list)
+                or any(not isinstance(g, list) or not g
+                       or any(not isinstance(t, str) or not t.strip() for t in g) for g in groups)):
+            raise UsageError(f"{key} 必须是非空字符串组的数组")
+    if (not plan.queries and not plan.concepts) or any(not q.strip() for q in plan.queries):
         raise UsageError("缺少检索词；检索词必须是非空字符串")
     sources = list(dict.fromkeys(s.strip().lower() for s in plan.sources))
     if not sources:
@@ -1731,35 +2088,31 @@ def validate_plan(plan: QueryPlan) -> QueryPlan:
         raise UsageError(f"未知数据源：{', '.join(unknown)}（可用：{', '.join(PROVIDERS)}）")
     for key in INTEGER_OPTIONS:
         value = getattr(plan, key)
-        if value is None and key != "limit":
+        if value is None and key in {"max_results", "min_citations"}:
             continue
-        if type(value) is not int or value < (0 if key == "min_citations" else 1):
+        if type(value) is not int or value < (0 if key in {"min_citations", "enrich_abstracts"} else 1):
             raise UsageError(f"{key} 必须是有效整数")
     for key in TEXT_OPTIONS:
         value = getattr(plan, key)
         if value is not None and not isinstance(value, str):
             raise UsageError(f"{key} 必须是字符串")
-    if plan.sort not in FETCH_SORT_CHOICES or plan.fetch_sort not in FETCH_SORT_CHOICES:
-        raise UsageError(f"排序必须是 {', '.join(FETCH_SORT_CHOICES)}")
+    if plan.sort not in SORT_CHOICES or plan.fetch_sort not in FETCH_SORT_CHOICES:
+        raise UsageError(f"sort 必须是 {', '.join(SORT_CHOICES)}；fetch_sort 仅支持 relevance/citations/year")
     if plan.oa_only is not None and type(plan.oa_only) is not bool:
         raise UsageError("oa_only 必须是布尔值")
     if type(plan.strict_filters) is not bool:
         raise UsageError("strict_filters 必须是布尔值")
     if plan.merge_policy not in ("title", "doi"):
         raise UsageError("merge_policy 必须是 title 或 doi")
-    if (not isinstance(plan.require, list)
-            or any(not isinstance(g, list) or not g
-                   or any(not isinstance(t, str) or not t.strip() for t in g)
-                   for g in plan.require)):
-        raise UsageError("require 必须是非空字符串组的数组")
     year = _normalized_year(plan.year) if plan.year is not None else None
     normalized_text: dict[str, Any] = {}
     for key in TEXT_OPTIONS - {"year"}:
         value = getattr(plan, key)
         normalized_text[key] = value.strip() if value is not None else None
-    return replace(plan, **normalized_text, queries=[q.strip() for q in plan.queries], sources=sources,
+    return replace(plan, **normalized_text, queries=list(dict.fromkeys(q.strip() for q in plan.queries)), sources=sources,
                    year=year, oa_only=bool(plan.oa_only),
-                   require=[list(g) for g in plan.require], exclude=list(plan.exclude))
+                   require=[list(g) for g in plan.require], exclude=list(plan.exclude),
+                   concepts=[list(dict.fromkeys(t.strip() for t in g)) for g in plan.concepts])
 
 
 def _preset_lookup(preset: dict | None, key: str) -> Any:
@@ -1796,7 +2149,16 @@ def build_plan(args: argparse.Namespace, preset: dict | None,
     exclude_specs = _resolve(args.exclude, preset, "exclude", []) or []
     require_groups: list[list[str]] = []
     for spec in require_specs:
-        require_groups.extend(_split_groups(str(spec)))
+        groups = _split_groups(str(spec))
+        if not groups:
+            raise UsageError("--require 必须包含非空检索词")
+        require_groups.extend(groups)
+    concepts: list[list[str]] = []
+    for spec in _resolve(args.concept, preset, "concepts", []) or []:
+        terms = [term.strip() for term in str(spec).split(",") if term.strip()]
+        if not terms:
+            raise UsageError("--concept 必须包含非空检索词")
+        concepts.append(terms)
     exclude_terms: list[str] = []
     for spec in exclude_specs:
         exclude_terms.extend(_split_or(str(spec)))
@@ -1822,6 +2184,8 @@ def build_plan(args: argparse.Namespace, preset: dict | None,
         title=_resolve(args.title, preset, "title", None),
         strict_filters=_resolve(args.strict_filters, preset, "strict_filters", False),
         merge_policy=_resolve(args.merge_policy, preset, "merge_policy", DEFAULT_MERGE_POLICY),
+        enrich_abstracts=_resolve(args.enrich_abstracts, preset, "enrich_abstracts", 0),
+        concepts=concepts,
     )
     return validate_plan(plan)
 
@@ -1942,7 +2306,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--preset", default=None,
                         help="使用配置文件 [presets] 中的命名检索预设")
     parser.add_argument("--source", default=None,
-                        help="数据源，逗号分隔（默认 openalex）；可选 openalex,crossref")
+                        help="数据源，逗号分隔（默认 openalex）；可选 openalex,crossref,europepmc")
     parser.add_argument("--year", default=None, help="年份过滤：2024 或 2021-2026")
     parser.add_argument("--limit", type=int, default=None,
                         help="每个查询从远端抓取的候选条数上限（默认 25，可超过 100，自动分页）")
@@ -1950,6 +2314,8 @@ def build_parser() -> argparse.ArgumentParser:
                         help="最终写入清单的条数上限（默认不限）；"
                              "配合 --limit 可「多抓候选、少出结果」")
     parser.add_argument("--min-citations", type=int, default=None, help="最低被引数")
+    parser.add_argument("--enrich-abstracts", type=int, default=None, metavar="N",
+                        help="按 DOI 用 Europe PMC 补齐空摘要，最多查询 N 个 DOI（默认 0）")
     parser.add_argument("--author", default=None, help="作者（姓名或 OpenAlex 作者 ID）")
     parser.add_argument("--institution", default=None,
                         help="机构（名称、OpenAlex 机构 ID 或 ROR 链接）")
@@ -1963,9 +2329,11 @@ def build_parser() -> argparse.ArgumentParser:
                         help="直接透传给 OpenAlex 的原始 filter 字符串（逃生舱，优先级最高）")
     parser.add_argument("--require", action="append", default=None, metavar="A,B",
                         help="相关性分组过滤，可重复；组内逗号分隔为 OR，组间为 AND")
+    parser.add_argument("--concept", action="append", default=None, metavar="A,B",
+                        help="主题概念同义词组，可重复；按来源生成精查询与宽召回查询，不作硬过滤")
     parser.add_argument("--exclude", action="append", default=None, metavar="X,Y",
                         help="排除词，可重复；命中任一即剔除")
-    parser.add_argument("--sort", choices=["citations", "year", "relevance"],
+    parser.add_argument("--sort", choices=list(SORT_CHOICES),
                         default=None, help="展示排序（默认 citations）")
     parser.add_argument("--fetch-sort", dest="fetch_sort",
                         choices=list(FETCH_SORT_CHOICES), default=None,

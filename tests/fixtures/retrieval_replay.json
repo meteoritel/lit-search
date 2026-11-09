@@ -1,0 +1,7430 @@
+{
+  "description": "Frozen source metadata and DOI labels for missing-abstract filtering regression.",
+  "require": [
+    [
+      "south china sea",
+      "northern south china",
+      "beibu gulf",
+      "daya bay",
+      "qinzhou",
+      "weizhou",
+      "hainan",
+      "pearl river",
+      "zhanjiang",
+      "sanya",
+      "xisha",
+      "nansha",
+      "zhongsha",
+      "xianbei",
+      "yazhou",
+      "maowei",
+      "sanniang"
+    ],
+    [
+      "protist",
+      "eukaryot",
+      "ciliate",
+      "dinoflagellate",
+      "microzooplankton",
+      "nanoflagellate",
+      "microeukaryot",
+      "phytoplankton",
+      "microalgae"
+    ],
+    [
+      "seasonal",
+      "temporal",
+      "time series",
+      "time-series",
+      "monthly",
+      "diel",
+      "daily",
+      "succession",
+      "dynamics",
+      "variation",
+      "spatiotemporal",
+      "long-term",
+      "interannual"
+    ]
+  ],
+  "response": {
+    "meta": {
+      "count": 19
+    },
+    "results": [
+      {
+        "id": "https://openalex.org/W4414753240",
+        "doi": "10.1186/s12866-025-04239-2",
+        "title": "Temporal factors and habitats drive the variation of microbial distributions and co-occurrence patterns in the Pearl River Estuary",
+        "publication_year": 2025,
+        "cited_by_count": 6,
+        "relevance_score": 83.00055,
+        "abstract_inverted_index": {
+          "BACKGROUND:": [
+            0
+          ],
+          "Estuaries": [
+            1
+          ],
+          "are": [
+            2,
+            32
+          ],
+          "dynamic": [
+            3
+          ],
+          "and": [
+            4,
+            11,
+            18,
+            24,
+            39,
+            55,
+            70,
+            75,
+            82,
+            94,
+            128,
+            163,
+            170,
+            174
+          ],
+          "complicated": [
+            5
+          ],
+          "aquatic": [
+            6
+          ],
+          "ecosystems,": [
+            7
+          ],
+          "where": [
+            8
+          ],
+          "both": [
+            9,
+            67
+          ],
+          "abiotic": [
+            10
+          ],
+          "biotic": [
+            12
+          ],
+          "factors": [
+            13
+          ],
+          "heavily": [
+            14
+          ],
+          "vary": [
+            15
+          ],
+          "across": [
+            16,
+            51
+          ],
+          "seasons": [
+            17
+          ],
+          "among": [
+            19
+          ],
+          "habitats.": [
+            20
+          ],
+          "However,": [
+            21
+          ],
+          "the": [
+            22,
+            37,
+            43,
+            68,
+            115,
+            138,
+            158,
+            183
+          ],
+          "distributions": [
+            23
+          ],
+          "co-occurrence": [
+            25,
+            71,
+            95
+          ],
+          "patterns": [
+            26,
+            72,
+            93,
+            96
+          ],
+          "of": [
+            27,
+            73,
+            97,
+            101,
+            132,
+            141,
+            149,
+            160
+          ],
+          "microorganisms": [
+            28
+          ],
+          "in": [
+            29,
+            42,
+            48,
+            123,
+            135,
+            166,
+            186
+          ],
+          "estuarine": [
+            30,
+            187
+          ],
+          "ecosystems": [
+            31
+          ],
+          "still": [
+            33
+          ],
+          "little": [
+            34
+          ],
+          "known.": [
+            35
+          ],
+          "Here,": [
+            36
+          ],
+          "microeukaryotic": [
+            38,
+            125,
+            150
+          ],
+          "prokaryotic": [
+            40,
+            133,
+            142
+          ],
+          "communities": [
+            41,
+            143
+          ],
+          "Pearl": [
+            44
+          ],
+          "River": [
+            45
+          ],
+          "Estuary": [
+            46
+          ],
+          "(PRE)": [
+            47
+          ],
+          "southern": [
+            49
+          ],
+          "China": [
+            50
+          ],
+          "different": [
+            52,
+            178
+          ],
+          "sampling": [
+            53,
+            80,
+            86,
+            161
+          ],
+          "time": [
+            54,
+            81,
+            87,
+            162
+          ],
+          "habitat": [
+            56,
+            83,
+            104,
+            164
+          ],
+          "types": [
+            57,
+            105,
+            165
+          ],
+          "were": [
+            58,
+            77,
+            144
+          ],
+          "investigated": [
+            59
+          ],
+          "using": [
+            60
+          ],
+          "amplicon": [
+            61
+          ],
+          "sequencing.": [
+            62
+          ],
+          "RESULTS:": [
+            63
+          ],
+          "Results": [
+            64
+          ],
+          "showed": [
+            65,
+            88,
+            106,
+            171
+          ],
+          "that": [
+            66,
+            172
+          ],
+          "distribution": [
+            69,
+            92
+          ],
+          "microeukaryotes": [
+            74,
+            98,
+            175
+          ],
+          "prokaryotes": [
+            76,
+            110,
+            173
+          ],
+          "driven": [
+            78
+          ],
+          "by": [
+            79
+          ],
+          "types.": [
+            84
+          ],
+          "The": [
+            85
+          ],
+          "stronger": [
+            89,
+            107
+          ],
+          "impact": [
+            90
+          ],
+          "on": [
+            91,
+            109,
+            112,
+            157
+          ],
+          "than": [
+            99,
+            111,
+            130,
+            147
+          ],
+          "those": [
+            100,
+            131,
+            148
+          ],
+          "prokaryotes,": [
+            102
+          ],
+          "whereas": [
+            103
+          ],
+          "influence": [
+            108
+          ],
+          "microeukaryotes.": [
+            113
+          ],
+          "Additionally,": [
+            114
+          ],
+          "deterministic": [
+            116
+          ],
+          "processes": [
+            117
+          ],
+          "played": [
+            118
+          ],
+          "a": [
+            119
+          ],
+          "more": [
+            120,
+            145
+          ],
+          "important": [
+            121
+          ],
+          "role": [
+            122
+          ],
+          "structuring": [
+            124
+          ],
+          "community": [
+            126
+          ],
+          "structures": [
+            127
+          ],
+          "networks": [
+            129
+          ],
+          "counterparts": [
+            134
+          ],
+          "PRE.": [
+            136
+          ],
+          "And": [
+            137
+          ],
+          "species": [
+            139
+          ],
+          "interactions": [
+            140
+          ],
+          "stable": [
+            146
+          ],
+          "counterparts.": [
+            151
+          ],
+          "CONCLUSIONS:": [
+            152
+          ],
+          "Our": [
+            153
+          ],
+          "study": [
+            154
+          ],
+          "sheds": [
+            155
+          ],
+          "light": [
+            156
+          ],
+          "importance": [
+            159
+          ],
+          "maintaining": [
+            167
+          ],
+          "microbial": [
+            168
+          ],
+          "diversities,": [
+            169
+          ],
+          "may": [
+            176
+          ],
+          "have": [
+            177
+          ],
+          "strategies": [
+            179
+          ],
+          "when": [
+            180
+          ],
+          "responding": [
+            181
+          ],
+          "to": [
+            182
+          ],
+          "environmental": [
+            184
+          ],
+          "changes": [
+            185
+          ],
+          "ecosystems.": [
+            188
+          ]
+        }
+      },
+      {
+        "id": "https://openalex.org/W4385986420",
+        "doi": "10.1038/s43705-023-00292-y",
+        "title": "A comparative study reveals the relative importance of prokaryotic and eukaryotic proton pump rhodopsins in a subtropical marginal sea",
+        "publication_year": 2023,
+        "cited_by_count": 9,
+        "relevance_score": 77.780396,
+        "abstract_inverted_index": {
+          "Proton-pump": [
+            0
+          ],
+          "rhodopsin": [
+            1
+          ],
+          "(PPR)": [
+            2
+          ],
+          "in": [
+            3,
+            22,
+            52,
+            65,
+            93,
+            113,
+            137,
+            192,
+            200
+          ],
+          "marine": [
+            4,
+            206
+          ],
+          "microbes": [
+            5
+          ],
+          "can": [
+            6
+          ],
+          "convert": [
+            7
+          ],
+          "solar": [
+            8
+          ],
+          "energy": [
+            9
+          ],
+          "to": [
+            10
+          ],
+          "bioavailable": [
+            11
+          ],
+          "chemical": [
+            12
+          ],
+          "energy.": [
+            13
+          ],
+          "Whereas": [
+            14
+          ],
+          "bacterial": [
+            15
+          ],
+          "PPR": [
+            16,
+            51,
+            100,
+            183
+          ],
+          "has": [
+            17
+          ],
+          "been": [
+            18
+          ],
+          "extensively": [
+            19
+          ],
+          "studied,": [
+            20
+          ],
+          "counterparts": [
+            21
+          ],
+          "microeukaryotes": [
+            23,
+            108,
+            142
+          ],
+          "are": [
+            24,
+            119
+          ],
+          "less": [
+            25
+          ],
+          "explored,": [
+            26
+          ],
+          "and": [
+            27,
+            43,
+            47,
+            55,
+            61,
+            82,
+            96,
+            109,
+            124,
+            143,
+            185,
+            190,
+            203
+          ],
+          "the": [
+            28,
+            32,
+            45,
+            66,
+            73,
+            94,
+            104,
+            152,
+            160,
+            175
+          ],
+          "relative": [
+            29
+          ],
+          "importance": [
+            30
+          ],
+          "of": [
+            31,
+            50,
+            99
+          ],
+          "two": [
+            33
+          ],
+          "groups": [
+            34
+          ],
+          "is": [
+            35
+          ],
+          "poorly": [
+            36
+          ],
+          "understood.": [
+            37
+          ],
+          "Here,": [
+            38
+          ],
+          "we": [
+            39
+          ],
+          "sequenced": [
+            40
+          ],
+          "whole-assemblage": [
+            41
+          ],
+          "metatranscriptomes": [
+            42
+          ],
+          "investigated": [
+            44
+          ],
+          "diversity": [
+            46
+          ],
+          "expression": [
+            48,
+            97,
+            186
+          ],
+          "dynamics": [
+            49
+          ],
+          "microbial": [
+            53
+          ],
+          "eukaryotes": [
+            54,
+            191
+          ],
+          "prokaryotes": [
+            56,
+            91,
+            110,
+            189
+          ],
+          "at": [
+            57,
+            103,
+            148,
+            151,
+            166,
+            171,
+            174
+          ],
+          "a": [
+            58,
+            62,
+            181,
+            193
+          ],
+          "continental": [
+            59,
+            105
+          ],
+          "shelf": [
+            60,
+            153
+          ],
+          "slope": [
+            63,
+            106,
+            176
+          ],
+          "site": [
+            64
+          ],
+          "northern": [
+            67
+          ],
+          "South": [
+            68
+          ],
+          "China": [
+            69
+          ],
+          "Sea.": [
+            70
+          ],
+          "Data": [
+            71
+          ],
+          "showed": [
+            72,
+            125
+          ],
+          "whole": [
+            74
+          ],
+          "PPRs": [
+            75,
+            118,
+            133,
+            158
+          ],
+          "transcript": [
+            76,
+            114
+          ],
+          "pool": [
+            77
+          ],
+          "was": [
+            78
+          ],
+          "dominated": [
+            79,
+            159
+          ],
+          "by": [
+            80,
+            85,
+            90,
+            122
+          ],
+          "Proteorhodopsins": [
+            81
+          ],
+          "Xanthorhodopsins,": [
+            83
+          ],
+          "followed": [
+            84
+          ],
+          "Bacteriorhodopsin-like": [
+            86
+          ],
+          "proteins,": [
+            87
+          ],
+          "dominantly": [
+            88
+          ],
+          "contributed": [
+            89,
+            111,
+            121
+          ],
+          "both": [
+            92,
+            167
+          ],
+          "number": [
+            95
+          ],
+          "levels": [
+            98
+          ],
+          "unigenes,": [
+            101
+          ],
+          "although": [
+            102
+          ],
+          "station,": [
+            107,
+            154
+          ],
+          "similarly": [
+            112
+          ],
+          "abundance.": [
+            115
+          ],
+          "Furthermore,": [
+            116
+          ],
+          "eukaryotic": [
+            117
+          ],
+          "mainly": [
+            120,
+            135
+          ],
+          "dinoflagellates": [
+            123
+          ],
+          "significant": [
+            126
+          ],
+          "correlation": [
+            127
+          ],
+          "with": [
+            128
+          ],
+          "nutrient": [
+            129
+          ],
+          "concentrations.": [
+            130
+          ],
+          "Green": [
+            131
+          ],
+          "light-absorbing": [
+            132,
+            157
+          ],
+          "were": [
+            134
+          ],
+          "distributed": [
+            136
+          ],
+          ">3": [
+            138
+          ],
+          "μm": [
+            139,
+            162
+          ],
+          "organisms": [
+            140
+          ],
+          "(including": [
+            141
+          ],
+          "their": [
+            144
+          ],
+          "associated": [
+            145
+          ],
+          "bacteria),": [
+            146
+          ],
+          "especially": [
+            147,
+            170
+          ],
+          "surface": [
+            149
+          ],
+          "layer": [
+            150
+          ],
+          "whereas": [
+            155
+          ],
+          "blue": [
+            156
+          ],
+          "<3": [
+            161
+          ],
+          "(mainly": [
+            163
+          ],
+          "bacterial)": [
+            164
+          ],
+          "communities": [
+            165
+          ],
+          "study": [
+            168,
+            179
+          ],
+          "sites,": [
+            169
+          ],
+          "deeper": [
+            172
+          ],
+          "layers": [
+            173
+          ],
+          "station.": [
+            177
+          ],
+          "Our": [
+            178
+          ],
+          "portrays": [
+            180
+          ],
+          "comparative": [
+            182
+          ],
+          "genotype": [
+            184
+          ],
+          "landscape": [
+            187
+          ],
+          "for": [
+            188
+          ],
+          "subtropical": [
+            194
+          ],
+          "marginal": [
+            195
+          ],
+          "sea,": [
+            196
+          ],
+          "suggesting": [
+            197
+          ],
+          "PPR's": [
+            198
+          ],
+          "role": [
+            199
+          ],
+          "niche": [
+            201
+          ],
+          "differentiation": [
+            202
+          ],
+          "adaptation": [
+            204
+          ],
+          "among": [
+            205
+          ],
+          "microbes.": [
+            207
+          ]
+        }
+      },
+      {
+        "id": "https://openalex.org/W3198467153",
+        "doi": "10.3389/fmicb.2021.689688",
+        "title": "Distribution Patterns of Ciliate Diversity in the South China Sea",
+        "publication_year": 2021,
+        "cited_by_count": 21,
+        "relevance_score": 75.8752,
+        "abstract_inverted_index": {
+          "Ciliates": [
+            0
+          ],
+          "are": [
+            1,
+            5
+          ],
+          "abundant": [
+            2
+          ],
+          "microplankton": [
+            3
+          ],
+          "that": [
+            4,
+            98,
+            164,
+            221
+          ],
+          "widely": [
+            6
+          ],
+          "distributed": [
+            7
+          ],
+          "in": [
+            8,
+            20,
+            48,
+            54,
+            63,
+            178,
+            216,
+            232,
+            241,
+            246
+          ],
+          "the": [
+            9,
+            14,
+            21,
+            49,
+            79,
+            83,
+            86,
+            90,
+            111,
+            118,
+            121,
+            140,
+            169,
+            179,
+            184,
+            203,
+            217,
+            225,
+            229,
+            243,
+            257
+          ],
+          "ocean.": [
+            10
+          ],
+          "In": [
+            11,
+            117,
+            135,
+            199
+          ],
+          "this": [
+            12
+          ],
+          "paper,": [
+            13
+          ],
+          "distribution": [
+            15
+          ],
+          "patterns": [
+            16
+          ],
+          "of": [
+            17,
+            41,
+            65,
+            106,
+            110,
+            143,
+            152,
+            172,
+            206,
+            213
+          ],
+          "ciliate": [
+            18,
+            43,
+            52,
+            214
+          ],
+          "diversity": [
+            19
+          ],
+          "South": [
+            22
+          ],
+          "China": [
+            23
+          ],
+          "Sea": [
+            24
+          ],
+          "(SCS)": [
+            25
+          ],
+          "were": [
+            26,
+            61,
+            114
+          ],
+          "analyzed": [
+            27
+          ],
+          "by": [
+            28,
+            154
+          ],
+          "compiling": [
+            29
+          ],
+          "community": [
+            30,
+            74,
+            122,
+            185
+          ],
+          "data": [
+            31
+          ],
+          "from": [
+            32
+          ],
+          "previous": [
+            33
+          ],
+          "publications.": [
+            34
+          ],
+          "Based": [
+            35
+          ],
+          "on": [
+            36,
+            174,
+            187,
+            211,
+            261
+          ],
+          "morphological": [
+            37
+          ],
+          "identification,": [
+            38
+          ],
+          "a": [
+            39,
+            175,
+            188
+          ],
+          "total": [
+            40
+          ],
+          "592": [
+            42
+          ],
+          "species": [
+            44
+          ],
+          "have": [
+            45
+          ],
+          "been": [
+            46
+          ],
+          "recorded": [
+            47
+          ],
+          "SCS.": [
+            50
+          ],
+          "The": [
+            51,
+            104
+          ],
+          "communities": [
+            53,
+            144,
+            153,
+            215
+          ],
+          "intertidal,": [
+            55
+          ],
+          "neritic": [
+            56,
+            100,
+            136,
+            247
+          ],
+          "and": [
+            57,
+            68,
+            89,
+            101,
+            137,
+            156,
+            160,
+            208,
+            219,
+            248
+          ],
+          "oceanic": [
+            58,
+            102,
+            138,
+            249
+          ],
+          "water": [
+            59
+          ],
+          "areas": [
+            60,
+            93,
+            113
+          ],
+          "compared": [
+            62
+          ],
+          "terms": [
+            64
+          ],
+          "taxonomy,": [
+            66
+          ],
+          "motility": [
+            67
+          ],
+          "feeding": [
+            69,
+            161
+          ],
+          "habit": [
+            70
+          ],
+          "composition,": [
+            71
+          ],
+          "respectively.": [
+            72
+          ],
+          "Significant": [
+            73
+          ],
+          "variation": [
+            75,
+            142,
+            186
+          ],
+          "was": [
+            76,
+            94,
+            123,
+            148
+          ],
+          "revealed": [
+            77,
+            168
+          ],
+          "among": [
+            78,
+            127,
+            132,
+            145
+          ],
+          "three": [
+            80,
+            112
+          ],
+          "areas,": [
+            81,
+            139
+          ],
+          "but": [
+            82,
+            129,
+            181
+          ],
+          "difference": [
+            84
+          ],
+          "between": [
+            85,
+            99
+          ],
+          "intertidal": [
+            87,
+            119,
+            233
+          ],
+          "area": [
+            88
+          ],
+          "other": [
+            91
+          ],
+          "two": [
+            92
+          ],
+          "more": [
+            95
+          ],
+          "significant": [
+            96,
+            239
+          ],
+          "than": [
+            97,
+            196
+          ],
+          "areas.": [
+            103
+          ],
+          "distributions": [
+            105
+          ],
+          "ciliates": [
+            107,
+            173
+          ],
+          "within": [
+            108
+          ],
+          "each": [
+            109
+          ],
+          "also": [
+            115
+          ],
+          "analyzed.": [
+            116
+          ],
+          "water,": [
+            120,
+            234
+          ],
+          "not": [
+            124
+          ],
+          "significantly": [
+            125
+          ],
+          "different": [
+            126,
+            146
+          ],
+          "sites": [
+            128,
+            147
+          ],
+          "did": [
+            130
+          ],
+          "differ": [
+            131
+          ],
+          "habitat": [
+            133
+          ],
+          "types.": [
+            134
+          ],
+          "spatial": [
+            141,
+            209,
+            236
+          ],
+          "clearly": [
+            149
+          ],
+          "observed.": [
+            150
+          ],
+          "Comparison": [
+            151
+          ],
+          "taxonomic": [
+            155,
+            191,
+            230,
+            244
+          ],
+          "ecological": [
+            157,
+            197,
+            252
+          ],
+          "traits": [
+            158,
+            166,
+            192
+          ],
+          "(motility": [
+            159
+          ],
+          "habit)": [
+            162
+          ],
+          "indicated": [
+            163
+          ],
+          "these": [
+            165
+          ],
+          "similarly": [
+            167
+          ],
+          "geographical": [
+            170
+          ],
+          "pattern": [
+            171
+          ],
+          "large": [
+            176
+          ],
+          "scale": [
+            177
+          ],
+          "SCS,": [
+            180
+          ],
+          "to": [
+            182
+          ],
+          "distinguish": [
+            183
+          ],
+          "local": [
+            189
+          ],
+          "scale,": [
+            190
+          ],
+          "has": [
+            193
+          ],
+          "higher": [
+            194
+          ],
+          "resolution": [
+            195
+          ],
+          "traits.": [
+            198
+          ],
+          "addition,": [
+            200
+          ],
+          "we": [
+            201
+          ],
+          "assessed": [
+            202
+          ],
+          "relative": [
+            204
+          ],
+          "influences": [
+            205
+          ],
+          "environmental": [
+            207,
+            222,
+            254
+          ],
+          "factors": [
+            210
+          ],
+          "assembly": [
+            212
+          ],
+          "SCS": [
+            218
+          ],
+          "found": [
+            220
+          ],
+          "selection": [
+            223,
+            255
+          ],
+          "is": [
+            224
+          ],
+          "major": [
+            226
+          ],
+          "process": [
+            227
+          ],
+          "structuring": [
+            228
+          ],
+          "composition": [
+            231,
+            245
+          ],
+          "while": [
+            235
+          ],
+          "processes": [
+            237
+          ],
+          "played": [
+            238
+          ],
+          "roles": [
+            240
+          ],
+          "influencing": [
+            242
+          ],
+          "water.": [
+            250
+          ],
+          "Among": [
+            251
+          ],
+          "traits,": [
+            253
+          ],
+          "had": [
+            256
+          ],
+          "most": [
+            258
+          ],
+          "important": [
+            259
+          ],
+          "impact": [
+            260
+          ],
+          "distributions.": [
+            262
+          ]
+        }
+      },
+      {
+        "id": "https://openalex.org/W7212223866",
+        "doi": "10.1016/j.marpolbul.2026.120333",
+        "title": "Seasonal environmental forcing masks thermal discharge effects on plankton communities in a subtropical coastal bay",
+        "publication_year": 2026,
+        "cited_by_count": 0,
+        "relevance_score": 53.26726,
+        "abstract_inverted_index": null
+      },
+      {
+        "id": "https://openalex.org/W4404852425",
+        "doi": "10.1128/spectrum.01247-24",
+        "title": "Effects of temporal, spatial, and environmental factors on ciliates community in northeastern South China Sea, with notes on co-occurrence patterns of environment, phytoplankton, and ciliate",
+        "publication_year": 2024,
+        "cited_by_count": 2,
+        "relevance_score": 46.704697,
+        "abstract_inverted_index": {
+          "Little": [
+            0
+          ],
+          "is": [
+            1,
+            223
+          ],
+          "known": [
+            2
+          ],
+          "about": [
+            3
+          ],
+          "temp-spatial": [
+            4,
+            106,
+            265,
+            314
+          ],
+          "variations": [
+            5,
+            71,
+            97
+          ],
+          "and": [
+            6,
+            21,
+            35,
+            54,
+            69,
+            80,
+            160,
+            204,
+            213,
+            248,
+            256
+          ],
+          "determining": [
+            7
+          ],
+          "mechanism": [
+            8
+          ],
+          "of": [
+            9,
+            23,
+            72,
+            85,
+            121,
+            166,
+            179,
+            192,
+            195,
+            211,
+            243,
+            253,
+            316
+          ],
+          "microplankton": [
+            10
+          ],
+          "community": [
+            11,
+            47,
+            73,
+            86,
+            177,
+            193,
+            245,
+            261,
+            287,
+            318
+          ],
+          "from": [
+            12,
+            64,
+            232
+          ],
+          "continental": [
+            13,
+            233
+          ],
+          "shelf": [
+            14,
+            234
+          ],
+          "to": [
+            15,
+            67,
+            118,
+            175,
+            235,
+            286
+          ],
+          "deep": [
+            16,
+            81,
+            236
+          ],
+          "basin.": [
+            17,
+            237
+          ],
+          "Here,": [
+            18
+          ],
+          "the": [
+            19,
+            26,
+            40,
+            59,
+            70,
+            90,
+            96,
+            112,
+            119,
+            126,
+            130,
+            148,
+            167,
+            176,
+            180,
+            190,
+            198,
+            240,
+            250,
+            273,
+            277,
+            283,
+            290,
+            307
+          ],
+          "distribution": [
+            20,
+            241
+          ],
+          "determinants": [
+            22,
+            84
+          ],
+          "ciliates": [
+            24
+          ],
+          "in": [
+            25,
+            33,
+            52,
+            125,
+            197,
+            218,
+            246,
+            313,
+            319
+          ],
+          "northeastern": [
+            27
+          ],
+          "South": [
+            28
+          ],
+          "China": [
+            29
+          ],
+          "Sea": [
+            30
+          ],
+          "were": [
+            31,
+            43,
+            75,
+            98,
+            111
+          ],
+          "investigated": [
+            32
+          ],
+          "summer": [
+            34,
+            53
+          ],
+          "winter.": [
+            36,
+            55
+          ],
+          "We": [
+            37,
+            238
+          ],
+          "found": [
+            38
+          ],
+          "that": [
+            39,
+            147,
+            295,
+            306
+          ],
+          "alpha": [
+            41,
+            60
+          ],
+          "diversity": [
+            42,
+            61
+          ],
+          "generally": [
+            44
+          ],
+          "similar,": [
+            45
+          ],
+          "but": [
+            46
+          ],
+          "composition": [
+            48,
+            74
+          ],
+          "showed": [
+            49,
+            135,
+            282,
+            294
+          ],
+          "clear": [
+            50
+          ],
+          "difference": [
+            51
+          ],
+          "For": [
+            56,
+            93,
+            129
+          ],
+          "spatial": [
+            57,
+            132
+          ],
+          "dimension,": [
+            58
+          ],
+          "significantly": [
+            62
+          ],
+          "decreased": [
+            63
+          ],
+          "neritic": [
+            65
+          ],
+          "water": [
+            66
+          ],
+          "deep,": [
+            68
+          ],
+          "only": [
+            76
+          ],
+          "detected": [
+            77
+          ],
+          "between": [
+            78
+          ],
+          "upper": [
+            79
+          ],
+          "water.": [
+            82
+          ],
+          "The": [
+            83
+          ],
+          "varied": [
+            87
+          ],
+          "depending": [
+            88
+          ],
+          "on": [
+            89,
+            139,
+            228
+          ],
+          "research": [
+            91,
+            127
+          ],
+          "scale.": [
+            92
+          ],
+          "entire": [
+            94
+          ],
+          "community,": [
+            95
+          ],
+          "higher": [
+            99
+          ],
+          "explained": [
+            100
+          ],
+          "by": [
+            101,
+            105
+          ],
+          "environmental": [
+            102,
+            257,
+            267,
+            278
+          ],
+          "factors": [
+            103,
+            110,
+            162,
+            258,
+            268,
+            281,
+            297
+          ],
+          "than": [
+            104,
+            141,
+            155
+          ],
+          "factors.": [
+            107,
+            143,
+            158
+          ],
+          "Specially,": [
+            108
+          ],
+          "physical": [
+            109,
+            122,
+            161,
+            280,
+            296,
+            308
+          ],
+          "main": [
+            113
+          ],
+          "determinants,": [
+            114
+          ],
+          "which": [
+            115
+          ],
+          "may": [
+            116
+          ],
+          "attribute": [
+            117
+          ],
+          "effects": [
+            120
+          ],
+          "processes": [
+            123,
+            309
+          ],
+          "occurred": [
+            124
+          ],
+          "area.": [
+            128
+          ],
+          "three": [
+            131
+          ],
+          "subareas,": [
+            133
+          ],
+          "season": [
+            134
+          ],
+          "more": [
+            136,
+            151,
+            270,
+            299
+          ],
+          "significant": [
+            137,
+            173
+          ],
+          "influences": [
+            138,
+            174
+          ],
+          "communities": [
+            140
+          ],
+          "other": [
+            142
+          ],
+          "Network": [
+            144
+          ],
+          "analyses": [
+            145
+          ],
+          "revealed": [
+            146,
+            239
+          ],
+          "ciliate": [
+            149,
+            244,
+            274,
+            317
+          ],
+          "exhibited": [
+            150
+          ],
+          "relationships": [
+            152
+          ],
+          "with": [
+            153,
+            156,
+            264
+          ],
+          "phytoplankton": [
+            154
+          ],
+          "environment": [
+            157
+          ],
+          "Diatom": [
+            159
+          ],
+          "accounted": [
+            163
+          ],
+          "for": [
+            164,
+            189,
+            259,
+            272,
+            300
+          ],
+          "most": [
+            165
+          ],
+          "ciliate-phytoplankton-environment": [
+            168
+          ],
+          "co-occurrence": [
+            169,
+            292
+          ],
+          "relationships,": [
+            170
+          ],
+          "suggesting": [
+            171
+          ],
+          "their": [
+            172,
+            229,
+            260,
+            301
+          ],
+          "stability": [
+            178
+          ],
+          "microbial": [
+            181
+          ],
+          "food": [
+            182
+          ],
+          "web.": [
+            183
+          ],
+          "This": [
+            184
+          ],
+          "study": [
+            185
+          ],
+          "improves": [
+            186
+          ],
+          "our": [
+            187
+          ],
+          "understanding": [
+            188
+          ],
+          "mechanisms": [
+            191,
+            231
+          ],
+          "structuring": [
+            194,
+            230
+          ],
+          "microzooplankton": [
+            196
+          ],
+          "open": [
+            199,
+            320
+          ],
+          "sea": [
+            200
+          ],
+          "across": [
+            201
+          ],
+          "both": [
+            202
+          ],
+          "space": [
+            203
+          ],
+          "time.": [
+            205
+          ],
+          "IMPORTANCE:": [
+            206
+          ],
+          "Ciliates": [
+            207
+          ],
+          "are": [
+            208
+          ],
+          "important": [
+            209
+          ],
+          "components": [
+            210
+          ],
+          "microplanktons": [
+            212
+          ],
+          "play": [
+            214,
+            310
+          ],
+          "a": [
+            215
+          ],
+          "crucial": [
+            216
+          ],
+          "role": [
+            217
+          ],
+          "global": [
+            219
+          ],
+          "nutrient": [
+            220
+          ],
+          "cycling.": [
+            221
+          ],
+          "There": [
+            222
+          ],
+          "still": [
+            224
+          ],
+          "large": [
+            225
+          ],
+          "knowledge": [
+            226
+          ],
+          "gap": [
+            227
+          ],
+          "patterns": [
+            242
+          ],
+          "neSCS": [
+            247
+          ],
+          "assessed": [
+            249
+          ],
+          "relative": [
+            251
+          ],
+          "contribution": [
+            252,
+            285
+          ],
+          "temporal,": [
+            254
+          ],
+          "spatial,": [
+            255
+          ],
+          "structuring.": [
+            262
+          ],
+          "Compared": [
+            263
+          ],
+          "factors,": [
+            266,
+            279
+          ],
+          "take": [
+            269
+          ],
+          "responsibilities": [
+            271
+          ],
+          "distribution.": [
+            275
+          ],
+          "Among": [
+            276
+          ],
+          "largest": [
+            284
+          ],
+          "variation.": [
+            288
+          ],
+          "Moreover,": [
+            289
+          ],
+          "ciliate-environment": [
+            291
+          ],
+          "pattern": [
+            293
+          ],
+          "contributed": [
+            298
+          ],
+          "relationships.": [
+            302
+          ],
+          "These": [
+            303
+          ],
+          "findings": [
+            304
+          ],
+          "suggested": [
+            305
+          ],
+          "key": [
+            311
+          ],
+          "roles": [
+            312
+          ],
+          "dynamics": [
+            315
+          ],
+          "ocean.": [
+            321
+          ]
+        }
+      },
+      {
+        "id": "https://openalex.org/W3201578197",
+        "doi": "10.3390/toxins13090643",
+        "title": "Ciguatoxin-Producing Dinoflagellate Gambierdiscus in the Beibu Gulf: First Report of Toxic Gambierdiscus in Chinese Waters",
+        "publication_year": 2021,
+        "cited_by_count": 19,
+        "relevance_score": 45.858154,
+        "abstract_inverted_index": {
+          "Ciguatera": [
+            0
+          ],
+          "poisoning": [
+            1
+          ],
+          "is": [
+            2,
+            39,
+            229
+          ],
+          "mainly": [
+            3
+          ],
+          "caused": [
+            4
+          ],
+          "by": [
+            5,
+            17,
+            84
+          ],
+          "the": [
+            6,
+            18,
+            44,
+            79,
+            130,
+            156,
+            185,
+            189,
+            194,
+            205,
+            230,
+            237,
+            258
+          ],
+          "consumption": [
+            7
+          ],
+          "of": [
+            8,
+            29,
+            67,
+            106,
+            173,
+            175,
+            197,
+            207
+          ],
+          "reef": [
+            9,
+            57
+          ],
+          "fish": [
+            10,
+            58,
+            183
+          ],
+          "that": [
+            11,
+            193
+          ],
+          "have": [
+            12,
+            50,
+            59
+          ],
+          "accumulated": [
+            13
+          ],
+          "ciguatoxins": [
+            14
+          ],
+          "(CTXs)": [
+            15
+          ],
+          "produced": [
+            16
+          ],
+          "benthic": [
+            19
+          ],
+          "dinoflagellates": [
+            20
+          ],
+          "Gambierdiscus": [
+            21,
+            68,
+            107,
+            150,
+            235
+          ],
+          "and": [
+            22,
+            54,
+            82,
+            86,
+            90,
+            96,
+            119,
+            122,
+            160,
+            240,
+            243
+          ],
+          "Fukuyoa.": [
+            23
+          ],
+          "China": [
+            24
+          ],
+          "has": [
+            25
+          ],
+          "a": [
+            26,
+            75,
+            110,
+            120,
+            147,
+            246
+          ],
+          "long": [
+            27
+          ],
+          "history": [
+            28
+          ],
+          "problems": [
+            30
+          ],
+          "with": [
+            31,
+            133,
+            181
+          ],
+          "ciguatera,": [
+            32
+          ],
+          "but": [
+            33
+          ],
+          "research": [
+            34,
+            250
+          ],
+          "on": [
+            35,
+            94,
+            233
+          ],
+          "ciguatera": [
+            36,
+            76,
+            255
+          ],
+          "causative": [
+            37
+          ],
+          "organisms": [
+            38
+          ],
+          "very": [
+            40
+          ],
+          "limited,": [
+            41
+          ],
+          "especially": [
+            42
+          ],
+          "in": [
+            43,
+            56,
+            78,
+            129,
+            178,
+            188,
+            209,
+            225,
+            257
+          ],
+          "Beibu": [
+            45,
+            80,
+            238
+          ],
+          "Gulf,": [
+            46,
+            81
+          ],
+          "where": [
+            47
+          ],
+          "coral": [
+            48
+          ],
+          "reefs": [
+            49
+          ],
+          "been": [
+            51
+          ],
+          "degraded": [
+            52
+          ],
+          "significantly": [
+            53
+          ],
+          "CTXs": [
+            55,
+            208
+          ],
+          "exceeded": [
+            60
+          ],
+          "food": [
+            61
+          ],
+          "safety": [
+            62
+          ],
+          "guidelines.": [
+            63
+          ],
+          "Here,": [
+            64
+          ],
+          "five": [
+            65,
+            141
+          ],
+          "strains": [
+            66,
+            142,
+            221
+          ],
+          "spp.": [
+            69
+          ],
+          "were": [
+            70
+          ],
+          "collected": [
+            71
+          ],
+          "from": [
+            72,
+            136,
+            162,
+            236
+          ],
+          "Weizhou": [
+            73,
+            179
+          ],
+          "Island,": [
+            74,
+            180
+          ],
+          "hotspot": [
+            77
+          ],
+          "identified": [
+            83
+          ],
+          "light": [
+            85
+          ],
+          "scanning": [
+            87
+          ],
+          "electron": [
+            88
+          ],
+          "microscopy": [
+            89
+          ],
+          "phylogenetic": [
+            91,
+            131
+          ],
+          "analyses": [
+            92
+          ],
+          "based": [
+            93
+          ],
+          "large": [
+            95,
+            121
+          ],
+          "small": [
+            97
+          ],
+          "subunit": [
+            98
+          ],
+          "rDNA": [
+            99
+          ],
+          "sequences.": [
+            100
+          ],
+          "Strains": [
+            101
+          ],
+          "showed": [
+            102
+          ],
+          "typical": [
+            103
+          ],
+          "morphological": [
+            104
+          ],
+          "characteristics": [
+            105
+          ],
+          "caribaeus,": [
+            108,
+            146
+          ],
+          "exhibiting": [
+            109
+          ],
+          "smooth": [
+            111
+          ],
+          "thecal": [
+            112
+          ],
+          "surface,": [
+            113
+          ],
+          "rectangular-shaped": [
+            114
+          ],
+          "2′,": [
+            115
+          ],
+          "almost": [
+            116
+          ],
+          "symmetric": [
+            117
+          ],
+          "4″,": [
+            118
+          ],
+          "broad": [
+            123
+          ],
+          "posterior": [
+            124
+          ],
+          "intercalary": [
+            125
+          ],
+          "plate.": [
+            126
+          ],
+          "They": [
+            127
+          ],
+          "clustered": [
+            128
+          ],
+          "tree": [
+            132
+          ],
+          "G.": [
+            134,
+            145,
+            176,
+            200
+          ],
+          "caribaeus": [
+            135,
+            177,
+            201
+          ],
+          "other": [
+            137,
+            218
+          ],
+          "locations.": [
+            138
+          ],
+          "Therefore,": [
+            139
+          ],
+          "these": [
+            140,
+            226
+          ],
+          "belonged": [
+            143
+          ],
+          "to": [
+            144,
+            164,
+            204
+          ],
+          "globally": [
+            148
+          ],
+          "distributed": [
+            149
+          ],
+          "species.": [
+            151
+          ],
+          "Toxicity": [
+            152
+          ],
+          "was": [
+            153
+          ],
+          "determined": [
+            154
+          ],
+          "through": [
+            155
+          ],
+          "mouse": [
+            157
+          ],
+          "neuroblastoma": [
+            158
+          ],
+          "assay": [
+            159
+          ],
+          "ranged": [
+            161
+          ],
+          "0": [
+            163
+          ],
+          "5.40": [
+            165
+          ],
+          "fg": [
+            166
+          ],
+          "CTX3C": [
+            167
+          ],
+          "eq": [
+            168
+          ],
+          "cell−1.": [
+            169
+          ],
+          "The": [
+            170
+          ],
+          "low": [
+            171,
+            198
+          ],
+          "level": [
+            172,
+            187
+          ],
+          "toxicity": [
+            174,
+            199
+          ],
+          "CTX-contaminated": [
+            182
+          ],
+          "above": [
+            184
+          ],
+          "regulatory": [
+            186
+          ],
+          "previous": [
+            190
+          ],
+          "study,": [
+            191
+          ],
+          "suggests": [
+            192
+          ],
+          "long-term": [
+            195
+          ],
+          "presence": [
+            196
+          ],
+          "might": [
+            202
+          ],
+          "lead": [
+            203
+          ],
+          "bioaccumulation": [
+            206
+          ],
+          "fish,": [
+            210
+          ],
+          "which": [
+            211
+          ],
+          "can": [
+            212
+          ],
+          "reach": [
+            213
+          ],
+          "dangerous": [
+            214
+          ],
+          "CTX": [
+            215
+          ],
+          "levels.": [
+            216
+          ],
+          "Alternatively,": [
+            217
+          ],
+          "highly-toxic,": [
+            219
+          ],
+          "non-sampled": [
+            220
+          ],
+          "could": [
+            222
+          ],
+          "be": [
+            223
+          ],
+          "present": [
+            224
+          ],
+          "waters.": [
+            227
+          ],
+          "This": [
+            228
+          ],
+          "first": [
+            231
+          ],
+          "report": [
+            232
+          ],
+          "toxic": [
+            234
+          ],
+          "Gulf": [
+            239
+          ],
+          "Chinese": [
+            241
+          ],
+          "waters": [
+            242
+          ],
+          "will": [
+            244
+          ],
+          "provide": [
+            245
+          ],
+          "basis": [
+            247
+          ],
+          "for": [
+            248,
+            254
+          ],
+          "further": [
+            249
+          ],
+          "determining": [
+            251
+          ],
+          "effective": [
+            252
+          ],
+          "strategies": [
+            253
+          ],
+          "management": [
+            256
+          ],
+          "area.": [
+            259
+          ]
+        }
+      },
+      {
+        "id": "https://openalex.org/W4400872321",
+        "doi": "10.3390/biology13070550",
+        "title": "Phytoplankton Diversity, Spatial Patterns, and Photosynthetic Characteristics Under Environmental Gradients and Anthropogenic Influence in the Pearl River Estuary",
+        "publication_year": 2024,
+        "cited_by_count": 31,
+        "relevance_score": 45.81643,
+        "abstract_inverted_index": {
+          "The": [
+            0,
+            177
+          ],
+          "Pearl": [
+            1
+          ],
+          "River": [
+            2
+          ],
+          "Estuary": [
+            3
+          ],
+          "(PRE)": [
+            4
+          ],
+          "is": [
+            5
+          ],
+          "one": [
+            6
+          ],
+          "of": [
+            7,
+            40,
+            46,
+            63,
+            174,
+            180
+          ],
+          "the": [
+            8,
+            34,
+            60,
+            73,
+            107,
+            112,
+            129,
+            172
+          ],
+          "world’s": [
+            9
+          ],
+          "most": [
+            10
+          ],
+          "urbanized": [
+            11
+          ],
+          "subtropical": [
+            12
+          ],
+          "coastal": [
+            13
+          ],
+          "systems.": [
+            14
+          ],
+          "It": [
+            15
+          ],
+          "presents": [
+            16
+          ],
+          "a": [
+            17,
+            56,
+            92,
+            97,
+            190
+          ],
+          "typical": [
+            18
+          ],
+          "environmental": [
+            19
+          ],
+          "gradient": [
+            20
+          ],
+          "suitable": [
+            21
+          ],
+          "for": [
+            22,
+            121
+          ],
+          "studying": [
+            23
+          ],
+          "estuarine": [
+            24,
+            113,
+            195
+          ],
+          "phytoplankton": [
+            25,
+            41,
+            64,
+            108
+          ],
+          "communities’": [
+            26
+          ],
+          "dynamics": [
+            27
+          ],
+          "and": [
+            28,
+            50,
+            83,
+            126,
+            137,
+            150,
+            157,
+            164,
+            203
+          ],
+          "photosynthetic": [
+            29,
+            186
+          ],
+          "physiology.": [
+            30
+          ],
+          "In": [
+            31
+          ],
+          "September": [
+            32
+          ],
+          "2018,": [
+            33
+          ],
+          "maximum": [
+            35
+          ],
+          "photochemical": [
+            36
+          ],
+          "quantum": [
+            37
+          ],
+          "yield": [
+            38
+          ],
+          "(Fv/Fm)": [
+            39
+          ],
+          "in": [
+            42,
+            72,
+            106,
+            132,
+            184
+          ],
+          "different": [
+            43,
+            118
+          ],
+          "salinity": [
+            44,
+            123,
+            145
+          ],
+          "habitats": [
+            45
+          ],
+          "PRE": [
+            47
+          ],
+          "(oceanic,": [
+            48
+          ],
+          "estuarine,": [
+            49
+          ],
+          "freshwater": [
+            51
+          ],
+          "zones)": [
+            52
+          ],
+          "was": [
+            53
+          ],
+          "studied,": [
+            54
+          ],
+          "revealing": [
+            55
+          ],
+          "complex": [
+            57
+          ],
+          "correlation": [
+            58,
+            148
+          ],
+          "with": [
+            59,
+            70,
+            167,
+            183
+          ],
+          "environment.": [
+            61
+          ],
+          "Fv/Fm": [
+            62
+          ],
+          "ranged": [
+            65
+          ],
+          "from": [
+            66
+          ],
+          "0.16": [
+            67
+          ],
+          "to": [
+            68,
+            77,
+            193
+          ],
+          "0.45,": [
+            69
+          ],
+          "taxa": [
+            71,
+            120,
+            131
+          ],
+          "upper": [
+            74
+          ],
+          "Lingdingyang": [
+            75
+          ],
+          "found": [
+            76
+          ],
+          "be": [
+            78
+          ],
+          "more": [
+            79
+          ],
+          "stressed.": [
+            80
+          ],
+          "Community": [
+            81
+          ],
+          "composition": [
+            82
+          ],
+          "structure": [
+            84
+          ],
+          "were": [
+            85,
+            128
+          ],
+          "analyzed": [
+            86
+          ],
+          "using": [
+            87
+          ],
+          "18S": [
+            88
+          ],
+          "rRNA,": [
+            89
+          ],
+          "accompanied": [
+            90
+          ],
+          "by": [
+            91
+          ],
+          "pigment": [
+            93
+          ],
+          "analysis": [
+            94,
+            103,
+            149
+          ],
+          "utilized": [
+            95
+          ],
+          "as": [
+            96,
+            189,
+            198,
+            200
+          ],
+          "supplementary": [
+            98
+          ],
+          "method.": [
+            99
+          ],
+          "Nonmetric": [
+            100
+          ],
+          "multidimensional": [
+            101
+          ],
+          "scaling": [
+            102
+          ],
+          "indicated": [
+            104
+          ],
+          "differences": [
+            105
+          ],
+          "spatial": [
+            109,
+            178
+          ],
+          "distribution": [
+            110,
+            179
+          ],
+          "along": [
+            111,
+            182
+          ],
+          "gradients.": [
+            114,
+            146
+          ],
+          "Specificity-occupancy": [
+            115
+          ],
+          "plots": [
+            116
+          ],
+          "identified": [
+            117
+          ],
+          "specialist": [
+            119
+          ],
+          "each": [
+            122
+          ],
+          "habitat.": [
+            124
+          ],
+          "Dinophyta": [
+            125
+          ],
+          "Haptophyta": [
+            127
+          ],
+          "predominant": [
+            130
+          ],
+          "oceanic": [
+            133
+          ],
+          "areas,": [
+            134
+          ],
+          "while": [
+            135
+          ],
+          "Chlorophyta": [
+            136
+          ],
+          "Cryptophyta": [
+            138
+          ],
+          "dominated": [
+            139
+          ],
+          "freshwater.": [
+            140
+          ],
+          "Bacillariophyta": [
+            141
+          ],
+          "prevailed": [
+            142
+          ],
+          "across": [
+            143
+          ],
+          "all": [
+            144
+          ],
+          "Canonical": [
+            147
+          ],
+          "Mantel": [
+            151
+          ],
+          "tests": [
+            152
+          ],
+          "revealed": [
+            153
+          ],
+          "that": [
+            154
+          ],
+          "temperature,": [
+            155
+          ],
+          "salinity,": [
+            156
+          ],
+          "elevated": [
+            158
+          ],
+          "nutrient": [
+            159
+          ],
+          "levels": [
+            160
+          ],
+          "(i.e.,": [
+            161
+          ],
+          "NO3−-N,": [
+            162
+          ],
+          "PO43−-P,": [
+            163
+          ],
+          "SiO32−-Si)": [
+            165
+          ],
+          "associated": [
+            166
+          ],
+          "anthropogenic": [
+            168
+          ],
+          "activities": [
+            169
+          ],
+          "significantly": [
+            170
+          ],
+          "influenced": [
+            171
+          ],
+          "heterogeneity": [
+            173
+          ],
+          "community": [
+            175,
+            201
+          ],
+          "structure.": [
+            176
+          ],
+          "phytoplankton,": [
+            181
+          ],
+          "situ": [
+            185
+          ],
+          "characteristics,": [
+            187
+          ],
+          "serves": [
+            188
+          ],
+          "foundational": [
+            191
+          ],
+          "basis": [
+            192
+          ],
+          "access": [
+            194
+          ],
+          "primary": [
+            196
+          ],
+          "productivity,": [
+            197
+          ],
+          "well": [
+            199
+          ],
+          "function": [
+            202
+          ],
+          "ecosystem": [
+            204
+          ],
+          "health.": [
+            205
+          ]
+        }
+      },
+      {
+        "id": "https://openalex.org/W3181372524",
+        "doi": "10.1016/j.marenvres.2021.105407",
+        "title": "Seasonal and spatial variation of protist communities from reef water and open ocean water in patchy coral reef areas of a semi-enclosed bay",
+        "publication_year": 2021,
+        "cited_by_count": 11,
+        "relevance_score": 45.60755,
+        "abstract_inverted_index": null
+      },
+      {
+        "id": "https://openalex.org/W7166663308",
+        "doi": "10.1016/j.marenvres.2026.108235",
+        "title": "Spatiotemporal patterns of phytoplankton communities in coastal waters near the Taishan Nuclear Power Plant",
+        "publication_year": 2026,
+        "cited_by_count": 0,
+        "relevance_score": 44.667538,
+        "abstract_inverted_index": null
+      },
+      {
+        "id": "https://openalex.org/W3189076185",
+        "doi": "10.1007/s10646-021-02451-0",
+        "title": "Microzooplankton grazing and its key group composition in subtropical eutrophic coast of Southern China: in relation to environmental changes",
+        "publication_year": 2021,
+        "cited_by_count": 3,
+        "relevance_score": 33.244255,
+        "abstract_inverted_index": null
+      },
+      {
+        "id": "https://openalex.org/W4224982734",
+        "doi": "10.3390/microorganisms10050913",
+        "title": "Diversity Patterns of Protists Are Highly Affected by Methods Disentangling Biological Variants: A Case Study in Oligotrich (s.l.) Ciliates",
+        "publication_year": 2022,
+        "cited_by_count": 2,
+        "relevance_score": 30.865995,
+        "abstract_inverted_index": {
+          "Protists": [
+            0
+          ],
+          "are": [
+            1,
+            30,
+            61,
+            66
+          ],
+          "a": [
+            2
+          ],
+          "dominant": [
+            3,
+            73
+          ],
+          "group": [
+            4,
+            68
+          ],
+          "in": [
+            5,
+            13,
+            19,
+            76,
+            86,
+            114,
+            189
+          ],
+          "marine": [
+            6,
+            20
+          ],
+          "microplankton": [
+            7
+          ],
+          "communities": [
+            8
+          ],
+          "and": [
+            9,
+            16,
+            37,
+            53,
+            72,
+            79,
+            104,
+            119,
+            123,
+            145,
+            158
+          ],
+          "play": [
+            10
+          ],
+          "important": [
+            11
+          ],
+          "roles": [
+            12
+          ],
+          "energy": [
+            14
+          ],
+          "flux": [
+            15
+          ],
+          "nutrient": [
+            17
+          ],
+          "cycling": [
+            18
+          ],
+          "ecosystems.": [
+            21
+          ],
+          "Environmental": [
+            22
+          ],
+          "sequences": [
+            23
+          ],
+          "produced": [
+            24
+          ],
+          "by": [
+            25,
+            164
+          ],
+          "high-throughput": [
+            26
+          ],
+          "sequencing": [
+            27
+          ],
+          "(HTS)": [
+            28
+          ],
+          "methods": [
+            29,
+            46
+          ],
+          "increasingly": [
+            31
+          ],
+          "used": [
+            32
+          ],
+          "for": [
+            33,
+            106,
+            134,
+            187
+          ],
+          "inferring": [
+            34,
+            107
+          ],
+          "the": [
+            35,
+            51,
+            70,
+            92,
+            115,
+            135,
+            159,
+            172,
+            183,
+            190
+          ],
+          "diversity": [
+            36,
+            52,
+            108,
+            139,
+            161
+          ],
+          "distribution": [
+            38,
+            54,
+            192
+          ],
+          "patterns": [
+            39,
+            55,
+            109
+          ],
+          "of": [
+            40,
+            56,
+            69,
+            110,
+            137,
+            171,
+            182,
+            193,
+            203
+          ],
+          "protists.": [
+            41
+          ],
+          "However,": [
+            42
+          ],
+          "studies": [
+            43
+          ],
+          "testing": [
+            44
+          ],
+          "whether": [
+            45
+          ],
+          "disentangling": [
+            47
+          ],
+          "biological": [
+            48
+          ],
+          "variants": [
+            49
+          ],
+          "affect": [
+            50
+          ],
+          "protists": [
+            57,
+            75
+          ],
+          "using": [
+            58
+          ],
+          "field": [
+            59,
+            87
+          ],
+          "samples": [
+            60,
+            88
+          ],
+          "insufficient.": [
+            62
+          ],
+          "Oligotrich": [
+            63
+          ],
+          "(s.l.)": [
+            64,
+            84,
+            112
+          ],
+          "ciliates": [
+            65,
+            85,
+            113
+          ],
+          "one": [
+            67,
+            181
+          ],
+          "abundant": [
+            71
+          ],
+          "planktonic": [
+            74
+          ],
+          "coastal": [
+            77
+          ],
+          "waters": [
+            78
+          ],
+          "open": [
+            80
+          ],
+          "oceans.": [
+            81
+          ],
+          "Using": [
+            82
+          ],
+          "oligotrich": [
+            83,
+            111
+          ],
+          "as": [
+            89
+          ],
+          "an": [
+            90
+          ],
+          "example,": [
+            91
+          ],
+          "present": [
+            93
+          ],
+          "study": [
+            94
+          ],
+          "indicates": [
+            95
+          ],
+          "that": [
+            96,
+            170
+          ],
+          "DADA2": [
+            97,
+            165
+          ],
+          "performs": [
+            98
+          ],
+          "better": [
+            99
+          ],
+          "than": [
+            100,
+            169
+          ],
+          "SWARM,": [
+            101
+          ],
+          "UNOISE,": [
+            102
+          ],
+          "UPARSE,": [
+            103
+          ],
+          "UCLUST": [
+            105,
+            150
+          ],
+          "Pearl": [
+            116
+          ],
+          "River": [
+            117
+          ],
+          "Estuary": [
+            118
+          ],
+          "surrounding": [
+            120
+          ],
+          "regions.": [
+            121
+          ],
+          "UPARSE": [
+            122
+          ],
+          "UNOISE": [
+            124
+          ],
+          "might": [
+            125,
+            130
+          ],
+          "underestimate": [
+            126
+          ],
+          "species": [
+            127,
+            156
+          ],
+          "richness.": [
+            128
+          ],
+          "SWARM": [
+            129
+          ],
+          "not": [
+            131
+          ],
+          "be": [
+            132,
+            180
+          ],
+          "suitable": [
+            133
+          ],
+          "resolution": [
+            136
+          ],
+          "alpha": [
+            138
+          ],
+          "owing": [
+            140
+          ],
+          "to": [
+            141,
+            147,
+            179
+          ],
+          "its": [
+            142
+          ],
+          "rigorous": [
+            143
+          ],
+          "clustering": [
+            144,
+            153
+          ],
+          "sensitivity": [
+            146
+          ],
+          "sequence": [
+            148
+          ],
+          "variations.": [
+            149
+          ],
+          "with": [
+            151
+          ],
+          "99%": [
+            152
+          ],
+          "threshold": [
+            154
+          ],
+          "overestimates": [
+            155
+          ],
+          "richness,": [
+            157
+          ],
+          "beta": [
+            160
+          ],
+          "pattern": [
+            162
+          ],
+          "inferred": [
+            163
+          ],
+          "is": [
+            166,
+            177
+          ],
+          "more": [
+            167
+          ],
+          "reasonable": [
+            168
+          ],
+          "other": [
+            173
+          ],
+          "methods.": [
+            174
+          ],
+          "Additionally,": [
+            175
+          ],
+          "salinity": [
+            176
+          ],
+          "shown": [
+            178
+          ],
+          "key": [
+            184
+          ],
+          "factors": [
+            185
+          ],
+          "responsible": [
+            186
+          ],
+          "variations": [
+            188
+          ],
+          "community": [
+            191
+          ],
+          "ciliates,": [
+            194
+          ],
+          "but": [
+            195
+          ],
+          "infrequent": [
+            196
+          ],
+          "marine-freshwater": [
+            197
+          ],
+          "transitions": [
+            198
+          ],
+          "occurred": [
+            199
+          ],
+          "during": [
+            200
+          ],
+          "evolutionary": [
+            201
+          ],
+          "terms": [
+            202
+          ],
+          "this": [
+            204
+          ],
+          "group.": [
+            205
+          ]
+        }
+      },
+      {
+        "id": "https://openalex.org/W4323652589",
+        "doi": "10.1038/s41598-023-30973-6",
+        "title": "Diel variations in planktonic ciliate community structure in the northern South China Sea and tropical Western Pacific",
+        "publication_year": 2023,
+        "cited_by_count": 18,
+        "relevance_score": 30.70271,
+        "abstract_inverted_index": {
+          "Abstract": [
+            0
+          ],
+          "Though": [
+            1
+          ],
+          "diel": [
+            2,
+            16,
+            29,
+            162,
+            179
+          ],
+          "variations": [
+            3,
+            17,
+            30
+          ],
+          "are": [
+            4
+          ],
+          "geographically": [
+            5
+          ],
+          "widespread": [
+            6
+          ],
+          "phenomena": [
+            7
+          ],
+          "among": [
+            8
+          ],
+          "phytoplankton": [
+            9
+          ],
+          "and": [
+            10,
+            44,
+            53,
+            62,
+            86,
+            129,
+            136,
+            144,
+            149
+          ],
+          "zooplankton,": [
+            11
+          ],
+          "knowledge": [
+            12
+          ],
+          "is": [
+            13
+          ],
+          "limited": [
+            14
+          ],
+          "regarding": [
+            15
+          ],
+          "in": [
+            18,
+            31,
+            37,
+            74,
+            77,
+            103,
+            121,
+            146,
+            181
+          ],
+          "planktonic": [
+            19,
+            35,
+            176
+          ],
+          "ciliate": [
+            20,
+            65,
+            130,
+            143,
+            177
+          ],
+          "(microzooplankton)": [
+            21
+          ],
+          "community": [
+            22,
+            32,
+            178
+          ],
+          "structure.": [
+            23
+          ],
+          "In": [
+            24,
+            82
+          ],
+          "this": [
+            25
+          ],
+          "study,": [
+            26
+          ],
+          "we": [
+            27
+          ],
+          "analyzed": [
+            28
+          ],
+          "structure": [
+            33
+          ],
+          "of": [
+            34,
+            90,
+            111,
+            175
+          ],
+          "ciliates": [
+            36,
+            97
+          ],
+          "the": [
+            38,
+            60,
+            75,
+            78,
+            84,
+            104,
+            122,
+            173,
+            182
+          ],
+          "northern": [
+            39
+          ],
+          "South": [
+            40
+          ],
+          "China": [
+            41
+          ],
+          "Sea": [
+            42
+          ],
+          "(nSCS)": [
+            43
+          ],
+          "tropical": [
+            45,
+            183
+          ],
+          "Western": [
+            46,
+            184
+          ],
+          "Pacific": [
+            47,
+            185
+          ],
+          "(tWP).": [
+            48
+          ],
+          "Hydrological": [
+            49
+          ],
+          "characteristics": [
+            50
+          ],
+          "during": [
+            51
+          ],
+          "day": [
+            52,
+            76,
+            148
+          ],
+          "night": [
+            54,
+            69,
+            99,
+            117
+          ],
+          "were": [
+            55,
+            100,
+            118,
+            138
+          ],
+          "slightly": [
+            56
+          ],
+          "different": [
+            57
+          ],
+          "over": [
+            58
+          ],
+          "both": [
+            59,
+            83,
+            147
+          ],
+          "nSCS": [
+            61,
+            85
+          ],
+          "tWP,": [
+            63,
+            87
+          ],
+          "while": [
+            64
+          ],
+          "average": [
+            66
+          ],
+          "abundance": [
+            67,
+            88,
+            109,
+            131
+          ],
+          "at": [
+            68,
+            98,
+            116
+          ],
+          "was": [
+            70
+          ],
+          "clearly": [
+            71
+          ],
+          "higher": [
+            72,
+            101
+          ],
+          "than": [
+            73,
+            102,
+            120
+          ],
+          "upper": [
+            79
+          ],
+          "200": [
+            80
+          ],
+          "m.": [
+            81
+          ],
+          "proportions": [
+            89
+          ],
+          "large": [
+            91,
+            112
+          ],
+          "size-fraction": [
+            92
+          ],
+          "(>": [
+            93
+          ],
+          "30": [
+            94
+          ],
+          "μm)": [
+            95
+          ],
+          "aloricate": [
+            96,
+            142
+          ],
+          "day.": [
+            105,
+            123
+          ],
+          "While": [
+            106
+          ],
+          "for": [
+            107,
+            170
+          ],
+          "tintinnids,": [
+            108
+          ],
+          "proportion": [
+            110
+          ],
+          "lorica": [
+            113
+          ],
+          "oral": [
+            114
+          ],
+          "diameter": [
+            115
+          ],
+          "lower": [
+            119
+          ],
+          "The": [
+            124
+          ],
+          "relationship": [
+            125
+          ],
+          "between": [
+            126
+          ],
+          "environmental": [
+            127
+          ],
+          "factors": [
+            128,
+            140
+          ],
+          "pointed": [
+            132
+          ],
+          "out": [
+            133
+          ],
+          "that": [
+            134
+          ],
+          "depth": [
+            135
+          ],
+          "temperature": [
+            137
+          ],
+          "main": [
+            139
+          ],
+          "influencing": [
+            141,
+            160
+          ],
+          "tintinnid": [
+            145,
+            154
+          ],
+          "night.": [
+            150
+          ],
+          "For": [
+            151
+          ],
+          "some": [
+            152
+          ],
+          "dominant": [
+            153
+          ],
+          "species,": [
+            155
+          ],
+          "chlorophyllawas": [
+            156
+          ],
+          "another": [
+            157
+          ],
+          "important": [
+            158
+          ],
+          "factor": [
+            159
+          ],
+          "their": [
+            161
+          ],
+          "vertical": [
+            163
+          ],
+          "distribution.": [
+            164
+          ],
+          "Our": [
+            165
+          ],
+          "results": [
+            166
+          ],
+          "provide": [
+            167
+          ],
+          "fundamental": [
+            168
+          ],
+          "data": [
+            169
+          ],
+          "better": [
+            171
+          ],
+          "understanding": [
+            172
+          ],
+          "mechanisms": [
+            174
+          ],
+          "variation": [
+            180
+          ],
+          "Ocean.": [
+            186
+          ]
+        }
+      },
+      {
+        "id": "https://openalex.org/W3134268069",
+        "doi": "10.3389/fmicb.2021.583982",
+        "title": "Effect of Ocean Acidification on Bacterial Metabolic Activity and Community Composition in Oligotrophic Oceans, Inferred From Short-Term Bioassays",
+        "publication_year": 2021,
+        "cited_by_count": 23,
+        "relevance_score": 27.179243,
+        "abstract_inverted_index": {
+          "Increasing": [
+            0
+          ],
+          "anthropogenic": [
+            1
+          ],
+          "CO2emissions": [
+            2
+          ],
+          "in": [
+            3,
+            13,
+            27,
+            30,
+            39,
+            42,
+            89,
+            102,
+            126,
+            131,
+            148
+          ],
+          "recent": [
+            4
+          ],
+          "decades": [
+            5
+          ],
+          "cause": [
+            6
+          ],
+          "ocean": [
+            7
+          ],
+          "acidification": [
+            8
+          ],
+          "(OA),": [
+            9
+          ],
+          "affecting": [
+            10
+          ],
+          "carbon": [
+            11,
+            28
+          ],
+          "cycling": [
+            12,
+            29
+          ],
+          "oceans": [
+            14
+          ],
+          "by": [
+            15,
+            65,
+            99,
+            116
+          ],
+          "regulating": [
+            16
+          ],
+          "eco-physiological": [
+            17
+          ],
+          "processes": [
+            18
+          ],
+          "of": [
+            19,
+            35,
+            54,
+            139,
+            169,
+            185
+          ],
+          "plankton.": [
+            20
+          ],
+          "Heterotrophic": [
+            21
+          ],
+          "bacteria": [
+            22,
+            38,
+            107,
+            142
+          ],
+          "play": [
+            23
+          ],
+          "an": [
+            24
+          ],
+          "important": [
+            25
+          ],
+          "role": [
+            26
+          ],
+          "oceans.": [
+            31
+          ],
+          "However,": [
+            32
+          ],
+          "the": [
+            33,
+            52,
+            74,
+            82,
+            90,
+            140,
+            170
+          ],
+          "effect": [
+            34
+          ],
+          "OA": [
+            36,
+            62,
+            157,
+            175
+          ],
+          "on": [
+            37
+          ],
+          "oceans,": [
+            40
+          ],
+          "especially": [
+            41
+          ],
+          "oligotrophic": [
+            43,
+            87
+          ],
+          "regions,": [
+            44
+          ],
+          "was": [
+            45,
+            63,
+            119,
+            190
+          ],
+          "not": [
+            46
+          ],
+          "well": [
+            47
+          ],
+          "understood.": [
+            48
+          ],
+          "In": [
+            49
+          ],
+          "our": [
+            50
+          ],
+          "study,": [
+            51
+          ],
+          "response": [
+            53,
+            103,
+            132
+          ],
+          "bacterial": [
+            55,
+            67,
+            127,
+            145,
+            171,
+            177
+          ],
+          "metabolic": [
+            56
+          ],
+          "activity": [
+            57
+          ],
+          "and": [
+            58,
+            70,
+            77,
+            143,
+            180
+          ],
+          "community": [
+            59,
+            71,
+            128,
+            172
+          ],
+          "composition": [
+            60,
+            72,
+            129
+          ],
+          "to": [
+            61,
+            104,
+            133,
+            156,
+            165,
+            173,
+            192
+          ],
+          "assessed": [
+            64
+          ],
+          "determining": [
+            66
+          ],
+          "production,": [
+            68
+          ],
+          "respiration,": [
+            69
+          ],
+          "at": [
+            73,
+            85,
+            151,
+            159
+          ],
+          "low-pCO2(400": [
+            75
+          ],
+          "ppm)": [
+            76,
+            79
+          ],
+          "high-pCO2(800": [
+            78
+          ],
+          "treatments": [
+            80
+          ],
+          "over": [
+            81
+          ],
+          "short": [
+            83
+          ],
+          "term": [
+            84
+          ],
+          "two": [
+            86
+          ],
+          "stations": [
+            88
+          ],
+          "northern": [
+            91
+          ],
+          "South": [
+            92
+          ],
+          "China": [
+            93
+          ],
+          "Sea.": [
+            94
+          ],
+          "Bacterial": [
+            95,
+            153
+          ],
+          "production": [
+            96
+          ],
+          "decreased": [
+            97
+          ],
+          "significantly": [
+            98
+          ],
+          "17.1–37.1": [
+            100
+          ],
+          "%": [
+            101
+          ],
+          "OA,": [
+            105,
+            117,
+            134
+          ],
+          "since": [
+            106
+          ],
+          "with": [
+            108,
+            135
+          ],
+          "high": [
+            109,
+            137,
+            144
+          ],
+          "nucleic": [
+            110
+          ],
+          "acid": [
+            111
+          ],
+          "content": [
+            112
+          ],
+          "preferentially": [
+            113
+          ],
+          "were": [
+            114
+          ],
+          "repressed": [
+            115
+          ],
+          "which": [
+            118
+          ],
+          "less": [
+            120
+          ],
+          "abundant": [
+            121
+          ],
+          "under": [
+            122
+          ],
+          "high-pCO2treatment.": [
+            123
+          ],
+          "Correspondingly,": [
+            124
+          ],
+          "shifts": [
+            125
+          ],
+          "occurred": [
+            130
+          ],
+          "a": [
+            136,
+            149,
+            182
+          ],
+          "fraction": [
+            138,
+            184
+          ],
+          "small-sized": [
+            141
+          ],
+          "species": [
+            146
+          ],
+          "diversity": [
+            147
+          ],
+          "high-pCO2scenario": [
+            150
+          ],
+          "K11.": [
+            152
+          ],
+          "respiration": [
+            154
+          ],
+          "responded": [
+            155
+          ],
+          "differently": [
+            158
+          ],
+          "both": [
+            160
+          ],
+          "stations,": [
+            161
+          ],
+          "most": [
+            162
+          ],
+          "likely": [
+            163
+          ],
+          "attributed": [
+            164
+          ],
+          "different": [
+            166
+          ],
+          "physiological": [
+            167
+          ],
+          "responses": [
+            168
+          ],
+          "OA.": [
+            174
+          ],
+          "mitigated": [
+            176
+          ],
+          "growth": [
+            178
+          ],
+          "efficiency,": [
+            179
+          ],
+          "consequently,": [
+            181
+          ],
+          "larger": [
+            183
+          ],
+          "DOC": [
+            186
+          ],
+          "entering": [
+            187
+          ],
+          "microbial": [
+            188
+          ],
+          "loops": [
+            189
+          ],
+          "transferred": [
+            191
+          ],
+          "CO2.": [
+            193
+          ]
+        }
+      },
+      {
+        "id": "https://openalex.org/W7162813689",
+        "doi": "10.1128/aem.00092-26",
+        "title": "Differential responses of size-fractionated eukaryotic microalgae to ocean alkalinity enhancement in oligotrophic seawaters",
+        "publication_year": 2026,
+        "cited_by_count": 0,
+        "relevance_score": 26.22053,
+        "abstract_inverted_index": {
+          "ABSTRACT": [
+            0
+          ],
+          "Ocean": [
+            1
+          ],
+          "alkalinity": [
+            2,
+            256
+          ],
+          "enhancement": [
+            3,
+            257
+          ],
+          "through": [
+            4,
+            47
+          ],
+          "olivine": [
+            5,
+            21,
+            41,
+            65,
+            90,
+            111,
+            132,
+            166,
+            190,
+            214,
+            232
+          ],
+          "dissolution": [
+            6,
+            22,
+            42,
+            91,
+            108,
+            212,
+            233
+          ],
+          "represents": [
+            7
+          ],
+          "a": [
+            8,
+            194,
+            235
+          ],
+          "critical": [
+            9
+          ],
+          "CO": [
+            10,
+            180
+          ],
+          "2": [
+            11,
+            181
+          ],
+          "removal": [
+            12
+          ],
+          "pathway.": [
+            13
+          ],
+          "While": [
+            14
+          ],
+          "laboratory": [
+            15,
+            158
+          ],
+          "experiments": [
+            16,
+            159
+          ],
+          "have": [
+            17
+          ],
+          "provided": [
+            18
+          ],
+          "insights": [
+            19
+          ],
+          "into": [
+            20
+          ],
+          "impacts": [
+            23
+          ],
+          "on": [
+            24,
+            138,
+            238,
+            258
+          ],
+          "eutrophic": [
+            25
+          ],
+          "coastal": [
+            26
+          ],
+          "seawater,": [
+            27
+          ],
+          "ecological": [
+            28,
+            187
+          ],
+          "responses": [
+            29
+          ],
+          "in": [
+            30,
+            51,
+            58,
+            85,
+            142,
+            198,
+            215,
+            261
+          ],
+          "offshore": [
+            31
+          ],
+          "oligotrophic": [
+            32,
+            200,
+            263
+          ],
+          "seawater": [
+            33,
+            168,
+            216
+          ],
+          "remain": [
+            34
+          ],
+          "poorly": [
+            35
+          ],
+          "understood.": [
+            36
+          ],
+          "This": [
+            37
+          ],
+          "study": [
+            38,
+            62,
+            229
+          ],
+          "investigated": [
+            39
+          ],
+          "how": [
+            40
+          ],
+          "affects": [
+            43,
+            217
+          ],
+          "size-fractionated": [
+            44
+          ],
+          "eukaryotic": [
+            45,
+            73,
+            97,
+            146,
+            225,
+            240,
+            259
+          ],
+          "microalgae": [
+            46,
+            147,
+            260
+          ],
+          "shipboard": [
+            48,
+            195
+          ],
+          "incubations": [
+            49
+          ],
+          "conducted": [
+            50,
+            193
+          ],
+          "the": [
+            52,
+            68,
+            81,
+            86,
+            94,
+            107,
+            128,
+            163,
+            175,
+            186,
+            199,
+            203,
+            211,
+            218,
+            248,
+            251,
+            262
+          ],
+          "South": [
+            53,
+            204
+          ],
+          "China": [
+            54,
+            205
+          ],
+          "Sea": [
+            55
+          ],
+          "under": [
+            56
+          ],
+          "near-": [
+            57
+          ],
+          "situ": [
+            59
+          ],
+          "conditions.": [
+            60
+          ],
+          "Our": [
+            61
+          ],
+          "demonstrated": [
+            63
+          ],
+          "that": [
+            64,
+            161,
+            210,
+            231
+          ],
+          "addition": [
+            66,
+            133
+          ],
+          "enhanced": [
+            67
+          ],
+          "richness": [
+            69
+          ],
+          "and": [
+            70,
+            79,
+            123,
+            157,
+            222
+          ],
+          "evenness": [
+            71
+          ],
+          "of": [
+            72,
+            83,
+            96,
+            178,
+            202,
+            213,
+            224,
+            250,
+            253
+          ],
+          "microalgae,": [
+            74,
+            98
+          ],
+          "promoted": [
+            75
+          ],
+          "community": [
+            76,
+            117,
+            139,
+            220
+          ],
+          "network": [
+            77
+          ],
+          "stability,": [
+            78
+          ],
+          "altered": [
+            80
+          ],
+          "direction": [
+            82
+          ],
+          "succession": [
+            84
+          ],
+          "microbial": [
+            87,
+            116
+          ],
+          "community.": [
+            88
+          ],
+          "Furthermore,": [
+            89
+          ],
+          "products": [
+            92
+          ],
+          "modulated": [
+            93
+          ],
+          "activities": [
+            95
+          ],
+          "which": [
+            99
+          ],
+          "may": [
+            100,
+            113
+          ],
+          "further": [
+            101,
+            184
+          ],
+          "influence": [
+            102,
+            115
+          ],
+          "biological": [
+            103
+          ],
+          "pump": [
+            104
+          ],
+          "efficiency.": [
+            105
+          ],
+          "Beyond": [
+            106
+          ],
+          "effects,": [
+            109
+          ],
+          "undissolved": [
+            110
+          ],
+          "particles": [
+            112
+          ],
+          "also": [
+            114
+          ],
+          "structure": [
+            118
+          ],
+          "by": [
+            119
+          ],
+          "providing": [
+            120
+          ],
+          "attachment": [
+            121
+          ],
+          "substrates": [
+            122
+          ],
+          "generating": [
+            124
+          ],
+          "localized": [
+            125
+          ],
+          "microenvironments": [
+            126
+          ],
+          "at": [
+            127
+          ],
+          "particle–water": [
+            129
+          ],
+          "interface.": [
+            130
+          ],
+          "Additionally,": [
+            131,
+            227
+          ],
+          "exerted": [
+            134
+          ],
+          "significantly": [
+            135
+          ],
+          "greater": [
+            136,
+            236
+          ],
+          "effects": [
+            137
+          ],
+          "assembly": [
+            140
+          ],
+          "processes": [
+            141
+          ],
+          "small-sized": [
+            143
+          ],
+          "(0.2–20": [
+            144
+          ],
+          "μm)": [
+            145
+          ],
+          "compared": [
+            148
+          ],
+          "to": [
+            149,
+            167
+          ],
+          "larger": [
+            150
+          ],
+          "size": [
+            151
+          ],
+          "(>20": [
+            152
+          ],
+          "µm)": [
+            153
+          ],
+          "fractions.": [
+            154
+          ],
+          "IMPORTANCE": [
+            155
+          ],
+          "Models": [
+            156
+          ],
+          "suggest": [
+            160
+          ],
+          "adding": [
+            162
+          ],
+          "alkaline": [
+            164
+          ],
+          "mineral": [
+            165
+          ],
+          "is": [
+            169
+          ],
+          "an": [
+            170
+          ],
+          "efficient": [
+            171
+          ],
+          "method": [
+            172
+          ],
+          "for": [
+            173,
+            247
+          ],
+          "enhancing": [
+            174
+          ],
+          "ocean’s": [
+            176
+          ],
+          "uptake": [
+            177
+          ],
+          "atmospheric": [
+            179
+          ],
+          ".": [
+            182
+          ],
+          "To": [
+            183
+          ],
+          "explore": [
+            185
+          ],
+          "changes": [
+            188
+          ],
+          "following": [
+            189
+          ],
+          "addition,": [
+            191
+          ],
+          "we": [
+            192
+          ],
+          "incubation": [
+            196
+          ],
+          "experiment": [
+            197
+          ],
+          "waters": [
+            201
+          ],
+          "Sea.": [
+            206
+          ],
+          "It": [
+            207
+          ],
+          "was": [
+            208
+          ],
+          "found": [
+            209
+          ],
+          "activity,": [
+            219
+          ],
+          "diversity,": [
+            221
+          ],
+          "stability": [
+            223
+          ],
+          "microalgae.": [
+            226,
+            241
+          ],
+          "this": [
+            228
+          ],
+          "reveals": [
+            230
+          ],
+          "has": [
+            234
+          ],
+          "impact": [
+            237,
+            249
+          ],
+          "smaller-sized": [
+            239
+          ],
+          "These": [
+            242
+          ],
+          "findings": [
+            243
+          ],
+          "provide": [
+            244
+          ],
+          "important": [
+            245
+          ],
+          "understandings": [
+            246
+          ],
+          "implementation": [
+            252
+          ],
+          "olivine-based": [
+            254
+          ],
+          "ocean": [
+            255
+          ],
+          "waters.": [
+            264
+          ]
+        }
+      },
+      {
+        "id": "https://openalex.org/W4402169124",
+        "doi": "10.1016/j.scitotenv.2024.176019",
+        "title": "Revealing the intricate temporal dynamics and adaptive responses of prokaryotic and eukaryotic microbes in the coastal South China Sea",
+        "publication_year": 2024,
+        "cited_by_count": 10,
+        "relevance_score": 25.11295,
+        "abstract_inverted_index": null
+      },
+      {
+        "id": "https://openalex.org/W4381735624",
+        "doi": "10.3389/fmicb.2023.1185436",
+        "title": "Deterministic processes dominate archaeal community assembly from the Pearl River to the northern South China Sea",
+        "publication_year": 2023,
+        "cited_by_count": 14,
+        "relevance_score": 16.770163,
+        "abstract_inverted_index": {
+          "Archaea": [
+            0
+          ],
+          "play": [
+            1
+          ],
+          "a": [
+            2,
+            44
+          ],
+          "significant": [
+            3
+          ],
+          "role": [
+            4
+          ],
+          "in": [
+            5,
+            11,
+            38,
+            105,
+            129,
+            144,
+            179
+          ],
+          "the": [
+            6,
+            48,
+            54,
+            84,
+            95,
+            106,
+            112,
+            115,
+            119,
+            126,
+            130,
+            145,
+            153,
+            159,
+            171,
+            186,
+            189,
+            195
+          ],
+          "biogeochemical": [
+            7
+          ],
+          "cycling": [
+            8
+          ],
+          "of": [
+            9,
+            86,
+            139,
+            162,
+            176
+          ],
+          "nutrients": [
+            10
+          ],
+          "estuaries.": [
+            12
+          ],
+          "However,": [
+            13
+          ],
+          "comprehensive": [
+            14
+          ],
+          "researches": [
+            15
+          ],
+          "about": [
+            16
+          ],
+          "their": [
+            17,
+            71
+          ],
+          "assembly": [
+            18,
+            85,
+            199
+          ],
+          "processes": [
+            19,
+            81,
+            102
+          ],
+          "remain": [
+            20
+          ],
+          "notably": [
+            21
+          ],
+          "insufficient.": [
+            22
+          ],
+          "In": [
+            23
+          ],
+          "this": [
+            24
+          ],
+          "study,": [
+            25
+          ],
+          "we": [
+            26,
+            123
+          ],
+          "systematically": [
+            27,
+            169
+          ],
+          "examined": [
+            28
+          ],
+          "archaeal": [
+            29,
+            91,
+            127,
+            177,
+            197
+          ],
+          "community": [
+            30,
+            61,
+            198
+          ],
+          "dynamics": [
+            31
+          ],
+          "distinguished": [
+            32
+          ],
+          "between": [
+            33
+          ],
+          "low-salinity": [
+            34,
+            96,
+            107,
+            131,
+            164
+          ],
+          "and": [
+            35,
+            40,
+            97,
+            136,
+            173
+          ],
+          "high-salinity": [
+            36,
+            98,
+            109,
+            146
+          ],
+          "groups": [
+            37,
+            132
+          ],
+          "water": [
+            39,
+            180
+          ],
+          "surface": [
+            41
+          ],
+          "sediments": [
+            42,
+            184
+          ],
+          "over": [
+            43
+          ],
+          "600-kilometer": [
+            45
+          ],
+          "range": [
+            46
+          ],
+          "from": [
+            47,
+            111,
+            185
+          ],
+          "upper": [
+            49
+          ],
+          "Pearl": [
+            50
+          ],
+          "River": [
+            51
+          ],
+          "(PR)": [
+            52
+          ],
+          "to": [
+            53,
+            114,
+            152,
+            188
+          ],
+          "northern": [
+            55
+          ],
+          "South": [
+            56
+          ],
+          "China": [
+            57
+          ],
+          "Sea": [
+            58
+          ],
+          "(NSCS).": [
+            59
+          ],
+          "Neutral": [
+            60
+          ],
+          "model": [
+            62,
+            67
+          ],
+          "analysis": [
+            63,
+            68
+          ],
+          "together": [
+            64
+          ],
+          "with": [
+            65
+          ],
+          "null": [
+            66
+          ],
+          "showed": [
+            69
+          ],
+          "that": [
+            70,
+            79,
+            125
+          ],
+          "C-score": [
+            72
+          ],
+          "values": [
+            73
+          ],
+          "were": [
+            74
+          ],
+          "greater": [
+            75
+          ],
+          "than": [
+            76,
+            108,
+            142
+          ],
+          "2,": [
+            77
+          ],
+          "suggesting": [
+            78
+          ],
+          "deterministic": [
+            80,
+            101
+          ],
+          "could": [
+            82
+          ],
+          "dominate": [
+            83
+          ],
+          "those": [
+            87,
+            143,
+            163
+          ],
+          "planktonic": [
+            88
+          ],
+          "or": [
+            89
+          ],
+          "benthic": [
+            90
+          ],
+          "communities": [
+            92,
+            128,
+            178
+          ],
+          "at": [
+            93
+          ],
+          "both": [
+            94
+          ],
+          "sites.": [
+            99
+          ],
+          "And": [
+            100
+          ],
+          "contributed": [
+            103
+          ],
+          "more": [
+            104
+          ],
+          "environments": [
+            110
+          ],
+          "PR": [
+            113,
+            187
+          ],
+          "NSCS.": [
+            116
+          ],
+          "Furthermore,": [
+            117
+          ],
+          "through": [
+            118
+          ],
+          "co-occurrence": [
+            120,
+            174
+          ],
+          "network": [
+            121
+          ],
+          "analysis,": [
+            122
+          ],
+          "found": [
+            124
+          ],
+          "possessed": [
+            133
+          ],
+          "closer": [
+            134
+          ],
+          "interactions": [
+            135,
+            141
+          ],
+          "higher": [
+            137
+          ],
+          "proportions": [
+            138
+          ],
+          "negative": [
+            140
+          ],
+          "groups,": [
+            147
+          ],
+          "which": [
+            148
+          ],
+          "might": [
+            149
+          ],
+          "be": [
+            150
+          ],
+          "due": [
+            151
+          ],
+          "larger": [
+            154
+          ],
+          "environmental": [
+            155
+          ],
+          "heterogeneities": [
+            156
+          ],
+          "reflected": [
+            157
+          ],
+          "by": [
+            158
+          ],
+          "nutrient": [
+            160
+          ],
+          "concentrations": [
+            161
+          ],
+          "samples.": [
+            165
+          ],
+          "Collectively,": [
+            166
+          ],
+          "our": [
+            167
+          ],
+          "work": [
+            168
+          ],
+          "investigated": [
+            170
+          ],
+          "composition": [
+            172
+          ],
+          "networks": [
+            175
+          ],
+          "as": [
+            181,
+            183
+          ],
+          "well": [
+            182
+          ],
+          "NSCS,": [
+            190
+          ],
+          "yielding": [
+            191
+          ],
+          "new": [
+            192
+          ],
+          "insights": [
+            193
+          ],
+          "into": [
+            194
+          ],
+          "estuary's": [
+            196
+          ],
+          "mechanisms.": [
+            200
+          ]
+        }
+      },
+      {
+        "id": "https://openalex.org/W4210554586",
+        "doi": "10.3389/fmicb.2021.785532",
+        "title": "Interactions Between Marine Group II Archaea and Phytoplankton Revealed by Population Correlations in the Northern Coast of South China Sea",
+        "publication_year": 2022,
+        "cited_by_count": 19,
+        "relevance_score": 15.798235,
+        "abstract_inverted_index": {
+          "Marine": [
+            0
+          ],
+          "Group": [
+            1
+          ],
+          "II": [
+            2
+          ],
+          "(MGII)": [
+            3
+          ],
+          "archaea": [
+            4,
+            13,
+            35,
+            76,
+            170
+          ],
+          "(Poseidoniales)": [
+            5
+          ],
+          "are": [
+            6,
+            15,
+            31,
+            46,
+            60
+          ],
+          "the": [
+            7,
+            37,
+            64,
+            78,
+            84,
+            103,
+            109,
+            113,
+            122,
+            132,
+            135,
+            204,
+            211
+          ],
+          "most": [
+            8
+          ],
+          "abundant": [
+            9
+          ],
+          "surface": [
+            10
+          ],
+          "marine": [
+            11,
+            65
+          ],
+          "planktonic": [
+            12
+          ],
+          "and": [
+            14,
+            21,
+            29,
+            45,
+            77,
+            94,
+            108,
+            124,
+            126,
+            147,
+            160,
+            171,
+            175,
+            180
+          ],
+          "widely": [
+            16
+          ],
+          "distributed": [
+            17
+          ],
+          "in": [
+            18,
+            49,
+            83,
+            102,
+            131,
+            151,
+            177,
+            210
+          ],
+          "both": [
+            19,
+            178
+          ],
+          "coastal": [
+            20
+          ],
+          "pelagic": [
+            22
+          ],
+          "waters.": [
+            23
+          ],
+          "The": [
+            24,
+            195
+          ],
+          "factors": [
+            25
+          ],
+          "affecting": [
+            26
+          ],
+          "their": [
+            27,
+            188
+          ],
+          "distribution": [
+            28
+          ],
+          "activity": [
+            30
+          ],
+          "poorly": [
+            32
+          ],
+          "understood.": [
+            33
+          ],
+          "MGII": [
+            34,
+            75,
+            99,
+            169
+          ],
+          "have": [
+            36
+          ],
+          "metabolic": [
+            38
+          ],
+          "potential": [
+            39
+          ],
+          "to": [
+            40
+          ],
+          "utilize": [
+            41
+          ],
+          "algae-derived": [
+            42
+          ],
+          "organic": [
+            43
+          ],
+          "matter": [
+            44
+          ],
+          "frequently": [
+            47
+          ],
+          "observed": [
+            48
+          ],
+          "high": [
+            50
+          ],
+          "abundance": [
+            51
+          ],
+          "during": [
+            52
+          ],
+          "or": [
+            53
+          ],
+          "following": [
+            54
+          ],
+          "phytoplankton": [
+            55,
+            82,
+            172
+          ],
+          "blooms,": [
+            56
+          ],
+          "suggesting": [
+            57
+          ],
+          "that": [
+            58
+          ],
+          "they": [
+            59
+          ],
+          "key": [
+            61
+          ],
+          "players": [
+            62
+          ],
+          "of": [
+            63,
+            81,
+            87,
+            112,
+            154,
+            197,
+            213
+          ],
+          "food": [
+            66
+          ],
+          "web.": [
+            67
+          ],
+          "In": [
+            68
+          ],
+          "this": [
+            69,
+            198
+          ],
+          "study,": [
+            70
+          ],
+          "we": [
+            71
+          ],
+          "studied": [
+            72
+          ],
+          "interactions": [
+            73,
+            206
+          ],
+          "between": [
+            74,
+            168,
+            207
+          ],
+          "diverse": [
+            79
+          ],
+          "taxa": [
+            80
+          ],
+          "northern": [
+            85,
+            114
+          ],
+          "coast": [
+            86
+          ],
+          "South": [
+            88,
+            115
+          ],
+          "China": [
+            89,
+            116
+          ],
+          "Sea.": [
+            90
+          ],
+          "Non-metric": [
+            91
+          ],
+          "multidimensional": [
+            92
+          ],
+          "scaling": [
+            93
+          ],
+          "cluster": [
+            95
+          ],
+          "analyses": [
+            96,
+            165
+          ],
+          "demonstrated": [
+            97
+          ],
+          "distinct": [
+            98
+          ],
+          "community": [
+            100
+          ],
+          "patterns": [
+            101
+          ],
+          "Pearl": [
+            104
+          ],
+          "River": [
+            105
+          ],
+          "plume": [
+            106
+          ],
+          "(PRP)": [
+            107
+          ],
+          "open": [
+            110
+          ],
+          "regions": [
+            111
+          ],
+          "Sea": [
+            117
+          ],
+          "(ONSCS),": [
+            118
+          ],
+          "with": [
+            119
+          ],
+          "MGIIb": [
+            120,
+            127
+          ],
+          "dominating": [
+            121
+          ],
+          "former": [
+            123
+          ],
+          "MGIIa": [
+            125
+          ],
+          "showing": [
+            128
+          ],
+          "remarkable": [
+            129
+          ],
+          "variations": [
+            130
+          ],
+          "latter": [
+            133
+          ],
+          "for": [
+            134
+          ],
+          "same": [
+            136
+          ],
+          "sampling": [
+            137
+          ],
+          "season.": [
+            138
+          ],
+          "Nevertheless,": [
+            139
+          ],
+          "positive": [
+            140
+          ],
+          "correlations": [
+            141
+          ],
+          "(Pearson": [
+            142
+          ],
+          "correlation:": [
+            143
+          ],
+          "R": [
+            144
+          ],
+          ">": [
+            145
+          ],
+          "0.8": [
+            146
+          ],
+          "P": [
+            148
+          ],
+          "<": [
+            149
+          ],
+          "0.01)": [
+            150
+          ],
+          "absolute": [
+            152
+          ],
+          "abundances": [
+            153
+          ],
+          "ribosomal": [
+            155
+          ],
+          "RNA": [
+            156
+          ],
+          "(rRNA)-derived": [
+            157
+          ],
+          "complementary": [
+            158
+          ],
+          "DNA": [
+            159
+          ],
+          "rRNA": [
+            161
+          ],
+          "genes": [
+            162
+          ],
+          "from": [
+            163
+          ],
+          "network": [
+            164
+          ],
+          "were": [
+            166
+          ],
+          "found": [
+            167
+          ],
+          "(cyanobacteria,": [
+            173
+          ],
+          "haptophytes,": [
+            174
+          ],
+          "stramenopiles": [
+            176
+          ],
+          "PRP": [
+            179
+          ],
+          "ONSCS)": [
+            181
+          ],
+          "among": [
+            182
+          ],
+          "different": [
+            183,
+            214
+          ],
+          "particle": [
+            184
+          ],
+          "size": [
+            185
+          ],
+          "fractions,": [
+            186
+          ],
+          "indicating": [
+            187
+          ],
+          "intrinsic": [
+            189
+          ],
+          "relationships": [
+            190
+          ],
+          "under": [
+            191
+          ],
+          "changing": [
+            192
+          ],
+          "environmental": [
+            193
+          ],
+          "conditions.": [
+            194
+          ],
+          "results": [
+            196
+          ],
+          "study": [
+            199
+          ],
+          "may": [
+            200
+          ],
+          "shed": [
+            201
+          ],
+          "light": [
+            202
+          ],
+          "on": [
+            203
+          ],
+          "multiple": [
+            205
+          ],
+          "co-existing": [
+            208
+          ],
+          "species": [
+            209
+          ],
+          "micro-niches": [
+            212
+          ],
+          "oceanic": [
+            215
+          ],
+          "regions.": [
+            216
+          ]
+        }
+      },
+      {
+        "id": "https://openalex.org/W4385382075",
+        "doi": "10.1007/s42995-023-00186-x",
+        "title": "Diversity, community structure, and quantity of eukaryotic phytoplankton revealed using 18S rRNA and plastid 16S rRNA genes and pigment markers: a case study of the Pearl River Estuary",
+        "publication_year": 2023,
+        "cited_by_count": 19,
+        "relevance_score": 11.036991,
+        "abstract_inverted_index": {
+          "Abstract": [
+            0
+          ],
+          "Understanding": [
+            1
+          ],
+          "consistencies": [
+            2
+          ],
+          "and": [
+            3,
+            8,
+            38,
+            45,
+            158,
+            160,
+            233
+          ],
+          "discrepancies": [
+            4
+          ],
+          "in": [
+            5,
+            24,
+            58,
+            72,
+            154,
+            162,
+            206,
+            238
+          ],
+          "characterizing": [
+            6
+          ],
+          "diversity": [
+            7,
+            232
+          ],
+          "quantity": [
+            9
+          ],
+          "of": [
+            10,
+            66,
+            90,
+            94,
+            98,
+            109,
+            114,
+            152,
+            180,
+            189,
+            197,
+            209,
+            236
+          ],
+          "phytoplankton": [
+            11,
+            23,
+            75,
+            117,
+            125,
+            237
+          ],
+          "is": [
+            12
+          ],
+          "essential": [
+            13
+          ],
+          "for": [
+            14,
+            123
+          ],
+          "better": [
+            15
+          ],
+          "modeling": [
+            16
+          ],
+          "ecosystem": [
+            17
+          ],
+          "change.": [
+            18
+          ],
+          "In": [
+            19
+          ],
+          "this": [
+            20
+          ],
+          "study,": [
+            21
+          ],
+          "eukaryotic": [
+            22,
+            181
+          ],
+          "the": [
+            25,
+            56,
+            64,
+            73,
+            83,
+            91,
+            107,
+            115,
+            128,
+            133,
+            147,
+            150,
+            155,
+            163,
+            210,
+            231
+          ],
+          "Pearl": [
+            26
+          ],
+          "River": [
+            27
+          ],
+          "Estuary,": [
+            28
+          ],
+          "South": [
+            29
+          ],
+          "China": [
+            30
+          ],
+          "Sea": [
+            31
+          ],
+          "were": [
+            32,
+            77,
+            166,
+            185,
+            213
+          ],
+          "investigated": [
+            33
+          ],
+          "using": [
+            34
+          ],
+          "nuclear": [
+            35
+          ],
+          "18S": [
+            36,
+            52,
+            68,
+            129,
+            156,
+            172,
+            193
+          ],
+          "rRNA": [
+            37,
+            43
+          ],
+          "plastid": [
+            39,
+            190
+          ],
+          "16S": [
+            40,
+            134,
+            164,
+            191,
+            198
+          ],
+          "or": [
+            41,
+            121
+          ],
+          "23S": [
+            42
+          ],
+          "genes": [
+            44
+          ],
+          "pigment": [
+            46,
+            148
+          ],
+          "analysis.": [
+            47
+          ],
+          "It": [
+            48
+          ],
+          "was": [
+            49,
+            103
+          ],
+          "found": [
+            50
+          ],
+          "that": [
+            51,
+            82,
+            171
+          ],
+          "abundance": [
+            53,
+            69
+          ],
+          "poorly": [
+            54
+          ],
+          "explained": [
+            55
+          ],
+          "variations": [
+            57
+          ],
+          "total": [
+            59
+          ],
+          "chlorophyll": [
+            60
+          ],
+          "a": [
+            61,
+            139
+          ],
+          "(Chl-a).": [
+            62
+          ],
+          "However,": [
+            63
+          ],
+          "ratios": [
+            65
+          ],
+          "log-transformed": [
+            67
+          ],
+          "to": [
+            70,
+            142,
+            146,
+            175,
+            215,
+            224,
+            227
+          ],
+          "Chl-a": [
+            71
+          ],
+          "major": [
+            74
+          ],
+          "groups": [
+            76
+          ],
+          "generally": [
+            78
+          ],
+          "environment": [
+            79
+          ],
+          "dependent,": [
+            80
+          ],
+          "suggesting": [
+            81
+          ],
+          "ratio": [
+            84
+          ],
+          "has": [
+            85
+          ],
+          "potential": [
+            86
+          ],
+          "as": [
+            87
+          ],
+          "an": [
+            88
+          ],
+          "indicator": [
+            89
+          ],
+          "physiological": [
+            92
+          ],
+          "state": [
+            93
+          ],
+          "phytoplankton.": [
+            95,
+            182
+          ],
+          "The": [
+            96
+          ],
+          "richness": [
+            97,
+            108
+          ],
+          "18S-based": [
+            99
+          ],
+          "operational": [
+            100
+          ],
+          "taxonomic": [
+            101
+          ],
+          "units": [
+            102
+          ],
+          "positively": [
+            104
+          ],
+          "correlated": [
+            105
+          ],
+          "with": [
+            106
+          ],
+          "16S-based": [
+            110
+          ],
+          "amplicon": [
+            111
+          ],
+          "sequence": [
+            112
+          ],
+          "variants": [
+            113
+          ],
+          "whole": [
+            116
+          ],
+          "community,": [
+            118
+          ],
+          "but": [
+            119
+          ],
+          "insignificant": [
+            120
+          ],
+          "weak": [
+            122
+          ],
+          "individual": [
+            124
+          ],
+          "groups.": [
+            126
+          ],
+          "Overall,": [
+            127
+          ],
+          "based,": [
+            130,
+            135
+          ],
+          "rather": [
+            131
+          ],
+          "than": [
+            132,
+            192
+          ],
+          "community": [
+            136,
+            178,
+            203,
+            212,
+            234
+          ],
+          "structure": [
+            137
+          ],
+          "had": [
+            138
+          ],
+          "greater": [
+            140
+          ],
+          "similarity": [
+            141
+          ],
+          "pigment-based": [
+            143,
+            211
+          ],
+          "estimations.": [
+            144
+          ],
+          "Relative": [
+            145
+          ],
+          "data,": [
+            149
+          ],
+          "proportion": [
+            151
+          ],
+          "haptophytes": [
+            153
+          ],
+          "dataset,": [
+            157,
+            165
+          ],
+          "diatoms": [
+            159
+          ],
+          "cryptophytes": [
+            161
+          ],
+          "underestimated.": [
+            167
+          ],
+          "This": [
+            168
+          ],
+          "study": [
+            169
+          ],
+          "highlights": [
+            170
+          ],
+          "metabarcoding": [
+            173,
+            196
+          ],
+          "tends": [
+            174
+          ],
+          "reflect": [
+            176
+          ],
+          "biomass-based": [
+            177
+          ],
+          "organization": [
+            179,
+            208
+          ],
+          "Because": [
+            183
+          ],
+          "there": [
+            184
+          ],
+          "lower": [
+            186
+          ],
+          "copy": [
+            187
+          ],
+          "numbers": [
+            188
+          ],
+          "per": [
+            194
+          ],
+          "genome,": [
+            195
+          ],
+          "probably": [
+            199
+          ],
+          "approximates": [
+            200
+          ],
+          "cell": [
+            201
+          ],
+          "abundance-based": [
+            202
+          ],
+          "organization.": [
+            204
+          ],
+          "Changes": [
+            205
+          ],
+          "biomass": [
+            207
+          ],
+          "sensitive": [
+            214
+          ],
+          "environmental": [
+            216
+          ],
+          "changes.": [
+            217
+          ],
+          "Taken": [
+            218
+          ],
+          "together,": [
+            219
+          ],
+          "multiple": [
+            220
+          ],
+          "methodologies": [
+            221
+          ],
+          "are": [
+            222
+          ],
+          "recommended": [
+            223
+          ],
+          "be": [
+            225
+          ],
+          "applied": [
+            226
+          ],
+          "more": [
+            228
+          ],
+          "accurately": [
+            229
+          ],
+          "profile": [
+            230
+          ],
+          "composition": [
+            235
+          ],
+          "natural": [
+            239
+          ],
+          "ecosystems.": [
+            240
+          ]
+        }
+      },
+      {
+        "id": "https://openalex.org/W7218679180",
+        "doi": "10.64898/2026.10.01.755934",
+        "title": "Particle association and monsoon seasonality influence microbial communities in marine coastal waters of Singapore",
+        "publication_year": 2026,
+        "cited_by_count": 1,
+        "relevance_score": 6.7415266,
+        "abstract_inverted_index": {
+          "Abstract": [
+            0,
+            229
+          ],
+          "Marine": [
+            1
+          ],
+          "microbial": [
+            2,
+            99
+          ],
+          "communities": [
+            3
+          ],
+          "vary": [
+            4
+          ],
+          "seasonally": [
+            5
+          ],
+          "and": [
+            6,
+            12,
+            36,
+            44,
+            87,
+            90,
+            109,
+            126,
+            167,
+            173,
+            220
+          ],
+          "spatially,": [
+            7
+          ],
+          "shaped": [
+            8
+          ],
+          "by": [
+            9,
+            62,
+            103,
+            227
+          ],
+          "physiochemical": [
+            10,
+            110
+          ],
+          "gradients": [
+            11
+          ],
+          "biotic": [
+            13
+          ],
+          "interactions.": [
+            14
+          ],
+          "Spatiotemporal": [
+            15
+          ],
+          "variability": [
+            16,
+            46,
+            191,
+            214
+          ],
+          "of": [
+            17,
+            47,
+            78,
+            114
+          ],
+          "seawater": [
+            18,
+            79,
+            98
+          ],
+          "microbiomes": [
+            19
+          ],
+          "in": [
+            20,
+            28,
+            49,
+            58,
+            136,
+            154,
+            206,
+            215,
+            222
+          ],
+          "tropical": [
+            21,
+            56
+          ],
+          "coastal": [
+            22
+          ],
+          "regions": [
+            23
+          ],
+          "is": [
+            24,
+            54
+          ],
+          "comparatively": [
+            25
+          ],
+          "understudied,": [
+            26
+          ],
+          "especially": [
+            27
+          ],
+          "Southeast": [
+            29,
+            59
+          ],
+          "Asia": [
+            30,
+            60
+          ],
+          "with": [
+            31,
+            171
+          ],
+          "high": [
+            32
+          ],
+          "pressures": [
+            33
+          ],
+          "from": [
+            34,
+            118,
+            127
+          ],
+          "development": [
+            35
+          ],
+          "anthropogenic": [
+            37
+          ],
+          "activities.": [
+            38
+          ],
+          "Here,": [
+            39
+          ],
+          "we": [
+            40,
+            94
+          ],
+          "examined": [
+            41
+          ],
+          "the": [
+            42,
+            50,
+            97,
+            119,
+            124,
+            129,
+            133,
+            141,
+            155,
+            164,
+            193,
+            216
+          ],
+          "microspatial": [
+            43,
+            76,
+            105
+          ],
+          "temporal": [
+            45,
+            190
+          ],
+          "bacterioplankton": [
+            48,
+            217
+          ],
+          "Singapore": [
+            51
+          ],
+          "Strait,": [
+            52
+          ],
+          "which": [
+            53,
+            197
+          ],
+          "a": [
+            55,
+            137,
+            202
+          ],
+          "system": [
+            57
+          ],
+          "influenced": [
+            61,
+            226
+          ],
+          "monsoons.": [
+            63,
+            228
+          ],
+          "By": [
+            64
+          ],
+          "applying": [
+            65
+          ],
+          "total": [
+            66
+          ],
+          "community": [
+            67,
+            100,
+            139
+          ],
+          "amplicon": [
+            68
+          ],
+          "sequencing": [
+            69
+          ],
+          "to": [
+            70,
+            123,
+            132,
+            201
+          ],
+          "three": [
+            71,
+            146
+          ],
+          "particle": [
+            72,
+            183,
+            207
+          ],
+          "size": [
+            73,
+            147
+          ],
+          "fractions": [
+            74
+          ],
+          "reflecting": [
+            75,
+            178
+          ],
+          "habitats": [
+            77
+          ],
+          "(0.22–1": [
+            80
+          ],
+          "µm": [
+            81,
+            84,
+            92,
+            157
+          ],
+          "“free-living”,": [
+            82
+          ],
+          "1–10": [
+            83
+          ],
+          "“large": [
+            85
+          ],
+          "cells": [
+            86
+          ],
+          "small": [
+            88
+          ],
+          "aggregates”": [
+            89
+          ],
+          "10–150": [
+            91,
+            156
+          ],
+          "“particle-associated”),": [
+            93
+          ],
+          "show": [
+            95
+          ],
+          "that": [
+            96
+          ],
+          "was": [
+            101,
+            152
+          ],
+          "structured": [
+            102
+          ],
+          "their": [
+            104
+          ],
+          "habitats,": [
+            106
+          ],
+          "monsoon": [
+            107,
+            143
+          ],
+          "seasons": [
+            108
+          ],
+          "variables.": [
+            111
+          ],
+          "Monsoon-driven": [
+            112
+          ],
+          "alternation": [
+            113
+          ],
+          "water": [
+            115
+          ],
+          "masses": [
+            116
+          ],
+          "originating": [
+            117
+          ],
+          "South": [
+            120
+          ],
+          "China": [
+            121
+          ],
+          "Sea": [
+            122
+          ],
+          "East": [
+            125
+          ],
+          "off": [
+            128
+          ],
+          "Sumatran": [
+            130
+          ],
+          "coast": [
+            131
+          ],
+          "West": [
+            134
+          ],
+          "resulted": [
+            135
+          ],
+          "distinct": [
+            138
+          ],
+          "during": [
+            140
+          ],
+          "Southwest": [
+            142
+          ],
+          "across": [
+            144,
+            218
+          ],
+          "all": [
+            145
+          ],
+          "fractions.": [
+            148
+          ],
+          "Total": [
+            149
+          ],
+          "DNA": [
+            150
+          ],
+          "(biomass)": [
+            151
+          ],
+          "lowest": [
+            153
+          ],
+          "fraction,": [
+            158
+          ],
+          "but": [
+            159
+          ],
+          "these": [
+            160
+          ],
+          "particle-associated": [
+            161
+          ],
+          "sequences": [
+            162
+          ],
+          "had": [
+            163
+          ],
+          "highest": [
+            165
+          ],
+          "diversity": [
+            166
+          ],
+          "were": [
+            168
+          ],
+          "surprisingly": [
+            169
+          ],
+          "enriched": [
+            170
+          ],
+          "picocyanobacterial": [
+            172
+          ],
+          "some": [
+            174
+          ],
+          "pathogenic": [
+            175
+          ],
+          "taxa,": [
+            176
+          ],
+          "potentially": [
+            177
+          ],
+          "aggregate": [
+            179
+          ],
+          "formation": [
+            180
+          ],
+          "and/or": [
+            181
+          ],
+          "host-derived": [
+            182
+          ],
+          "association.": [
+            184
+          ],
+          "This": [
+            185
+          ],
+          "fraction": [
+            186
+          ],
+          "also": [
+            187
+          ],
+          "exhibited": [
+            188
+          ],
+          "greater": [
+            189
+          ],
+          "than": [
+            192
+          ],
+          "two": [
+            194
+          ],
+          "smaller": [
+            195
+          ],
+          "fractions,": [
+            196
+          ],
+          "could": [
+            198
+          ],
+          "be": [
+            199
+          ],
+          "related": [
+            200
+          ],
+          "more": [
+            203
+          ],
+          "heterogenous": [
+            204
+          ],
+          "environment": [
+            205
+          ],
+          "microhabitats.": [
+            208
+          ],
+          "Overall,": [
+            209
+          ],
+          "this": [
+            210
+          ],
+          "study": [
+            211
+          ],
+          "demonstrated": [
+            212
+          ],
+          "compositional": [
+            213
+          ],
+          "space": [
+            219
+          ],
+          "time": [
+            221
+          ],
+          "an": [
+            223
+          ],
+          "equatorial": [
+            224
+          ],
+          "region": [
+            225
+          ],
+          "Figure": [
+            230
+          ]
+        }
+      }
+    ]
+  },
+  "abstracts": {
+    "10.1016/j.marenvres.2021.105407": "Protists are an important component of the marine ecosystem and play an essential role in material cycle and energy flow, but the distribution of protists in coral reefs have not been fully studied. In this study, high-throughput amplicon sequencing technology was used to study the biodiversity and community structure of protists from coral reefs and open sea areas, with the typical semi-enclosed bay Daya Bay as the research field. There were significant seasonal differences in the dominant phyla of protists, biodiversity index values and βeta diversity (P < 0.05) but no significant differences in the different sampling areas (P > 0.05). The topological parameters of the co-occurrence network showed the protist co-occurrence network in the open sea had more complex interactions and stronger stability than in the coral reef areas because of the hydrodynamics, waves, and relatively poor nutrients. Redundancy analysis and the Mantel test showed that the structure of the protist community was affected by seawater temperature, pH, salinity, and dissolved oxygen. This study analysed the temporal and spatial differences in protists in the coral reef and open sea areas of Daya Bay to provide important information for the study of protist biodiversity and community structure in semi-enclosed bays.",
+    "10.1016/j.marenvres.2026.108235": "Coastal nuclear power plants are expanding rapidly, yet their ecological effects on phytoplankton in open coastal waters remain difficult to distinguish from strong seasonal background variability. We combined pre-operation surveys in 2015-2016 with monthly post-operation monitoring in 2019 around the Taishan Nuclear Power Plant in the northern South China Sea. Reference-based difference-in-differences (DiD) models and continuous-distance analyses provided little evidence for persistent near-field post-operation divergence. Instead, cross-period changes were mainly characterised by broader environmental differences, including lower chemical oxygen demand and higher nitrate after operation. Further analyses of the 2019 monthly data showed that spatial gradients were seasonally bounded and concentrated in late spring to summer, especially from May to August. The cumulative observed phytoplankton taxon pool was smaller after operation, Shannon diversity decreased in spring-early summer and winter, and multivariate analyses indicated clear before-after differences in community composition, including a relative increase in dinoflagellates. These community-level differences indicate broader before-after reorganization rather than a stable year-round distance gradient from the outfall. Our findings support season-aware monitoring that prioritizes periods of strongest detectability and integrates physicochemical variables with phytoplankton community composition. Because the pre- and post-operation surveys were conducted in different years and used partially different station networks, these results should be interpreted as operation-associated ecological patterns rather than definitive causal effects of plant operation.",
+    "10.1007/s10646-021-02451-0": "Microzooplanton play a crucial role in marine ecosystems, as they transfer matter and energy from pico- and nano-phytoplankton to mesozooplankton. In this study, we explored the seasonal variations of microzooplankton grazing derived from dilution experiments in a typical eutrophic coast of Southern China, as well as the abundance and biodiversity of its key group (ciliate), to further understand its function in the subtropical coastal food web associated with potential regulation factors. A total of 29 ciliate species belonging to 18 genera were identified, with the dominating species of Mesodinium rubrum, Strombidium globosaneum and Strombidium conicum. The spatial difference of ciliates abundance was attributed by the changes of temperature and salinity. Phytoplankton growth rate (μ) and microzooplankton grazing rate (m) ranged from 0.03 to 1.36 d<sup>-1</sup> and 0.10 to 1.57 d<sup>-1</sup>, respectively, and both μ and m showed the highest values in summer and the lowest in winter. Moreover, microzooplankton grazing pressure on the phytoplankton standing stocks and potential primary production ranged from 10% to 79% and 58% to 471%, respectively. Our results indicated that temperature is the main environmental driving force for the seasonal changes of μ and m, and that the impacts of run-offs from the Pearl River and offshore seawater intrusion from the South China Sea are responsible for the spatial-temporal variations of phytoplankton growth and microzooplankton grazing.",
+    "10.1016/j.scitotenv.2024.176019": "This comprehensive two-year investigation in the coastal South China Sea has advanced our understanding of marine microbes at both community and genomic levels. By combining metagenomics and metatranscriptomics, we have revealed the intricate temporal dynamics and remarkable adaptability of microbial communities and phytoplankton metagenome-assembled genomes (MAGs) in response to environmental fluctuations. We observed distinct seasonal shifts in microbial community composition and function: cyanobacteria were predominant during warmer months, whereas photosynthetic protists were more abundant during colder seasons. Notably, metabolic marker KOs of photosynthesis were consistently active throughout the year, underscoring the persistent role of these processes irrespective of seasonal changes. Our analysis reveals that environmental parameters such as temperature, salinity, and nitrate concentrations profoundly influence microbial community composition, while temperature and silicate have emerged as crucial factors shaping their functional traits. Through the recovery and analysis of 37 phytoplankton MAGs, encompassing nine prokaryotic cyanobacteria and 28 eukaryotic protists from diverse phyla, we have gained insights into their genetic diversity and metabolic capabilities. Distinct profiles of photosynthesis-related pathways including carbon fixation, carotenoid biosynthesis, photosynthesis-antenna proteins, and photosynthesis among the MAGs indicated their genetic adaptations to changing environmental conditions. This study not only enhances our understanding of microbial dynamics in coastal marine ecosystems but also sheds light on the ecological roles and adaptive responses of different microbial groups to environmental changes."
+  }
+}

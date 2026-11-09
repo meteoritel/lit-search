@@ -1,0 +1,14 @@
+[presets.marine_timeseries]
+concepts = [
+  "South China Sea,Daya Bay,Beibu Gulf,Pearl River Estuary",
+  "protist,ciliate,dinoflagellate,microeukaryote,eukaryotic plankton",
+  "time series,seasonal,monthly,diel,long-term monitoring",
+]
+sources = ["openalex", "europepmc"]
+year = "2021-2026"
+limit = 200
+max_results = 100
+sort = "hybrid"
+fetch_sort = "relevance"
+merge_policy = "doi"
+enrich_abstracts = 20

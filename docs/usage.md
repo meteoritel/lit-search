@@ -41,6 +41,7 @@ sort = "citations"
 fetch_sort = "relevance"
 require = ["marine,coastal,seawater"]
 exclude = ["retraction,corrigendum"]
+enrich_abstracts = 0
 merge_policy = "doi"
 strict_filters = false
 ```
@@ -60,9 +61,9 @@ litsearch --preset marine --require "marine,ocean" --stdout
 
 | 参数 | 行为 |
 |---|---|
-| query... | 自由文本查询，可给多个；也可从预设提供 |
+| query... | 自由文本查询，可给多个；也可从预设或 concept 提供 |
 | --preset NAME | 选择命名预设 |
-| --source openalex,crossref | 来源列表，默认 openalex |
+| --source openalex,crossref,europepmc | 来源列表，默认 openalex |
 | --year YEAR / START-END | 年份范围，起点不晚于终点 |
 | --limit N | 每个来源/查询的候选上限，默认 25 |
 | --max-results N | 合并、主题过滤、排序后的最终上限 |
@@ -76,7 +77,9 @@ litsearch --preset marine --require "marine,ocean" --stdout
 | --oa-filter VALUE | OpenAlex 原始 filter，同键覆盖结构化条件并生成诊断 |
 | --require A,B | 组内 OR、组间 AND，可重复 |
 | --exclude X,Y | 命中任一排除词即剔除，可重复 |
-| --sort citations/year/relevance | 最终展示排序，默认 citations |
+| --concept A,B | 同义词概念组，可重复；用于来源查询与软排序 |
+| --enrich-abstracts N | 缺失摘要的新 DOI 查询预算，默认 0，使用 Europe PMC |
+| --sort citations/year/relevance/rrf/bm25/hybrid | 最终展示排序，默认 citations |
 | --fetch-sort relevance/citations/year | 远端候选排序，默认 relevance |
 | --merge-policy title/doi | 默认 title；doi 使用保守合并策略 |
 | --strict-filters / --no-strict-filters | 严格模式在联网前拒绝忽略或覆盖条件 |
@@ -91,9 +94,9 @@ litsearch --preset marine --require "marine,ocean" --stdout
 
 ## 候选、过滤与排序
 
-`--limit` 控制每个来源/查询交给后续流程的候选窗口，`--max-results` 控制最终产出。远端候选在跨源合并后进行标题/摘要主题过滤，再排序和截断。
+`--limit` 控制每个来源/查询交给后续流程的候选窗口，`--max-results` 控制最终产出。远端候选在跨源合并后按需补摘要，执行标题/摘要主题过滤，再排序和截断。
 
-OpenAlex 使用 cursor 分页。Crossref 也使用 cursor；需要按被引数或语言做本地筛选时，扫描预算为 limit 的三倍，保留至多 limit 条。JSON 的 fetched_count、mapped_count、returned_count 与 stop_reason 说明每个查询的执行情况。
+OpenAlex、Crossref、Europe PMC 使用 cursor 分页。Crossref 与 Europe PMC 需要按被引数或语言做本地筛选时，扫描预算为 limit 的三倍，保留至多 limit 条。JSON 的 fetched_count、mapped_count、returned_count 与 stop_reason 说明每个查询的执行情况。Crossref relevance 抓取在所有页明确使用 score 降序。
 
 `--fetch-sort` 决定哪些候选进入窗口；`--sort` 只改变窗口内结果的展示顺序。希望按被引数获取候选并排序时同时指定：
 
@@ -111,8 +114,44 @@ litsearch "marine bacteria" --fetch-sort citations --sort citations --stdout
 | =sea | 整词精确匹配 |
 | *bacteri* | 任意位置子串，命中 cyanobacteria |
 | 海洋 | 非 ASCII 词使用子串匹配 |
+| title:protist | 只匹配标题 |
+| abstract:monthly | 只匹配摘要 |
 
-每个 require 组的统计基于同一份排除词过滤后的集合，便于定位筛选瓶颈。
+`title:` / `abstract:` 适用于 require 与 exclude，可以与整词和子串写法组合。空 require 组在联网前报参数错误。每个 require 组的统计基于同一份排除词过滤后的集合，便于定位筛选瓶颈。
+
+`--enrich-abstracts N` 在硬过滤前向 Europe PMC 按 DOI 补空摘要；N 控制新 DOI 查询次数，重试遵循 HTTP 策略。查不到或预算用尽会产生诊断，网络失败则整个检索失败。缓存与统计详见 [Python 契约](python.md#摘要补齐)。
+
+## 概念查询与主题排序
+
+概念组表达主题的不同要素，组内放近义词。手工 queries 与生成查询合并去重；concepts 用于软证据，require 用于硬过滤。只有 concepts 时也可以检索：
+
+```bash
+litsearch --concept "South China Sea,Daya Bay" --concept "protist,ciliate" --concept "seasonal,monthly" --source openalex,europepmc --sort hybrid --stdout
+```
+
+OpenAlex 将组内词编译为带引号的 OR 条件，组间用 AND；Europe PMC 在词前加 `TITLE_ABS:`。概念组至少为三组时，额外生成只含前两组的宽查询，因此将基本地理与研究对象放在前面。Crossref 按同义词位置轮换生成普通文本查询，并增加相同的宽查询，使用其自身的查询语义。`--explain` 的 compiled_queries 显示实际查询与来源筛选条件。
+
+中文主题可使用可审阅的英文术语预设。将[南海时间序列示例](../examples/marine-timeseries.toml)中的预设表复制到项目 `litsearch.toml`，或将该文件作为 `LITSEARCH_CONFIG`：
+
+```powershell
+$env:LITSEARCH_CONFIG = (Resolve-Path examples/marine-timeseries.toml).Path
+litsearch --preset marine_timeseries --explain
+litsearch --preset marine_timeseries --stdout
+```
+
+该示例使用宽查询保留候选，再由 hybrid 排序；需要确定的筛选门槛时显式添加 require，并核对摘要缺失与过滤统计。
+
+| 排序 | 计算与用途 |
+|---|---|
+| citations / year | 按被引数或年份排序 |
+| relevance | 按来源原始相关分排序；缺分记录按被引数排在后段 |
+| rrf | 每个独立 source/query 列表贡献 `1/(60+rank)`，同列表同文献保留最佳名次 |
+| bm25 | 标题与摘要分别计算 BM25 后相加，标题权重 2、摘要权重 1；同义词组取最高贡献，再乘概念覆盖比例 |
+| hybrid | 对 RRF 分与字段 BM25 分分别转为名次，共分共享名次，再以 `1/(60+rank)` 融合并乘概念覆盖比例 |
+
+字段 BM25 使用 `k1=1.2`、`b=0.75`，IDF 为 `log(1+(N-df+0.5)/(df+0.5))`，统计来自过滤后的当前候选池。排序词组优先使用 concepts，其次 require，否则从 queries 提取非停用词。此实现为字段加权 BM25。概念覆盖比例为命中组占全部组的比例，摘要缺失会在证据中标明。
+
+可选排序对标题明确标为补充材料、评议回复或推荐记录的条目设置 ancillary 标记，并将得分乘 0.5；条目保留在结果中。分数相同时按被引数和规范化身份确定次序。JSON 的 retrieval_hits、ranking_score 和 ranking_evidence 便于核对来源名次、字段命中与降权原因。默认排序维持 citations；专题对照见[评测说明](research/retrieval-quality-evaluation.md)。
 
 ## 去重与来源差异
 
@@ -122,7 +161,9 @@ litsearch "marine bacteria" --fetch-sort citations --sort citations --stdout
 
 Crossref 的机构、OA、OpenAlex 作者 ID 和 OpenAlex 原始 filter 条件不受支持；被引数和语言在本地处理。所有被忽略条件进入结构化诊断。严格模式会在发送任何请求前拒绝被忽略或覆盖的条件。
 
-OpenAlex/Crossref 的覆盖范围和元数据完整性各异。远端全文命中可能在本地标题/摘要中找不到对应词，且语言字段可能缺失；这些条件会影响后置过滤的保留结果。
+Europe PMC 无需 API key，年份、OA、作者姓名和 ISSN 在远端执行；被引数和语言在本地处理。机构、类型筛选、OpenAlex 作者 ID/原始 filter 及 relevance 之外的 fetch_sort 不受支持，普通模式诊断后忽略，严格模式联网前拒绝。
+
+各来源的覆盖范围和元数据完整性各异。远端全文或关键词命中可能在本地标题/摘要中找不到对应词，且语言字段可能缺失；这些条件会影响后置过滤的保留结果。
 
 ## 输出与错误
 

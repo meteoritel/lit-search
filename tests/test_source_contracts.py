@@ -31,6 +31,10 @@ def test_crossref_cursor_retrieves_beyond_the_single_request_maximum():
     second = urllib.parse.parse_qs(urllib.parse.urlparse(opener.urls[1]).query)
     assert second["cursor"] == ["cursor+0"]
     assert all("offset=" not in url for url in opener.urls)
+    for url in opener.urls:
+        params = urllib.parse.parse_qs(urllib.parse.urlparse(url).query)
+        assert params["sort"] == ["score"]
+        assert params["order"] == ["desc"]
     assert opener.remaining == []
 
 

@@ -1,0 +1,479 @@
+{
+  "topic": "Protist/eukaryotic-plankton time-series (or repeated temporal sampling) studies in the South China Sea, published 2021-2026",
+  "records": [
+    {
+      "doi": "10.3390/microorganisms10010016",
+      "year": 2021,
+      "tier": 1,
+      "note": "Daya Bay, 36-h high-temporal-resolution phytoplankton size fractions"
+    },
+    {
+      "doi": "10.1016/j.marenvres.2021.105407",
+      "year": 2021,
+      "tier": 1,
+      "note": "Daya Bay seasonal protist communities (18S)"
+    },
+    {
+      "doi": "10.1007/s10646-021-02451-0",
+      "year": 2021,
+      "tier": 1,
+      "note": "Southern China eutrophic coast, seasonal microzooplankton grazing/ciliates"
+    },
+    {
+      "doi": "10.1038/s41598-023-30973-6",
+      "year": 2023,
+      "tier": 1,
+      "note": "nSCS diel ciliate community"
+    },
+    {
+      "doi": "10.1016/j.envres.2022.114584",
+      "year": 2023,
+      "tier": 1,
+      "note": "nSCS shelf/slope eukaryotic plankton over diel cycle (journal version)"
+    },
+    {
+      "doi": "10.1016/j.marpolbul.2024.116955",
+      "year": 2024,
+      "tier": 1,
+      "note": "Daya Bay 1986-2020 long-term phytoplankton/nutrients"
+    },
+    {
+      "doi": "10.1016/j.marpolbul.2024.116832",
+      "year": 2024,
+      "tier": 1,
+      "note": "Daya Bay bi-monthly benthic eukaryotic microalgae metabarcoding"
+    },
+    {
+      "doi": "10.1016/j.scitotenv.2024.176019",
+      "year": 2024,
+      "tier": 1,
+      "note": "Coastal SCS two-year seasonal microbial (incl. photosynthetic protists) series"
+    },
+    {
+      "doi": "10.1186/s40793-025-00803-5",
+      "year": 2025,
+      "tier": 1,
+      "note": "Coastal SCS 48-h time-series multi-omics incl. eukaryotes"
+    },
+    {
+      "doi": "10.1016/j.envres.2025.122565",
+      "year": 2025,
+      "tier": 1,
+      "note": "Pearl River Estuary wet/dry season eukaryotic communities"
+    },
+    {
+      "doi": "10.1186/s12866-025-04239-2",
+      "year": 2025,
+      "tier": 1,
+      "note": "Pearl River Estuary temporal microeukaryote/prokaryote variation"
+    },
+    {
+      "doi": "10.1016/j.marpolbul.2026.120333",
+      "year": 2026,
+      "tier": 1,
+      "note": "Daya Bay seasonal plankton monitoring across 24 stations"
+    },
+    {
+      "doi": "10.1007/s00248-026-02804-4",
+      "year": 2026,
+      "tier": 1,
+      "note": "Pearl River Estuary 24-h hourly tidal time series, eukaryotic + prokaryotic"
+    },
+    {
+      "doi": "10.1016/j.marenvres.2026.108235",
+      "year": 2026,
+      "tier": 1,
+      "note": "Taishan NPP monthly monitoring phytoplankton 2015-16 + 2019"
+    },
+    {
+      "doi": "10.1128/spectrum.01247-24",
+      "year": 2025,
+      "tier": 1,
+      "note": "NE SCS summer/winter ciliate communities, shelf to basin"
+    },
+    {
+      "doi": "10.1002/ece3.71207",
+      "year": 2025,
+      "tier": 1,
+      "note": "Beibu Gulf summer/winter phytoplankton morphology + eDNA"
+    },
+    {
+      "doi": "10.1016/j.marenvres.2026.108285",
+      "year": 2026,
+      "tier": 1,
+      "note": "SCS spatiotemporal phytoplankton + HAB across regions/seasons"
+    },
+    {
+      "doi": "10.1128/aem.01489-26",
+      "year": 2026,
+      "tier": 2,
+      "note": "Xiamen Island monthly 7-month microeukaryote series (borderline geography)"
+    },
+    {
+      "doi": "10.1016/j.marenvres.2026.108231",
+      "year": 2026,
+      "tier": 2,
+      "note": "Xiamen Bay seasonal ciliates (borderline geography)"
+    },
+    {
+      "doi": "10.1093/ismejo/wraf095",
+      "year": 2025,
+      "tier": 2,
+      "note": "nSCS sedimentary ancient + contemporary dinoflagellates (paleo/long-term)"
+    },
+    {
+      "doi": "10.1016/j.jenvman.2026.128848",
+      "year": 2026,
+      "tier": 2,
+      "note": "nSCS century-scale sedimentary phytoplankton reconstruction"
+    },
+    {
+      "doi": "10.1002/ece3.10127",
+      "year": 2023,
+      "tier": 2,
+      "note": "Beibu Gulf annual phytoplankton metabarcoding"
+    },
+    {
+      "doi": "10.1128/aem.01654-21",
+      "year": 2022,
+      "tier": 2,
+      "note": "Beibu Gulf Phaeocystis blooms over 8 cruises"
+    },
+    {
+      "doi": "10.1007/s42995-025-00337-2",
+      "year": 2026,
+      "tier": 2,
+      "note": "SCS three cruises 2019-2020 phytoplankton carbon biomass"
+    },
+    {
+      "doi": "10.3390/microorganisms12101982",
+      "year": 2024,
+      "tier": 2,
+      "note": "Daya Bay seasonal trophic cascade experiments on phytoplankton"
+    },
+    {
+      "doi": "10.1186/s12866-026-05387-9",
+      "year": 2026,
+      "tier": 2,
+      "note": "Zhanjiang Bay succession across two typhoons"
+    },
+    {
+      "doi": "10.1016/j.marpolbul.2026.120297",
+      "year": 2026,
+      "tier": 2,
+      "note": "Qinzhou Bay year-round phycotoxin survey (toxigenic dinoflagellates)"
+    },
+    {
+      "doi": "10.1016/j.hal.2025.102954",
+      "year": 2025,
+      "tier": 2,
+      "note": "SCS seasonal phycotoxins (toxigenic dinoflagellates)"
+    },
+    {
+      "doi": "10.1007/s00248-026-02786-3",
+      "year": 2026,
+      "tier": 2,
+      "note": "China marginal seas Jan 2025 microbial food web incl. microzooplankton"
+    },
+    {
+      "doi": "10.1002/ece3.71936",
+      "year": 2025,
+      "tier": 2,
+      "note": "Beibu Gulf diatom/Chlorophyta succession via 18S"
+    },
+    {
+      "doi": "10.1093/ismejo/wraf214",
+      "year": 2025,
+      "tier": 2,
+      "note": "SCS deep-sea 18-sample seasonal series (prokaryote-dominant)"
+    },
+    {
+      "doi": "10.1111/gcb.15667",
+      "year": 2021,
+      "tier": 2,
+      "note": "PRE 18-year monthly series, diatoms/dinoflagellates vs warming"
+    },
+    {
+      "doi": "10.1016/j.marpolbul.2021.112406",
+      "year": 2021,
+      "tier": 2,
+      "note": "Daya Bay + Jiaozhou Bay 30-year nutrients/plankton trends"
+    },
+    {
+      "doi": "10.3390/microorganisms13112609",
+      "year": 2025,
+      "tier": 2,
+      "note": "Zhanjiang Bay phytoplankton before/after typhoon, time analysis"
+    },
+    {
+      "doi": "10.1016/j.marenvres.2026.108171",
+      "year": 2026,
+      "tier": 2,
+      "note": "Qinzhou Bay monthly Nov 2021-Nov 2022 phytoplankton"
+    },
+    {
+      "doi": "10.1007/s42995-025-00343-4",
+      "year": 2026,
+      "tier": 2,
+      "note": "nSCS/ECS summer diat-dino ratios (snapshot, partial)"
+    },
+    {
+      "doi": "10.1186/s12862-024-02315-1",
+      "year": 2024,
+      "tier": 2,
+      "note": "Beibu Gulf phytoplankton 18S metabarcoding, temp/runoff"
+    },
+    {
+      "doi": "10.1016/j.marenvres.2023.106193",
+      "year": 2023,
+      "tier": 2,
+      "note": "PRE two-season bacteria + eukaryotic phytoplankton"
+    },
+    {
+      "doi": "10.1093/ismeco/ycaf216",
+      "year": 2025,
+      "tier": 2,
+      "note": "PRE diel high-frequency sampling (prokaryote-dominant)"
+    },
+    {
+      "doi": "10.3389/frmbi.2025.1655960",
+      "year": 2025,
+      "tier": 2,
+      "note": "nSCS/PRE 4-hourly time series nutrient limitation"
+    },
+    {
+      "doi": "10.1002/edn3.580",
+      "year": 2024,
+      "tier": 3,
+      "note": "18S marker benchmarking, no SCS time series"
+    },
+    {
+      "doi": "10.1038/s42003-026-10438-y",
+      "year": 2026,
+      "tier": 3,
+      "note": "Eddy snapshot nanoflagellate bacterivory (no temporal series)"
+    },
+    {
+      "doi": "10.1128/aem.00092-26",
+      "year": 2026,
+      "tier": 3,
+      "note": "Olivine shipboard incubation succession"
+    },
+    {
+      "doi": "10.3390/toxins13090643",
+      "year": 2021,
+      "tier": 3,
+      "note": "Gambierdiscus strain characterization"
+    },
+    {
+      "doi": "10.3389/fmicb.2021.689688",
+      "year": 2021,
+      "tier": 3,
+      "note": "Compilation of SCS ciliate distribution (no time series)"
+    },
+    {
+      "doi": "10.1016/j.marpolbul.2021.112341",
+      "year": 2021,
+      "tier": 3,
+      "note": "PRE ciliate spatial water-mass survey"
+    },
+    {
+      "doi": "10.1016/j.marenvres.2023.105873",
+      "year": 2023,
+      "tier": 3,
+      "note": "Spatial biogeography bacteria/microeukaryotes PRE-SCS"
+    },
+    {
+      "doi": "10.1016/j.marpolbul.2021.112091",
+      "year": 2021,
+      "tier": 3,
+      "note": "NEC spatial transect"
+    },
+    {
+      "doi": "10.1128/spectrum.02734-25",
+      "year": 2026,
+      "tier": 3,
+      "note": "Xianbei Seamount single-survey protists"
+    },
+    {
+      "doi": "10.3390/microorganisms10050913",
+      "year": 2022,
+      "tier": 3,
+      "note": "Method comparison, PRE"
+    },
+    {
+      "doi": "10.1016/j.watres.2021.117294",
+      "year": 2021,
+      "tier": 3,
+      "note": "Freshwater PRD drainages, one summer"
+    },
+    {
+      "doi": "10.1038/s43705-023-00292-y",
+      "year": 2023,
+      "tier": 3,
+      "note": "Rhodopsin diversity, not time series"
+    },
+    {
+      "doi": "10.1007/s42995-023-00186-x",
+      "year": 2023,
+      "tier": 3,
+      "note": "PRE one survey method comparison"
+    },
+    {
+      "doi": "10.1016/j.marpolbul.2026.120393",
+      "year": 2026,
+      "tier": 3,
+      "note": "Hainan single survey Aug 2025"
+    },
+    {
+      "doi": "10.1016/j.marenvres.2026.108052",
+      "year": 2026,
+      "tier": 3,
+      "note": "Qinzhou Bay single summer survey"
+    },
+    {
+      "doi": "10.1038/s41597-026-07329-6",
+      "year": 2026,
+      "tier": 3,
+      "note": "Freshwater reservoirs in Xiamen, not SCS marine"
+    },
+    {
+      "doi": "10.1128/spectrum.02451-24",
+      "year": 2025,
+      "tier": 3,
+      "note": "East China Sea, bacteria-focused"
+    },
+    {
+      "doi": "10.1016/j.envres.2024.119084",
+      "year": 2024,
+      "tier": 3,
+      "note": "East China Sea acidification mesocosm"
+    },
+    {
+      "doi": "10.1128/spectrum.02759-21",
+      "year": 2022,
+      "tier": 3,
+      "note": "Depth distribution, spatial"
+    },
+    {
+      "doi": "10.3390/biology13070550",
+      "year": 2024,
+      "tier": 3,
+      "note": "PRE single survey Sept 2018"
+    },
+    {
+      "doi": "10.3390/jof10120867",
+      "year": 2024,
+      "tier": 3,
+      "note": "Fungi in sediments"
+    },
+    {
+      "doi": "10.1101/2023.08.23.554380",
+      "year": 2023,
+      "tier": 3,
+      "note": "Coral microbiome preprint"
+    },
+    {
+      "doi": "10.3390/biology15131047",
+      "year": 2026,
+      "tier": 3,
+      "note": "Cryptophyta ensemble species-distribution modelling"
+    },
+    {
+      "doi": "10.1016/j.hal.2026.103166",
+      "year": 2026,
+      "tier": 3,
+      "note": "Tripos taxonomy single-cell sequencing"
+    },
+    {
+      "doi": "10.64898/2026.10.01.755934",
+      "year": 2026,
+      "tier": 3,
+      "note": "Singapore Strait bacterioplankton (wrong geography/taxon)"
+    },
+    {
+      "doi": "10.1016/j.envres.2026.123872",
+      "year": 2026,
+      "tier": 3,
+      "note": "Zhanjiang Bay bacterioplankton after typhoon, bacteria-only"
+    },
+    {
+      "doi": "10.1128/aem.01169-26",
+      "year": 2026,
+      "tier": 3,
+      "note": "Coral-reef spatial microbiome states"
+    },
+    {
+      "doi": "10.1007/s11356-021-17449-8",
+      "year": 2022,
+      "tier": 3,
+      "note": "PRE bacterioplankton seasonality, bacteria-only"
+    },
+    {
+      "doi": "10.3389/fmicb.2023.1185436",
+      "year": 2023,
+      "tier": 3,
+      "note": "Archaea community assembly"
+    },
+    {
+      "doi": "10.1186/s40793-023-00530-9",
+      "year": 2023,
+      "tier": 3,
+      "note": "Planktonic archaea in estuaries"
+    },
+    {
+      "doi": "10.1016/j.envres.2024.119561",
+      "year": 2024,
+      "tier": 3,
+      "note": "Beibu Gulf bacterioplankton spatiotemporal"
+    },
+    {
+      "doi": "10.3389/fmicb.2021.583982",
+      "year": 2021,
+      "tier": 3,
+      "note": "OA acidification bacteria, oligotrophic oceans"
+    },
+    {
+      "doi": "10.1007/s10533-021-00860-1",
+      "year": 2021,
+      "tier": 3,
+      "note": "DOC nitrogen sources for bacterioplankton"
+    },
+    {
+      "doi": "10.1016/j.envres.2021.110934",
+      "year": 2021,
+      "tier": 3,
+      "note": "Bacterioplankton assembly, urban estuary"
+    },
+    {
+      "doi": "10.3390/ijerph19010299",
+      "year": 2021,
+      "tier": 3,
+      "note": "Ballast-tank dinoflagellate cysts"
+    },
+    {
+      "doi": "10.3389/fmicb.2021.785532",
+      "year": 2021,
+      "tier": 3,
+      "note": "MGII archaea-phytoplankton correlations"
+    },
+    {
+      "doi": "10.1101/2022.02.09.479823",
+      "year": 2022,
+      "tier": 3,
+      "note": "Preprint duplicate of 10.1016/j.envres.2022.114584"
+    },
+    {
+      "doi": "10.3390/microorganisms12071273",
+      "year": 2024,
+      "tier": 3,
+      "note": "Sediment microbial communities, PRE"
+    },
+    {
+      "doi": "10.1016/j.hal.2021.102059",
+      "year": 2022,
+      "tier": 3,
+      "note": "China-wide HAB review, 4 decades"
+    }
+  ]
+}

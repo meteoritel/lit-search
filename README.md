@@ -2,7 +2,7 @@
 
 多源文献检索工具，提供 CLI 和 Python 调用入口。检索后统一去重、过滤、排序，输出文献清单、结构化结果或供 Zotero 导入的 DOI 列表。
 
-运行要求 Python 3.12+，运行时仅使用标准库。OpenAlex 为默认来源，Crossref 通过 `--source` 开启；`src/litsearch.py` 可单独拷走运行。
+运行要求 Python 3.12+，运行时仅使用标准库。OpenAlex 为默认来源，Crossref、Europe PMC 通过 `--source` 开启；`src/litsearch.py` 可单独拷走运行。
 
 ## 安装与开始使用
 
@@ -40,9 +40,17 @@ litsearch "marine protist grazing" --limit 100 --max-results 30
 
 # 开启 Crossref；严格要求所有来源执行请求的筛选条件
 litsearch "marine bacteria" --source openalex,crossref --strict-filters --stdout
+
+# 用概念组生成来源查询，并按主题证据与来源排名排序
+litsearch --concept "perovskite" --concept "solar cell" --concept "moisture,humidity" --sort hybrid --stdout
+
+# 在硬过滤前按 DOI 补充缺失摘要，最多查询 20 个新 DOI
+litsearch "marine protist" --source crossref --enrich-abstracts 20 --require "seasonal,monthly" --stdout
 ```
 
 默认文件写到 `output/`。目标已存在时使用 `--overwrite` 明确允许覆盖。文件模式 stdout 只打印成功提交的路径；JSON 模式 stdout 只输出结果，诊断均可在 JSON 和 stderr 中查看。
+
+南海时间序列主题可从 [TOML 示例](examples/marine-timeseries.toml) 开始；先用 `--explain` 查看实际查询。`rrf`、`bm25`、`hybrid` 是可选排序，默认仍按被引数。算法对照与质量取舍见[评测说明](docs/research/retrieval-quality-evaluation.md)。
 
 ## Python 调用
 
