@@ -14,6 +14,71 @@ import litsearch
 from conftest import SleepRecorder, load_fixture, make_http, make_plan, make_record
 
 
+@pytest.mark.parametrize("dates,year,publication_date,warnings", [
+    ({}, None, None, []),
+    ({"issued": {"date-parts": [[None]]}}, None, None, ["issued.date-parts"]),
+    ({"issued": {"date-parts": [[2024]]}}, 2024, "2024-01-01", []),
+    ({"published": {"date-parts": [[2024, 5]]},
+      "issued": {"date-parts": [[None]]}}, 2024, "2024-05-01", ["issued.date-parts"]),
+    ({"published": {"date-parts": [[None]]},
+      "issued": {"date-parts": [[2023, 5, 1]]}}, 2023, "2023-05-01", ["published.date-parts"]),
+    ({"issued": {"date-parts": [[2024, None, 15]]}}, 2024, None, ["issued.date-parts"]),
+    ({"issued": {"date-parts": [[None, 5, 15]]}}, None, None, ["issued.date-parts"]),
+])
+def test_crossref_nullable_dates_through_complete_search(dates, year, publication_date, warnings):
+    body = json.dumps({"message": {"total-results": 1, "items": [
+        {"DOI": "10.1000/date", **dates},
+    ]}}).encode()
+    http, opener = make_http([body])
+    result = litsearch.SearchClient(litsearch.Config(), http).search(
+        make_plan(sources=["crossref"], limit=1))
+    assert result.records[0].year == year
+    assert result.records[0].publication_date == publication_date
+    diagnostics = [d for d in result.report.diagnostics if d.code == "provider_warning"]
+    assert [d.field for d in diagnostics] == warnings
+    assert all(d.source == "crossref" and d.query == "q" and "10.1000/date" in d.message
+               for d in diagnostics)
+    assert result.report.queries[0].mapped_count == 1
+    assert opener.remaining == []
+
+
+@pytest.mark.parametrize("issued", [[], {"date-parts": ["2024"]},
+                                    {"date-parts": [["2024"]]}, {"date-parts": [[True]]}])
+def test_crossref_bad_dates_keep_network_error_and_identify_record(issued):
+    body = json.dumps({"message": {"total-results": 1, "items": [
+        {"DOI": "10.1000/bad-date", "issued": issued},
+    ]}}).encode()
+    http, _ = make_http([body])
+    with pytest.raises(litsearch.NetworkError, match="10.1000/bad-date.*issued"):
+        litsearch.SearchClient(litsearch.Config(), http).search(make_plan(sources=["crossref"]))
+
+
+def test_nullable_dates_across_pages_and_sources(monkeypatch):
+    monkeypatch.setattr(litsearch, "CROSSREF_PAGE_SIZE", 1)
+    pages = [json.dumps({"message": {"total-results": 2, "items": [item],
+                                    "next-cursor": "next"}}).encode() for item in [
+        {"title": ["An identifiable work without a DOI"], "issued": {"date-parts": [[None]]}},
+        {"DOI": "10.1/dated", "issued": {"date-parts": [[2024]]}},
+    ]]
+    pages.append(json.dumps({"hitCount": 1, "resultList": {"result": [
+        {"id": "1", "source": "MED", "doi": "10.1/epmc"},
+    ]}}).encode())
+    http, opener = make_http(pages)
+    result = litsearch.SearchClient(litsearch.Config(), http).search(
+        make_plan(sources=["crossref", "europepmc"], limit=2))
+    assert len(result.records) == 3
+    assert result.report.queries[0].fetched_count == 2
+    warning = next(d for d in result.report.diagnostics if d.field == "issued.date-parts")
+    assert "第 1 条记录" in warning.message
+    assert opener.remaining == []
+
+
+def test_bad_crossref_doi_remains_a_network_error():
+    http, _ = make_http([json.dumps({"message": {"total-results": 1, "items": [{"DOI": 42}]}}).encode()])
+    with pytest.raises(litsearch.NetworkError, match="第 1 条记录"):
+        litsearch.SearchClient(litsearch.Config(), http).search(make_plan(sources=["crossref"]))
+
+
 def test_crossref_cursor_retrieves_beyond_the_single_request_maximum():
     pages = []
     for page in range(11):

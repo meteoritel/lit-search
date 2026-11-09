@@ -3,6 +3,10 @@
 from __future__ import annotations
 
 import json
+import os
+import subprocess
+import sys
+from pathlib import Path
 
 import pytest
 
@@ -28,6 +32,76 @@ def run_cli(argv, responses, tmp_path, monkeypatch, key="test-key"):
     args = litsearch.build_parser().parse_args(argv)
     code = litsearch.run(args, tmp_path, http, litsearch.RetryPolicy(), sleeps)
     return code, opener, sleeps
+
+
+def test_crossref_nullable_date_succeeds_without_year(tmp_path, monkeypatch, capsys):
+    body = json.dumps({"message": {"total-results": 1, "items": [
+        {"DOI": "10.1/null-date", "issued": {"date-parts": [[None]]}},
+    ]}}).encode()
+    code, _, _ = run_cli(["marine bacteria", "--source", "crossref", "--stdout"],
+                          [body], tmp_path, monkeypatch, key=None)
+    captured = capsys.readouterr()
+    assert code == 0
+    assert json.loads(captured.out)["results"][0]["year"] is None
+    assert "10.1/null-date" in captured.err
+
+
+def test_empty_mixed_sources_keep_json_and_stderr_diagnostics_in_sync(tmp_path, monkeypatch, capsys):
+    crossref = json.dumps({"message": {"total-results": 4, "items": [
+        {"DOI": f"10.1/{i}", "language": "fr"} for i in range(3)],
+        "next-cursor": "next"}}).encode()
+    europepmc = b'{"hitCount":0,"resultList":{"result":[]}}'
+    code, opener, _ = run_cli(["q", "--source", "crossref,europepmc", "--limit", "1",
+                              "--language", "en", "--stdout"],
+                             [crossref, europepmc], tmp_path, monkeypatch, key=None)
+    captured = capsys.readouterr()
+    payload = json.loads(captured.out)
+    assert code == 0
+    assert payload["results"] == []
+    assert len(opener.urls) == 2
+    empty = [d for d in payload["diagnostics"] if d["code"] == "empty_results"]
+    assert [d["source"] for d in empty] == ["crossref", "europepmc"]
+    assert "来源本地条件筛空" in empty[0]["message"]
+    assert "远端无命中" in empty[1]["message"]
+    window = next(d for d in payload["diagnostics"] if d["code"] == "fetch_window_limited")
+    assert "scan_budget" in window["message"]
+    assert all(d["message"] in captured.err for d in [*empty, window])
+
+
+@pytest.mark.parametrize("configured", [False, True])
+def test_explain_resolves_output_directory_without_filesystem_side_effects(
+    configured, tmp_path, monkeypatch, capsys,
+):
+    if configured:
+        directory = tmp_path / "configuration"
+        directory.mkdir()
+        config = directory / "search.toml"
+        config.write_text('output_dir = "results"\n', encoding="utf-8")
+        monkeypatch.setenv("LITSEARCH_CONFIG", str(config))
+        expected = directory / "results"
+    else:
+        expected = tmp_path / "output"
+    # 已存在的非目录目标也可解释；解释不执行输出目标检查。
+    expected.write_text("existing", encoding="utf-8")
+    code, opener, _ = run_cli(["q", "--explain"], [], tmp_path, monkeypatch, key=None)
+    output = json.loads(capsys.readouterr().out)["output"]
+    assert code == 0
+    assert output["directory"] == str(expected.resolve())
+    assert output["origin"] == (str(config) if configured else "default")
+    assert expected.read_text(encoding="utf-8") == "existing"
+    assert opener.urls == []
+
+
+def test_source_cli_forces_utf8_even_with_cp936_defaults(tmp_path):
+    source = Path(litsearch.__file__).resolve()
+    env = dict(os.environ, PYTHONIOENCODING="cp936", PYTHONUTF8="0")
+    process = subprocess.run([sys.executable, str(source), "--不存在的参数"],
+                             cwd=tmp_path, env=env, capture_output=True)
+    assert process.returncode == litsearch.EXIT_ARGS
+    assert "不存在的参数" in process.stderr.decode("utf-8", errors="strict")
+    explanation = subprocess.run([sys.executable, str(source), "海洋细菌", "--explain"],
+                                 cwd=tmp_path, env=env, capture_output=True, check=True)
+    assert json.loads(explanation.stdout.decode("utf-8"))["plan"]["queries"] == ["海洋细菌"]
 
 
 # --------------------------------------------------------------------------- #

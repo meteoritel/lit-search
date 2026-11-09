@@ -30,6 +30,7 @@ import urllib.request
 from dataclasses import asdict, dataclass, field, fields, replace
 from email.utils import parsedate_to_datetime
 from http.client import HTTPException
+from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any, Callable, Iterable
 
@@ -245,6 +246,7 @@ class ProviderResult:
     fetched_count: int = 0
     mapped_count: int = 0
     stop_reason: str = "exhausted"
+    diagnostics: list[Diagnostic] = field(default_factory=list)
 
 
 @dataclass(slots=True)
@@ -301,6 +303,14 @@ class Report:
 class SearchResult:
     records: list[Record]
     report: Report
+
+    @property
+    def count(self) -> int:
+        return len(self.records)
+
+    @property
+    def version(self) -> str:
+        return __version__
 
     def to_dict(self) -> dict[str, Any]:
         return _result_payload(self.report, self.records)
@@ -408,7 +418,33 @@ def decode_json(payload: bytes, source: str) -> dict:
 # 摘要处理
 # --------------------------------------------------------------------------- #
 
-_TAG_RE = re.compile(r"<[^>]+>")
+class _PlainTextParser(HTMLParser):
+    _blocks = frozenset({"p", "div", "br", "sec", "title", "list", "list-item",
+                         "abstract", "section", "h1", "h2", "h3", "h4", "h5", "h6",
+                         "ul", "ol", "li", "table", "tr", "td", "th"})
+    _inline = frozenset({"i", "b", "em", "strong", "sub", "sup", "italic", "bold",
+                         "roman", "sc", "span", "a", "xref", "ext-link", "underline"})
+
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.parts: list[str] = []
+
+    def handle_data(self, data: str) -> None:
+        self.parts.append(data)
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        name = tag.removeprefix("jats:")
+        if name in self._blocks:
+            self.parts.append(" ")
+        elif name not in self._inline:
+            self.parts.append(self.get_starttag_text() or f"<{tag}>")
+
+    def handle_endtag(self, tag: str) -> None:
+        name = tag.removeprefix("jats:")
+        if name in self._blocks:
+            self.parts.append(" ")
+        elif name not in self._inline:
+            self.parts.append(f"</{tag}>")
 
 
 def reconstruct_abstract(inv_idx: dict | None) -> str | None:
@@ -425,11 +461,13 @@ def reconstruct_abstract(inv_idx: dict | None) -> str | None:
 
 
 def strip_jats(text: str | None) -> str | None:
-    """Crossref 摘要是 JATS XML，剥标签并解实体。"""
+    """解一层编码标签并提取已知 HTML/JATS 标签文本；保留科学比较符。"""
     if not text:
         return None
-    plain = _TAG_RE.sub("", text)
-    plain = html.unescape(plain)
+    parser = _PlainTextParser()
+    parser.feed(html.unescape(text))
+    parser.close()
+    plain = "".join(parser.parts)
     plain = re.sub(r"\s+", " ", plain).strip()
     return plain or None
 
@@ -869,20 +907,6 @@ def _map_record(mapper: Callable[[dict], Record | None], item: dict, source: str
             if value is not None and (not isinstance(value, list)
                                       or any(not isinstance(v, str) for v in value)):
                 raise NetworkError(f"{source}: {key} 必须是字符串数组或 null")
-        for key in ("published", "issued"):
-            block = item.get(key)
-            if block is None:
-                continue
-            if not isinstance(block, dict):
-                raise NetworkError(f"{source}: {key} 必须是 object 或 null")
-            parts = block.get("date-parts")
-            if parts is None:
-                parts = []
-            if (not isinstance(parts, list) or any(
-                not isinstance(part, list) or any(type(n) is not int for n in part)
-                for part in parts
-            )):
-                raise NetworkError(f"{source}: {key}.date-parts 必须是整数数组的数组")
     if source == "openalex" and item.get("abstract_inverted_index") is not None:
         inverted = item["abstract_inverted_index"]
         if not isinstance(inverted, dict) or any(
@@ -1125,6 +1149,39 @@ class OpenAlexProvider(Provider):
         return ProviderResult(total, records, warnings, fetched, mapped, stop)
 
 
+def _crossref_date(item: dict, diagnostics: list[Diagnostic]) -> tuple[int | None, str | None]:
+    selected: list[int | None] = []
+    for key in ("published", "issued"):
+        block = item.get(key)
+        if block is None:
+            continue
+        if not isinstance(block, dict):
+            raise NetworkError(f"{key} 必须是 object 或 null")
+        parts = block.get("date-parts")
+        if parts is None:
+            continue
+        if not isinstance(parts, list) or any(
+            not isinstance(part, list) or any(n is not None and type(n) is not int for n in part)
+            for part in parts
+        ):
+            raise NetworkError(f"{key}.date-parts 必须是整数或 null 组成的嵌套数组")
+        if any(n is None for part in parts for n in part):
+            diagnostics.append(Diagnostic(
+                "provider_warning", f"{key}.date-parts 含空值，保留可用年份，缺失日期按 null 处理",
+                source="crossref", field=f"{key}.date-parts",
+            ))
+        if not selected and parts and parts[0] and parts[0][0] is not None:
+            selected = parts[0]
+    if not selected:
+        return None, None
+    year = selected[0]
+    month = selected[1] if len(selected) > 1 else 1
+    day = selected[2] if len(selected) > 2 else 1
+    publication_date = (f"{year:04d}-{month:02d}-{day:02d}"
+                        if year is not None and month is not None and day is not None else None)
+    return year, publication_date
+
+
 class CrossrefProvider(Provider):
     name = "crossref"
     env_key = "CROSSREF_API_KEY"
@@ -1186,27 +1243,13 @@ class CrossrefProvider(Provider):
             params["mailto"] = mailto
         return f"{API_CROSSREF}/works?{urllib.parse.urlencode(params)}"
 
-    def map_item(self, item: dict) -> Record | None:
+    def map_item(self, item: dict, *, diagnostics: list[Diagnostic] | None = None) -> Record | None:
+        year, pub_date = _crossref_date(item, diagnostics if diagnostics is not None else [])
         titles = item.get("title") or []
-        title = titles[0] if titles else None
+        title = strip_jats(titles[0]) if titles else None
         doi = norm_doi(item.get("DOI"))
         if not title and not doi:
             return None
-        # date-parts 是 [[Y, M, D]]，取内层数组；没有就是空列表，避免 Optional 空值判断
-        date: list[Any] = []
-        for date_key in ("published", "issued"):
-            block = item.get(date_key) or {}
-            parts = block.get("date-parts") or []
-            if parts and parts[0]:
-                date = list(parts[0])
-                break
-        numbers = [int(v) for v in date if isinstance(v, int)]
-        year = numbers[0] if numbers else None
-        pub_date = None
-        if numbers:
-            month = numbers[1] if len(numbers) > 1 else 1
-            day = numbers[2] if len(numbers) > 2 else 1
-            pub_date = f"{numbers[0]:04d}-{month:02d}-{day:02d}"
         containers = item.get("container-title") or []
         authors: list[str] = []
         for author in item.get("author") or []:
@@ -1251,6 +1294,7 @@ class CrossrefProvider(Provider):
     def search(self, query: str, plan: QueryPlan, http: Http,
                policy: RetryPolicy, cfg: "Config") -> ProviderResult:
         warnings: list[str] = []
+        diagnostics: list[Diagnostic] = []
         local_filter_needed = bool(plan.min_citations) or bool(plan.language)
         overfetch = plan.limit * 3 if local_filter_needed else plan.limit
         warnings.extend(d.message for d in self.diagnostics(plan, query))
@@ -1271,7 +1315,17 @@ class CrossrefProvider(Provider):
                 break
             fetched += len(items)
             for index, item in enumerate(items, fetched - len(items) + 1):
-                record = _map_record(self.map_item, item, self.name)
+                raw_doi = item.get("DOI")
+                identity = (norm_doi(raw_doi) if isinstance(raw_doi, str) else None) or f"第 {index} 条记录"
+                start = len(diagnostics)
+                try:
+                    record = _map_record(functools.partial(self.map_item, diagnostics=diagnostics),
+                                         item, self.name)
+                except NetworkError as exc:
+                    raise NetworkError(f"crossref: {identity}: {exc}") from exc
+                for diagnostic in diagnostics[start:]:
+                    diagnostic.query = query
+                    diagnostic.message = f"crossref: {identity}: {diagnostic.message}"
                 if record is not None:
                     _add_retrieval_hit(record, query, index)
                     records.append(record)
@@ -1307,7 +1361,7 @@ class CrossrefProvider(Provider):
                 "（该源 language 字段稀疏，召回不可靠；可提高 --limit 补充候选）"
             )
         records = records[:plan.limit]
-        return ProviderResult(total, records, warnings, fetched, mapped, stop)
+        return ProviderResult(total, records, warnings, fetched, mapped, stop, diagnostics)
 
 
 def _epmc_integer(value: Any) -> int | None:
@@ -1365,7 +1419,7 @@ class EuropePMCProvider(Provider):
             "review" if "Review" in types else "article" if "Journal Article" in types else None)
         journal = ((item.get("journalInfo") or {}).get("journal") or {}).get("title")
         return Record(
-            doi=doi, title=item.get("title"), year=_epmc_integer(item.get("pubYear")),
+            doi=doi, title=strip_jats(item.get("title")), year=_epmc_integer(item.get("pubYear")),
             publication_date=item.get("firstPublicationDate"), venue=journal,
             citation_count=_epmc_integer(item.get("citedByCount")),
             abstract=abstract, abstract_source=self.name if abstract else None,
@@ -1529,6 +1583,7 @@ class SearchClient:
             for query in _queries_for(plan, name):
                 current = provider.diagnostics(plan, query)
                 result = provider.search(query, plan, self.http, self.retry, self.config)
+                current.extend(result.diagnostics)
                 executions.append(QueryExecution(
                     name, query, result.total, result.fetched_count, result.mapped_count,
                     len(result.records), result.stop_reason, provider.filter_execution(plan),
@@ -1538,9 +1593,16 @@ class SearchClient:
                     if not any(d.message == warning for d in current):
                         current.append(Diagnostic("provider_warning", warning, name, query))
                 if result.stop_reason != "exhausted":
+                    local_fields = [key for key, mode in provider.filter_execution(plan).items()
+                                    if mode == "local"]
+                    reason = ("耗尽 scan_budget 扫描预算" if result.stop_reason == "scan_budget"
+                              else "到达 limit 候选窗口")
+                    detail = f"；来源本地条件：{', '.join(local_fields)}" if local_fields else ""
                     current.append(Diagnostic(
                         "fetch_window_limited", f"{name}: 「{query}」远端共 {result.total} 篇，"
-                        f"只考察了前 {result.fetched_count} 篇（提高 --limit 可取更多候选）", name, query,
+                        f"只考察了前 {result.fetched_count} 篇；{reason}{detail}；"
+                        f"映射 {result.mapped_count} 篇，保留 {len(result.records)} 篇"
+                        "（提高 --limit 可取更多候选，或调整筛选条件）", name, query,
                     ))
                 diagnostics.extend(current)
         return records, executions, diagnostics
@@ -1562,6 +1624,24 @@ class SearchClient:
             diagnostics.append(Diagnostic("enrichment_budget_limited",
                 f"摘要补全预算用尽，跳过 {enrichment.budget_skipped} 条候选", field="enrich_abstracts"))
         filtered, filter_stats = apply_filters(merged, plan.require, plan.exclude)
+        if not filtered:
+            if merged:
+                diagnostics.append(Diagnostic(
+                    "empty_results", f"合并后 {len(merged)} 篇经 require/exclude 主题过滤后为空；"
+                    "请检查 filter_stats 各组保留量并调整主题条件", field="require/exclude"))
+            else:
+                for execution in executions:
+                    if execution.remote_total == 0:
+                        reason = "远端无命中，请调整检索词或远端条件"
+                    elif execution.mapped_count == 0:
+                        reason = f"已扫描 {execution.fetched_count} 篇，映射未产生有效记录"
+                    elif execution.returned_count == 0:
+                        reason = f"已扫描 {execution.fetched_count} 篇，来源本地条件筛空，请调整条件或提高 --limit"
+                    else:
+                        reason = "候选缺少可合并身份，合并后为空"
+                    diagnostics.append(Diagnostic(
+                        "empty_results", f"{execution.source}: 「{execution.query}」{reason}",
+                        execution.source, execution.query))
         ordered = rank_records(filtered, plan)
         truncated = max(0, len(ordered) - plan.max_results) if plan.max_results else 0
         if truncated:
@@ -2112,7 +2192,8 @@ def validate_plan(plan: QueryPlan) -> QueryPlan:
     return replace(plan, **normalized_text, queries=list(dict.fromkeys(q.strip() for q in plan.queries)), sources=sources,
                    year=year, oa_only=bool(plan.oa_only),
                    require=[list(g) for g in plan.require], exclude=list(plan.exclude),
-                   concepts=[list(dict.fromkeys(t.strip() for t in g)) for g in plan.concepts])
+                   concepts=[list(g) for g in dict.fromkeys(
+                       tuple(dict.fromkeys(t.strip() for t in group)) for group in plan.concepts)])
 
 
 def _preset_lookup(preset: dict | None, key: str) -> Any:
@@ -2199,6 +2280,10 @@ def _absolute_path(path: Path, cwd: Path) -> Path:
     return (expanded if expanded.is_absolute() else cwd / expanded).resolve()
 
 
+def _output_directory(cfg: Config, cwd: Path) -> Path:
+    return _absolute_path(cfg.output_dir or Path("output"), cwd.resolve())
+
+
 def _check_output_paths(paths: list[Path], overwrite: bool) -> None:
     for index, path in enumerate(paths):
         if any(path.resolve() == other.resolve()
@@ -2218,7 +2303,7 @@ def resolve_outputs(args: argparse.Namespace, cfg: Config, plan: QueryPlan,
         return None, None
 
     base_dir = (Path.cwd() if cwd is None else cwd).resolve()
-    out_dir = _absolute_path(cfg.output_dir or Path("output"), base_dir)
+    out_dir = _output_directory(cfg, base_dir)
     if args.output:
         main_path = _absolute_path(Path(args.output), base_dir)
         _render_suffix(main_path)      # 尽早失败：别等检索完才发现后缀不对
@@ -2434,7 +2519,12 @@ def run(args: argparse.Namespace, cwd: Path, http: Http,
     if args.explain:
         if args.output or args.doi_list or args.stdout_format or args.overwrite:
             raise UsageError("--explain 与文件输出、输出格式和覆盖选项互斥")
-        print(json.dumps(client.explain(plan), ensure_ascii=False, indent=2))
+        explanation = client.explain(plan)
+        explanation["output"] = {
+            "directory": str(_output_directory(cfg, cwd)),
+            "origin": cfg.origins.get("output_dir", "default"),
+        }
+        print(json.dumps(explanation, ensure_ascii=False, indent=2))
         return EXIT_OK
     main_path, doi_path = resolve_outputs(args, cfg, plan, cwd)
     result = client.search(plan)
