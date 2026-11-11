@@ -33,7 +33,7 @@ def source_version() -> str:
 
 def check_portable(archive: Path, version: str) -> None:
     with tempfile.TemporaryDirectory(prefix="litsearch-portable-check-") as directory:
-        temporary = Path(directory)
+        temporary = Path(directory).resolve()
         extracted = temporary / "解压 测试"
         with zipfile.ZipFile(archive) as bundle:
             bundle.extractall(extracted)
@@ -66,7 +66,7 @@ def check_portable(archive: Path, version: str) -> None:
         explanation = json.loads(run("海洋细菌", "--source", "crossref", "--explain").stdout)
         assert explanation["version"] == version
         assert explanation["plan"]["queries"] == ["海洋细菌"]
-        assert explanation["output"]["directory"] == str(working / "output")
+        assert explanation["output"]["directory"] == str(working / "output"), explanation["output"]
         assert not (working / "output").exists()
         assert "不存在的参数" in run("--不存在的参数", code=2).stderr
         assert "API key" in run("q", code=3).stderr
@@ -76,8 +76,8 @@ def check_portable(archive: Path, version: str) -> None:
                           encoding="utf-8")
         explanation = json.loads(run("海洋细菌", "--explain").stdout)
         assert explanation["plan"]["sources"] == ["crossref"]
-        assert explanation["output"]["directory"] == str(working / "检索结果")
-        assert explanation["output"]["origin"] == str(config)
+        assert explanation["output"]["directory"] == str(working / "检索结果"), explanation["output"]
+        assert explanation["output"]["origin"] == str(config), explanation["output"]
         assert not (working / "检索结果").exists()
     print("Extracted Windows x64 portable checks passed.", flush=True)
 
@@ -100,7 +100,7 @@ def build_release() -> None:
             raise SystemExit("wheel 与当前源码不一致；请先运行 scripts/check.py。")
 
     with tempfile.TemporaryDirectory(prefix="litsearch-release-") as directory:
-        temporary = Path(directory)
+        temporary = Path(directory).resolve()
         subprocess.run([
             sys.executable, "-m", "PyInstaller", "--noconfirm", "--clean", "--onedir",
             "--console", "--name", "litsearch", "--distpath", str(temporary / "dist"),

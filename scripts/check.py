@@ -50,7 +50,7 @@ def check_distribution() -> None:
                                         f"litsearch-{version}/.local/")) for name in names)
 
     with tempfile.TemporaryDirectory(prefix="litsearch-distribution-") as directory:
-        temporary = Path(directory)
+        temporary = Path(directory).resolve()
         environment = temporary / "environment"
         subprocess.run([sys.executable, "-m", "venv", "--without-pip", str(environment)], check=True)
         binaries = environment / ("Scripts" if os.name == "nt" else "bin")
