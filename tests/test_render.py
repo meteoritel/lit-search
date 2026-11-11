@@ -210,6 +210,21 @@ def test_resolve_outputs_honours_explicit_paths(tmp_path):
     assert doi_path == tmp_path / "b.txt"
 
 
+def test_resolve_outputs_supports_no_doi_list_and_rejects_empty_doi_list(tmp_path):
+    args = litsearch.build_parser().parse_args(["q", "--output", str(tmp_path / "a.json"), "--no-doi-list"])
+    main_path, doi_path = litsearch.resolve_outputs(args, litsearch.Config(), make_plan())
+    assert main_path == tmp_path / "a.json"
+    assert doi_path is None
+
+    empty_args = litsearch.build_parser().parse_args(["q", "--output", str(tmp_path / "a.json"), "--doi-list", ""])
+    with pytest.raises(litsearch.UsageError, match="--no-doi-list"):
+        litsearch.resolve_outputs(empty_args, litsearch.Config(), make_plan())
+
+    conflict_args = litsearch.build_parser().parse_args(["q", "--doi-list", "x.txt", "--no-doi-list"])
+    with pytest.raises(litsearch.UsageError):
+        litsearch.resolve_outputs(conflict_args, litsearch.Config(), make_plan())
+
+
 def test_resolve_outputs_returns_none_for_stdout():
     args = litsearch.build_parser().parse_args(["q", "--stdout"])
     assert litsearch.resolve_outputs(args, litsearch.Config(), make_plan()) == (None, None)

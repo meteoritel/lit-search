@@ -4,7 +4,7 @@
 
 Windows x64 便携版自带 Python；安装 wheel 或直接运行源码时要求 Python 3.12+，运行时仅使用标准库。默认检索来源为 OpenAlex，默认按被引数排序。
 
-项目面向使用英文关键词与同义词组织的文献检索，**中文文献检索不在项目规划中**。中文主题请先整理为英文术语，再使用自由查询或 `--concept` 概念组。CLI 中文提示、UTF-8 输入输出和中文路径保持支持；查询按用户提供的词项提交，工具不做自动翻译。详见[检索范围](docs/usage.md#检索范围)。
+项目面向以英文术语组织的文献检索，**不支持中文数据库接入、中文分词与中英自动翻译**；中文主题请先整理为英文词或 `--concept` 概念组。CLI 中文提示、UTF-8 输入输出与中文路径均受支持。详见[检索范围](docs/usage.md#检索范围)。
 
 ## 安装
 
@@ -72,53 +72,59 @@ python src/litsearch.py --help
 
 ## 第一次检索
 
-Crossref 无需 API key，可直接开始。专题检索显式选择 hybrid，在相关性候选窗口内按主题证据排序：
+默认来源为 `openalex`（需要 API key）；**零配置试用**请显式指定免 key 的 `--source crossref` 或 `--source europepmc`：
 
 ```shell
+# 免 key 试用（--stdout 输出 JSON，--sort hybrid 按主题证据排序）
 litsearch "marine bacteria" --source crossref --limit 10 --sort hybrid --stdout
-```
 
-`--stdout` 输出 JSON；日志与诊断写入 stderr。联网前可用 `--explain` 查看实际查询、筛选能力和默认输出目录：
-
-```shell
+# 联网前离线检查实际查询、各源查询条数与筛选能力
 litsearch "marine bacteria" --source crossref --explain
 ```
 
-使用默认 OpenAlex 来源时，先在 [OpenAlex](https://openalex.org/settings/api) 获取 key。在当前目录创建 UTF-8 编码的 `.env`，可参考 [.env.example](.env.example)：
+中文主题建议按“整理英文概念组 → `--explain` 核对 → `--sort hybrid` 检索”三步执行：
+
+```shell
+litsearch --concept "Western North Pacific,Kuroshio" --concept "water mass,NPIW" --source crossref --explain
+litsearch --concept "Western North Pacific,Kuroshio" --concept "water mass,NPIW" --source crossref --limit 20 --sort hybrid --stdout
+```
+
+日志与诊断统一写入 stderr。使用默认 OpenAlex 来源时，先在 [OpenAlex](https://openalex.org/settings/api) 获取 key，再写入当前目录的 UTF-8 `.env`（参考 [.env.example](.env.example)）：
 
 ```dotenv
 OPENALEX_API_KEY=your-key
 ```
 
-也可使用环境变量或用户级 TOML。Windows 配置位置为 `%APPDATA%/litsearch/config.toml`，macOS / Linux 为 `~/.config/litsearch/config.toml`：
+也可使用进程环境变量或用户级 TOML（Windows：`%APPDATA%/litsearch/config.toml`，macOS / Linux：`~/.config/litsearch/config.toml`）：
 
 ```toml
 [api_keys]
 openalex = "your-key"
 ```
 
-Europe PMC 无需 API key。配置优先级与筛选支持情况见 [CLI 文档](docs/usage.md)。
+配置优先级与筛选能力见 [CLI 文档](docs/usage.md)。
 
 ## 检索与输出
 
 ```shell
-# 合并多源候选，用标题和摘要中的海洋词筛选，再按主题证据排序
+# 多源合并 + 标题/摘要硬过滤 + hybrid 排序
 litsearch "marine protist grazing" --source openalex,europepmc --year 2022-2026 --limit 100 --require "marine,seawater,ocean,coastal" --sort hybrid --max-results 30
 
-# 在硬过滤前补齐缺失摘要，最多查询 20 个新 DOI
+# 硬过滤前补齐缺失摘要（最多查询 20 个未缓存的新 DOI）
 litsearch "marine protist" --source crossref --enrich-abstracts 20 --require "seasonal,monthly" --stdout
 
-# 生成 JSON 文件和 DOI 列表
+# 导出 JSON 文件；若不需要顺带生成 .doi.txt，可追加 --no-doi-list
 litsearch "marine bacteria" --source crossref --output output/marine.json --doi-list output/marine.doi.txt
+litsearch "marine bacteria" --source crossref --output output/marine.json --no-doi-list
 ```
 
-文件模式默认在调用目录的 `output/` 中生成 Markdown 和 DOI 列表，stdout 打印已写入的路径。`--output` 支持 `.md`、`.json`、`.csv`。目标已存在时，使用 `--overwrite` 允许覆盖。终端流和结果文件均使用 UTF-8。
+文件模式默认在 `output/` 下生成 Markdown 与同名 `.doi.txt`（stdout 打印写入路径）。`--output` 支持 `.md`、`.csv`、`.json`，目标已存在时需显式 `--overwrite`。
 
-`--year` 可省略；`--limit` 控制每个来源、每个查询的候选窗口，`--max-results` 控制最终结果上限。`require` 组内按 OR、组间按 AND 匹配标题与摘要；缺失摘要会影响保留结果。
+- `--limit` 控制每个来源、每个查询的候选窗口；`--max-results` 控制最终输出上限。
+- `--require` 组内 OR、组间 AND 匹配标题与摘要，缺失摘要会直接影响留存。
+- 默认按相关性取数、按被引数展示；专题检索建议搭配 `--sort hybrid`，避免盲目使用 `--fetch-sort citations` 挤出贴题文献。详见[候选、过滤与排序](docs/usage.md#候选过滤与排序)。
 
-默认按相关性获取候选，最终按被引数排序；专题查找可显式使用 `--sort hybrid`。需要窗口内的高被引文献时用 `--sort citations`。`--fetch-sort citations` 会改取来源匹配范围内的高被引候选，可能挤出更贴近主题的文献，详见[候选与排序](docs/usage.md#候选过滤与排序)。
-
-可在自己的 TOML 配置中定义命名预设，通过 `--preset NAME` 调用；配置格式见 [CLI 文档](docs/usage.md#配置发现与优先级)。
+可在 TOML 配置中定义命名预设并通过 `--preset NAME` 调用，格式见[配置发现与优先级](docs/usage.md#配置发现与优先级)。
 
 ## Python 调用
 

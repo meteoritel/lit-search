@@ -26,23 +26,26 @@ for diagnostic in result.report.diagnostics:
 payload = result.to_dict()
 ```
 
-`result.count` 为当前 records 的长度，`result.version` 为源码版本；两者为只读属性，与 to_dict() 对应字段一致。构造客户端时校验 Config 结构；search 按实际 sources 检查必需凭据。Crossref、Europe PMC 可使用空 Config，OpenAlex search 需要 key；explain 可离线调用。
+`result.count` 为当前 `records` 长度，`result.version` 为源码版本；两者为只读属性，与 `to_dict()` 对应字段一致。构造 `SearchClient` 时完整校验 `Config` 结构（`api_keys`、`mailto`、`output_dir`、`default_sources`、`presets`），不合法抛出 `ConfigError`；`search()` 按实际 `sources` 检查必需凭据。`QueryPlan.sources` 为必传参数（Python 直接调用不自动读取 `Config.default_sources`）。Crossref、Europe PMC 可使用空 `Config()`，OpenAlex `search` 需要 key；`explain` 可离线调用。
 
-`queries`、`sources`、`exclude` 是字符串数组；`require` 是 OR 词组数组，外层按 AND 组合。数量必须为整数，oa_only/strict_filters 为布尔值。直接 Python 调用和 CLI 共用检索意图校验。
+`queries`、`sources`、`exclude` 是字符串数组；`require` 是 OR 词组数组，外层按 AND 组合。数量必须为整数，`oa_only` / `strict_filters` 为布尔值。直接 Python 调用和 CLI 共用检索意图校验。
 
-`concepts` 为同义词组数组，用于查询编译与可选主题排序，保留缺少部分概念证据的候选；`require` 用于硬过滤。至少提供一个非空 queries 或 concepts。只有概念组时显式传入 `queries=[]`。来源编译与字段过滤规则见 [CLI 文档](usage.md#概念查询与主题排序)。
+`concepts` 为同义词组数组，用于查询编译与可选主题排序，保留缺少部分概念证据的候选；`require` 用于硬过滤。至少提供一个非空 `queries` 或 `concepts`（只有概念组时显式传入 `queries=[]`）。来源编译与字段过滤规则见 [CLI 文档](usage.md#概念查询与主题排序)。
 
-需要配置文件发现时显式调用 `load_config(Path(...))`。需要离线检查时调用 `client.explain(plan)`，其中 `compiled_queries` 给出逐来源的 query 和包含来源筛选语法的 remote_query。返回计划为独立副本，可用于报告和后续核对。explain 校验意图并返回来源能力诊断；strict_filters 的能力拒绝在 search 联网前执行。
+需要配置文件发现时显式调用 `load_config(Path(...))`。离线预检可调用 `client.explain(plan)`，返回独立副本，其中 `compiled_queries` 给出逐来源查询、`sources[]` 包含各源 `query_count` 与 `filter_execution`。`explain` 保留全部诊断供检查，严格模式下 `strict_filters` 的拒绝在 `search()` 联网前执行。
 
 ## 摘要补齐
 
-`QueryPlan.enrich_abstracts` 为非负整数，默认 0。启用后，在身份合并之后、require/exclude 之前，对缺少摘要且有 DOI 的候选查询 Europe PMC core。只接受相同 DOI 的摘要，只填空值，并将 `abstract_source` 设为 europepmc；文献身份与检索命中证据保持原语义。
+`QueryPlan.enrich_abstracts` 为非负整数，默认 `0`。启用后在身份合并之后、`require`/`exclude` 之前，对缺少摘要且有 DOI 的候选向 Europe PMC core 补空摘要（仅接受同 DOI、只填空值、`abstract_source` 设为 `europepmc`，不增加检索投票）。
 
-预算按每次 search 中尚未缓存的新 DOI 计数，按合并后的候选顺序消耗。每批最多组合 10 个 DOI，批次仅包含剩余预算内的 DOI；HTTP 请求数随批次、分页和重试变化。每批完整读取 Europe PMC 分页，按规范化 DOI 回填首个有效摘要，完成后才缓存未找到结果。
-
-相同 SearchClient 实例缓存成功摘要和未找到结果；缓存读取不占新 DOI 预算，HTTP 重试遵循客户端策略。补齐的元数据来源不产生检索投票。响应错误、分页未完整返回与网络失败整体抛出 NetworkError，失败批次不写入缓存。
-
-`enrichment` 统计本次调用：requested 为实际执行的新 DOI 数，一次批次请求可贡献多个 DOI，分页、HTTP 重试和缓存读取不另计；cache_hits 为读取已有缓存的候选数，本次预取不计为缓存命中，同 DOI 的后续候选读取计入；filled 为实际填入摘要的候选数；not_found 为已查询或命中负缓存后仍无摘要的候选数；budget_skipped 为预算耗尽后跳过的候选数。已有摘要或无 DOI 的记录不进入这些计数，预算为零时该阶段不执行。
+- **预算与缓存**：`enrich_abstracts` 限制每次 `search()` 中**未缓存的新 DOI** 数量，按合并后候选顺序每批最多请求 10 个 DOI。同 `SearchClient` 实例自动复用正负缓存；缓存读取、分页与 HTTP 重试均不占预算。失败批次抛出 `NetworkError` 且不写入缓存。
+- **统计口径（`enrichment`）**：
+  - `requested`：本次实际执行查询的新 DOI 数（每批按所含 DOI 计数）。
+  - `cache_hits`：读取同客户端已有缓存的候选数（本次刚预取的同 DOI 后续候选也计入）。
+  - `filled`：成功填入摘要的候选数。
+  - `not_found`：已查询或命中负缓存后仍无摘要的候选数。
+  - `budget_skipped`：因预算耗尽而跳过的候选数。
+  - 已有摘要或无 DOI 的记录不进入上述计数；预算为 `0` 时跳过该阶段。
 
 ## Transport 与测试
 
@@ -95,7 +98,7 @@ assert result.records[0].doi == "10.1000/example"
 
 `merge_stats.total_in` 是进入合并的候选量，与远端收到的 fetched_count 分别统计。主题过滤与 max_results 发生在这些逐查询统计之后。
 
-诊断包含 code、message、source、query、field；不适用的定位值为 null。code 当前包括 unsupported_filter、filter_override、provider_warning、fetch_window_limited、empty_results、results_truncated、missing_doi、abstract_not_found、enrichment_budget_limited。程序按 code 分支，message 用于展示。
+诊断包含 `code`、`message`、`source`、`query`、`field`（不适用的定位值为 `null`；`filter_override` 的 `field` 标明被覆盖的结构化字段名）。`code` 当前包括 `unsupported_filter`、`filter_override`、`provider_warning`、`fetch_window_limited`、`empty_results`、`results_truncated`、`missing_doi`、`abstract_not_found`、`enrichment_budget_limited`。程序应按 `code` 分支，`message` 仅用于展示。
 
 fetch_window_limited 区分 limit 候选窗口与 scan_budget 扫描预算，展示扫描、映射、保留量及来源本地条件。empty_results 在最终为空时说明远端无命中、映射无有效记录、来源本地条件筛空或 require/exclude 主题过滤筛空；逐查询原因可并存。filter_stats 始终只统计合并后的主题过滤。
 
@@ -150,4 +153,4 @@ UsageError、ConfigError、NetworkError、OutputError 均继承 LitsearchError�
 - [OpenAlex Location](https://github.com/ourresearch/openalex-docs/blob/main/api-entities/works/work-object/location-object.md)：landing_page_url 与 pdf_url。
 - [Europe PMC REST](https://dev.europepmc.org/RestfulWebService)：core 元数据、cursorMark / nextCursorMark、字段查询；来源内身份由 source 与 id 共同构成。
 
-Crossref relevance 抓取的所有分页显式发送 `sort=score&order=desc`。Europe PMC 默认按相关性取数；年份、OA、作者姓名和 ISSN 在远端执行，被引数与语言在本地执行；机构、原始 OpenAlex filter、类型筛选和其他 fetch_sort 不受支持。严格模式在联网前拒绝这些条件。
+Crossref `relevance` 抓取的所有分页显式发送 `sort=score&order=desc`。Europe PMC 默认按相关性取数；年份、OA、作者姓名和 ISSN 在远端执行，被引数与语言在本地执行并生成 `provider_warning`；机构、原始 OpenAlex filter、类型筛选和其他 `fetch_sort` 不受支持。严格模式在联网前拒绝这些条件。

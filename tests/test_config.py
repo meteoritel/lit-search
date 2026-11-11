@@ -151,6 +151,7 @@ def test_missing_key_message_is_actionable():
     message = litsearch.missing_key_message(litsearch.PROVIDERS["openalex"])
     assert "openalex.org/settings/api" in message
     assert "OPENALEX_API_KEY" in message
+    assert "--source crossref" in message
 
 
 # --------------------------------------------------------------------------- #
@@ -247,6 +248,32 @@ def test_limit_must_be_positive():
     args = litsearch.build_parser().parse_args(["q", "--limit", "0"])
     with pytest.raises(litsearch.UsageError):
         litsearch.build_plan(args, None, litsearch.Config())
+
+
+def test_dotenv_supports_litsearch_mailto_with_crossref_mailto_precedence(tmp_path):
+    (tmp_path / ".env").write_text("LITSEARCH_MAILTO=lit@example.com\n", encoding="utf-8")
+    cfg = litsearch.load_config(tmp_path, env={})
+    assert cfg.mailto == "lit@example.com"
+    assert cfg.origins["mailto"] == str(tmp_path / ".env")
+
+    (tmp_path / ".env").write_text(
+        "LITSEARCH_MAILTO=lit@example.com\nCROSSREF_MAILTO=cr@example.com\n",
+        encoding="utf-8",
+    )
+    cfg2 = litsearch.load_config(tmp_path, env={})
+    assert cfg2.mailto == "cr@example.com"
+
+
+@pytest.mark.parametrize("bad_kwargs", [
+    {"default_sources": ["unknown"]},
+    {"default_sources": []},
+    {"presets": {"bad": "not-a-dict"}},
+    {"output_dir": 123},
+    {"mailto": 123},
+])
+def test_search_client_validates_config_structure(bad_kwargs):
+    with pytest.raises(litsearch.ConfigError):
+        litsearch.SearchClient(litsearch.Config(**bad_kwargs))
 
 
 def test_source_list_is_deduplicated_by_lowercasing():

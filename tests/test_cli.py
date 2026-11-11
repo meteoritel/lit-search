@@ -472,3 +472,30 @@ def test_run_propagates_network_errors(tmp_path, monkeypatch):
     monkeypatch.setenv("OPENALEX_API_KEY", "test-key")
     with pytest.raises(litsearch.NetworkError):
         litsearch.run(args, tmp_path, http, litsearch.RetryPolicy(), lambda _: None)
+
+
+def test_run_no_doi_list_skips_doi_file_and_conflicts_with_stdout(tmp_path, monkeypatch):
+    out_json = tmp_path / "only.json"
+    code, _, _ = run_cli(
+        ["q", "--limit", "2", "--output", str(out_json), "--no-doi-list"],
+        [load_fixture("openalex_page1.json")], tmp_path, monkeypatch)
+    assert code == litsearch.EXIT_OK
+    assert out_json.is_file()
+    assert not (tmp_path / "only.doi.txt").exists()
+
+    http, _ = make_http([])
+    for conflict in (["q", "--stdout", "--no-doi-list"], ["q", "--explain", "--no-doi-list"]):
+        with pytest.raises(litsearch.UsageError):
+            litsearch.run(litsearch.build_parser().parse_args(conflict),
+                          tmp_path, http, litsearch.RetryPolicy(), lambda _: None)
+
+
+def test_explain_reports_per_source_query_count(tmp_path, monkeypatch, capsys):
+    code, _, _ = run_cli(
+        ["--concept", "A,B", "--concept", "C,D", "--concept", "E,F",
+         "--source", "openalex,crossref", "--explain"],
+        [], tmp_path, monkeypatch)
+    assert code == litsearch.EXIT_OK
+    payload = json.loads(capsys.readouterr().out)
+    counts = {item["source"]: item["query_count"] for item in payload["sources"]}
+    assert counts == {"openalex": 2, "crossref": 3}

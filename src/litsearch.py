@@ -96,6 +96,24 @@ CROSSREF_TYPE_MAP = {
     "preprint": "posted-content",
 }
 
+CROSSREF_SUPPORTED_TYPES = frozenset({
+    "book", "book-chapter", "book-part", "book-section", "book-series", "book-set",
+    "book-track", "component", "database", "dataset", "dissertation", "edited-book",
+    "grant", "journal", "journal-article", "journal-issue", "journal-volume",
+    "monograph", "other", "peer-review", "posted-content", "proceedings",
+    "proceedings-article", "proceedings-series", "reference-book", "reference-entry",
+    "report", "report-component", "report-series", "standard",
+})
+
+UNSUPPORTED_FLAG_LABELS = {
+    "institution": "--institution",
+    "oa_only": "--oa-only",
+    "raw_filter": "--oa-filter",
+    "work_type": "--type",
+    "fetch_sort": "--fetch-sort",
+    "author": "--author OpenAlex ID",
+}
+
 # 远端抓取排序：决定「取到哪一批候选」。默认 relevance 即来源自身的相关度序。
 # 与 QueryPlan.sort（只改展示顺序）是两个独立旋钮 —— 只设 --sort citations 时，
 # 被引排序只作用在「相关度最高的 N 条」这个切片内部，并不是全网最高被引的 N 条。
@@ -971,65 +989,75 @@ class OpenAlexProvider(Provider):
         "本工具使用 OpenAlex 检索时要求提供 API key。\n"
         "  申请：https://openalex.org/settings/api\n"
         "  设置（任选其一）：\n"
-        '    1) 环境变量   setx OPENALEX_API_KEY "你的key"   （重开终端生效）\n'
-        "    2) 用户级配置 %APPDATA%\\litsearch\\config.toml  ->  "
-        '[api_keys] 下写 openalex = "你的key"\n'
-        "    3) 项目级     ./.env  ->  OPENALEX_API_KEY=你的key"
+        + (
+            '    1) 环境变量   setx OPENALEX_API_KEY "你的key"   （重开终端生效）\n'
+            "    2) 用户级配置 %APPDATA%\\litsearch\\config.toml  ->  "
+            if os.name == "nt" else
+            '    1) 环境变量   export OPENALEX_API_KEY="你的key"\n'
+            "    2) 用户级配置 ~/.config/litsearch/config.toml  ->  "
+        )
+        + '[api_keys] 下写 openalex = "你的key"\n'
+        "    3) 项目级     ./.env  ->  OPENALEX_API_KEY=你的key\n"
+        "  免 key 试用：追加 --source crossref 或 --source europepmc"
     )
+    STRUCTURED_FILTER_KEYS: dict[str, set[str]] = {
+        "year": {"from_publication_date", "to_publication_date", "publication_year"},
+        "min_citations": {"cited_by_count"},
+        "author": {"authorships.author.id", "raw_author_name.search"},
+        "institution": {"institutions.id", "institutions.ror", "raw_affiliation_strings.search"},
+        "journal_issn": {"primary_location.source.issn"},
+        "work_type": {"type"},
+        "oa_only": {"is_oa", "open_access.is_oa"},
+        "language": {"language"},
+    }
 
     def diagnostics(self, plan: QueryPlan, query: str) -> list[Diagnostic]:
-        return [Diagnostic("filter_override", message, self.name, query)
-                for message in self.filter_string(plan)[1]]
+        return [Diagnostic("filter_override", message, self.name, query, field_name)
+                for field_name, message in self._resolve_filters(plan)[1]]
 
     def filter_execution(self, plan: QueryPlan) -> dict[str, str]:
         modes = super().filter_execution(plan)
-        if self.filter_string(plan)[1]:
-            raw_keys = self._raw_filter_keys(plan.raw_filter or "")
-            field_keys = {
-                "year": {"from_publication_date", "to_publication_date"},
-                "min_citations": {"cited_by_count"}, "author": {"authorships.author.id", "raw_author_name.search"},
-                "institution": {"institutions.id", "institutions.ror", "raw_affiliation_strings.search"},
-                "journal_issn": {"primary_location.source.issn"}, "work_type": {"type"},
-                "oa_only": {"is_oa"}, "language": {"language"},
-            }
-            for key, remote_keys in field_keys.items():
-                if key in modes and raw_keys & remote_keys:
-                    modes[key] = "overridden"
+        for field_name, _ in self._resolve_filters(plan)[1]:
+            if field_name in modes:
+                modes[field_name] = "overridden"
         return modes
 
-    def structured_filters(self, plan: QueryPlan) -> list[tuple[str, str]]:
-        pairs: list[tuple[str, str]] = []
+    def _structured_filter_entries(self, plan: QueryPlan) -> list[tuple[str, str, str]]:
+        entries: list[tuple[str, str, str]] = []
         if plan.year:
             lo, _, hi = plan.year.partition("-")
             hi = hi or lo
-            pairs.append(("from_publication_date", f"{lo.strip()}-01-01"))
-            pairs.append(("to_publication_date", f"{hi.strip()}-12-31"))
+            entries.append(("year", "from_publication_date", f"{lo.strip()}-01-01"))
+            entries.append(("year", "to_publication_date", f"{hi.strip()}-12-31"))
         # OpenAlex 使用严格大于比较；减一以保持与本地 >= 过滤一致。
         if plan.min_citations:
-            pairs.append(("cited_by_count", f">{plan.min_citations - 1}"))
+            entries.append(("min_citations", "cited_by_count", f">{plan.min_citations - 1}"))
         if plan.author:
             value = plan.author.strip()
             if re.fullmatch(r"A\d+", value):
-                pairs.append(("authorships.author.id", value))
+                entries.append(("author", "authorships.author.id", value))
             else:
-                pairs.append(("raw_author_name.search", value))
+                entries.append(("author", "raw_author_name.search", value))
         if plan.institution:
             value = plan.institution.strip()
             if re.fullmatch(r"https?://ror\.org/\w+", value):
-                pairs.append(("institutions.ror", value.rstrip("/").rsplit("/", 1)[-1]))
+                entries.append(("institution", "institutions.ror", value.rstrip("/").rsplit("/", 1)[-1]))
             elif re.fullmatch(r"I\d+", value):
-                pairs.append(("institutions.id", value))
+                entries.append(("institution", "institutions.id", value))
             else:
-                pairs.append(("raw_affiliation_strings.search", value))
+                entries.append(("institution", "raw_affiliation_strings.search", value))
         if plan.journal_issn:
-            pairs.append(("primary_location.source.issn", plan.journal_issn.strip()))
+            entries.append(("journal_issn", "primary_location.source.issn", plan.journal_issn.strip()))
         if plan.work_type:
-            pairs.append(("type", plan.work_type.strip()))
+            entries.append(("work_type", "type", plan.work_type.strip()))
         if plan.oa_only:
-            pairs.append(("is_oa", "true"))
+            entries.append(("oa_only", "is_oa", "true"))
         if plan.language:
-            pairs.append(("language", plan.language.strip()))
-        return pairs
+            entries.append(("language", "language", plan.language.strip()))
+        return entries
+
+    def structured_filters(self, plan: QueryPlan) -> list[tuple[str, str]]:
+        return [(key, value) for _, key, value in self._structured_filter_entries(plan)]
 
     def _raw_filter_keys(self, raw: str) -> set[str]:
         keys = set()
@@ -1039,22 +1067,36 @@ class OpenAlexProvider(Provider):
                 keys.add(key)
         return keys
 
-    def filter_string(self, plan: QueryPlan) -> tuple[str, list[str]]:
-        """结构化 filter 在前，--oa-filter 追加在后；同字段键时 raw 优先并警告。"""
-        warnings: list[str] = []
+    def _overridden_by(self, field_name: str, remote_key: str, raw_keys: set[str]) -> str | None:
+        if remote_key in raw_keys:
+            return remote_key
+        if field_name == "year":
+            return "publication_year" if "publication_year" in raw_keys else None
+        hits = raw_keys & self.STRUCTURED_FILTER_KEYS[field_name]
+        return sorted(hits)[0] if hits else None
+
+    def _resolve_filters(self, plan: QueryPlan) -> tuple[str, list[tuple[str, str]]]:
+        """结构化 filter 在前，--oa-filter 追加在后；语义同组或同键时 raw 优先并警告。"""
+        overrides: dict[str, str] = {}
         raw = (plan.raw_filter or "").strip()
         raw_keys = self._raw_filter_keys(raw) if raw else set()
-        parts = []
-        for key, value in self.structured_filters(plan):
-            if key in raw_keys:
-                warnings.append(
-                    f"openalex: --oa-filter 中的 {key} 覆盖了结构化参数，已忽略后者"
+        parts: list[str] = []
+        for field_name, remote_key, value in self._structured_filter_entries(plan):
+            raw_hit = self._overridden_by(field_name, remote_key, raw_keys)
+            if raw_hit:
+                overrides.setdefault(
+                    field_name,
+                    f"openalex: --oa-filter 中的 {raw_hit} 覆盖了 {field_name} 条件，已忽略后者",
                 )
                 continue
-            parts.append(f"{key}:{value}")
+            parts.append(f"{remote_key}:{value}")
         if raw:
             parts.append(raw)
-        return ",".join(parts), warnings
+        return ",".join(parts), list(overrides.items())
+
+    def filter_string(self, plan: QueryPlan) -> tuple[str, list[str]]:
+        filter_str, overrides = self._resolve_filters(plan)
+        return filter_str, [message for _, message in overrides]
 
     def build_url(self, query: str, plan: QueryPlan, api_key: str,
                   cursor: str, per_page: int) -> str:
@@ -1188,6 +1230,12 @@ class CrossrefProvider(Provider):
     env_key = "CROSSREF_API_KEY"
     requires_api_key = False
 
+    def _resolved_work_type(self, work_type: str | None) -> str | None:
+        if not work_type:
+            return None
+        mapped = CROSSREF_TYPE_MAP.get(work_type.strip(), work_type.strip())
+        return mapped if mapped in CROSSREF_SUPPORTED_TYPES else None
+
     def filter_execution(self, plan: QueryPlan) -> dict[str, str]:
         modes = super().filter_execution(plan)
         for key in ("institution", "oa_only", "raw_filter"):
@@ -1198,15 +1246,20 @@ class CrossrefProvider(Provider):
                 modes[key] = "local"
         if plan.author and re.fullmatch(r"A\d+", plan.author):
             modes["author"] = "unsupported"
+        if plan.work_type and self._resolved_work_type(plan.work_type) is None:
+            modes["work_type"] = "unsupported"
         return modes
 
     def diagnostics(self, plan: QueryPlan, query: str) -> list[Diagnostic]:
-        flags = {"institution": "--institution", "oa_only": "--oa-only", "raw_filter": "--oa-filter",
-                 "author": "--author OpenAlex ID"}
-        return [Diagnostic(
-            "unsupported_filter", f"crossref: {flags[key]} 不受支持，已忽略",
-            self.name, query, key,
-        ) for key, mode in self.filter_execution(plan).items() if mode == "unsupported"]
+        result: list[Diagnostic] = []
+        for key, mode in self.filter_execution(plan).items():
+            if mode != "unsupported":
+                continue
+            label = UNSUPPORTED_FLAG_LABELS[key]
+            msg = (f"crossref: {label} ({plan.work_type}) 不受支持，已忽略（仅支持 article/preprint 或 Crossref 原生类型）"
+                   if key == "work_type" else f"crossref: {label} 不受支持，已忽略")
+            result.append(Diagnostic("unsupported_filter", msg, self.name, query, key))
+        return result
 
     def structured_filters(self, plan: QueryPlan) -> list[tuple[str, str]]:
         pairs: list[tuple[str, str]] = []
@@ -1217,9 +1270,9 @@ class CrossrefProvider(Provider):
             pairs.append(("until-pub-date", f"{hi.strip()}-12-31"))
         if plan.journal_issn:
             pairs.append(("issn", plan.journal_issn.strip()))
-        if plan.work_type:
-            pairs.append(("type", CROSSREF_TYPE_MAP.get(plan.work_type,
-                                                        plan.work_type)))
+        resolved_type = self._resolved_work_type(plan.work_type)
+        if resolved_type:
+            pairs.append(("type", resolved_type))
         return pairs
 
     def build_url(self, query: str, plan: QueryPlan, rows: int, offset: int | str,
@@ -1397,7 +1450,7 @@ class EuropePMCProvider(Provider):
         return modes
 
     def diagnostics(self, plan: QueryPlan, query: str) -> list[Diagnostic]:
-        return [Diagnostic("unsupported_filter", f"europepmc: {key} 不受支持，已忽略",
+        return [Diagnostic("unsupported_filter", f"europepmc: {UNSUPPORTED_FLAG_LABELS[key]} 不受支持，已忽略",
                            self.name, query, key)
                 for key, mode in self.filter_execution(plan).items() if mode == "unsupported"]
 
@@ -1469,10 +1522,24 @@ class EuropePMCProvider(Provider):
                 raise NetworkError("europepmc: 分页响应缺少新的 nextCursorMark")
             cursor = next_cursor
         mapped = len(records)
-        records = [record for record in records
-                   if (not plan.min_citations or (record.citation_count or 0) >= plan.min_citations)
-                   and (not plan.language or record.language == plan.language)]
-        return ProviderResult(total, records[:plan.limit], [], fetched, mapped, stop)
+        warnings = [d.message for d in self.diagnostics(plan, query)]
+        if plan.min_citations:
+            before = len(records)
+            records = [r for r in records if (r.citation_count or 0) >= plan.min_citations]
+            removed = before - len(records)
+            if removed:
+                warnings.append(
+                    f"europepmc: --min-citations 为本地过滤（该源不支持按被引过滤），"
+                    f"剔除 {removed} 条；可提高 --limit 补充候选"
+                )
+        if plan.language:
+            before = len(records)
+            records = [r for r in records if r.language == plan.language]
+            removed = before - len(records)
+            warnings.append(
+                f"europepmc: --language 为本地过滤，剔除 {removed} 条；可提高 --limit 补充候选"
+            )
+        return ProviderResult(total, records[:plan.limit], warnings, fetched, mapped, stop)
 
 
 def _quote_query_term(term: str) -> str:
@@ -1511,11 +1578,7 @@ class SearchClient:
 
     def __init__(self, config: "Config", http: Http | None = None,
                  *, retry: RetryPolicy | None = None) -> None:
-        if not isinstance(config.api_keys, dict) or any(
-            name not in PROVIDERS or not isinstance(value, str)
-            for name, value in config.api_keys.items()
-        ):
-            raise ConfigError("api_keys 必须是来源名称到字符串的映射")
+        _validate_config(config)
         self.config = config
         self.http = http if http is not None else Http()
         self.retry = retry if retry is not None else RetryPolicy()
@@ -1594,6 +1657,7 @@ class SearchClient:
                 "source": name,
                 "key_configured": bool(self.config.api_keys.get(name)),
                 "requires_api_key": PROVIDERS[name].requires_api_key,
+                "query_count": len(_queries_for(plan, name)),
                 "filter_execution": PROVIDERS[name].filter_execution(plan),
             } for name in plan.sources],
             "diagnostics": [asdict(d) for name in plan.sources for query in _queries_for(plan, name)
@@ -2036,7 +2100,7 @@ def load_config(cwd: Path, env: dict[str, str] | None = None) -> Config:
 
     mailto = _first_not_none(
         env.get("CROSSREF_MAILTO"), env.get("LITSEARCH_MAILTO"),
-        scalar("mailto"), dotenv.get("CROSSREF_MAILTO"),
+        scalar("mailto"), dotenv.get("CROSSREF_MAILTO"), dotenv.get("LITSEARCH_MAILTO"),
     )
     output_dir_raw = _first_not_none(
         env.get("LITSEARCH_OUTPUT_DIR"),
@@ -2147,6 +2211,19 @@ def _validate_preset(preset: dict, label: str = "preset") -> None:
                 raise ConfigError(f"{label}.{key}：未知或空数据源")
 
 
+def _validate_api_keys(keys: Any, label: str) -> None:
+    if not isinstance(keys, dict) or any(
+        name not in PROVIDERS or not isinstance(value, str) for name, value in keys.items()
+    ):
+        raise ConfigError(f"{label}：api_keys 必须是来源名称到字符串的映射")
+
+
+def _validate_default_sources(value: Any, label: str) -> None:
+    if (not isinstance(value, list) or not value
+            or any(not isinstance(n, str) or n.strip().lower() not in PROVIDERS for n in value)):
+        raise ConfigError(f"{label}：default_sources 必须是有效来源的数组")
+
+
 def _validate_config_document(document: dict, path: Path) -> None:
     known = {"api_keys", "presets", "mailto", "output_dir", "default_sources"}
     unknown = document.keys() - known
@@ -2155,21 +2232,32 @@ def _validate_config_document(document: dict, path: Path) -> None:
     for key in ("mailto", "output_dir"):
         if key in document and not isinstance(document[key], str):
             raise ConfigError(f"{path}：{key} 必须是字符串")
-    keys = document.get("api_keys", {})
-    if not isinstance(keys, dict) or any(
-        name not in PROVIDERS or not isinstance(value, str) for name, value in keys.items()
-    ):
-        raise ConfigError(f"{path}：api_keys 必须是来源名称到字符串的 table")
+    _validate_api_keys(document.get("api_keys", {}), str(path))
     if "default_sources" in document:
-        value = document["default_sources"]
-        if (not isinstance(value, list) or not value
-                or any(not isinstance(n, str) or n.strip().lower() not in PROVIDERS for n in value)):
-            raise ConfigError(f"{path}：default_sources 必须是有效来源的数组")
+        _validate_default_sources(document["default_sources"], str(path))
     presets = document.get("presets", {})
     if not isinstance(presets, dict):
         raise ConfigError(f"{path}：presets 必须是 table")
     for name, preset in presets.items():
         _validate_preset(preset, f"{path}:presets.{name}")
+
+
+def _validate_config(config: Config) -> None:
+    if not isinstance(config, Config):
+        raise ConfigError("config 必须是 Config 实例")
+    _validate_api_keys(config.api_keys, "Config")
+    if config.mailto is not None and not isinstance(config.mailto, str):
+        raise ConfigError("Config：mailto 必须是字符串或 None")
+    if config.output_dir is not None and not isinstance(config.output_dir, (Path, str)):
+        raise ConfigError("Config：output_dir 必须是 Path、字符串或 None")
+    if config.default_sources is not None:
+        _validate_default_sources(config.default_sources, "Config")
+    if not isinstance(config.presets, dict):
+        raise ConfigError("Config：presets 必须是映射")
+    for name, preset in config.presets.items():
+        if not isinstance(name, str) or not name.strip():
+            raise ConfigError("Config：presets 键必须是非空字符串")
+        _validate_preset(preset, f"presets.{name}")
 
 
 def validate_plan(plan: QueryPlan) -> QueryPlan:
@@ -2340,11 +2428,19 @@ def resolve_outputs(args: argparse.Namespace, cfg: Config, plan: QueryPlan,
         slug = query_slug(plan.queries, plan.title)
         main_path = out_dir / f"litsearch_{slug}_{stamp}.md"
 
-    if args.doi_list:
-        doi_path = _absolute_path(Path(args.doi_list), base_dir)
+    no_doi_list = bool(getattr(args, "no_doi_list", False))
+    if args.doi_list is not None:
+        if no_doi_list:
+            raise UsageError("--doi-list 与 --no-doi-list 不能同时使用")
+        if not args.doi_list.strip():
+            raise UsageError("--doi-list 路径不能为空；若不需要 DOI 列表请使用 --no-doi-list")
+        doi_path: Path | None = _absolute_path(Path(args.doi_list), base_dir)
+    elif no_doi_list:
+        doi_path = None
     else:
         doi_path = main_path.with_name(main_path.stem + ".doi.txt")
-    _check_output_paths([main_path, doi_path], getattr(args, "overwrite", False))
+    _check_output_paths([p for p in (main_path, doi_path) if p is not None],
+                        getattr(args, "overwrite", False))
     return main_path, doi_path
 
 
@@ -2392,16 +2488,17 @@ EPILOG = """\
 候选与结果：
   --limit 是每个来源/查询的候选上限；--max-results 是最终结果上限。
   --fetch-sort 决定远端候选排序，--sort 决定最终展示排序。
-  Crossref 本地过滤的扫描预算是 limit 的三倍；执行统计和停止原因见 JSON。
+  Crossref 与 Europe PMC 本地过滤的扫描预算是 limit 的三倍；执行统计和停止原因见 JSON。
 
 输出与检查：
-  默认写 output/ 下的 Markdown 与 DOI 列表；已有文件需 --overwrite。
+  默认写 output/ 下的 Markdown 与 DOI 列表（--no-doi-list 可跳过）；已有文件需 --overwrite。
   --stdout 默认 JSON，可用 --stdout-format md|csv|doi。
   --explain 输出脱敏的生效计划，不联网、不写文件。
   --strict-filters 拒绝来源忽略或原始 filter 覆盖的筛选条件。
   --merge-policy doi 保留 DOI 不同的同名文献；默认 title 合并同名版本。
 
 示例：
+  litsearch "marine bacteria" --source crossref --limit 10 --stdout
   litsearch '"low nucleic acid content" bacteria' --year 2022-2026 --stdout
   litsearch --preset marine --explain
 """
@@ -2434,7 +2531,7 @@ def build_parser() -> argparse.ArgumentParser:
                         help="机构（名称、OpenAlex 机构 ID 或 ROR 链接）")
     parser.add_argument("--journal-issn", default=None, help="期刊 ISSN")
     parser.add_argument("--type", dest="work_type", default=None,
-                        help="文献类型，如 article / preprint / review")
+                        help="文献类型，如 article / preprint / review（Crossref 仅支持 article、preprint 及原生类型）")
     parser.add_argument("--language", default=None, help="语言，如 en / zh")
     parser.add_argument("--oa-only", action=argparse.BooleanOptionalAction,
                         default=None, help="仅开放获取（--no-oa-only 关闭）")
@@ -2455,7 +2552,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--output", default=None,
                         help="覆盖主输出路径；后缀 .md/.csv/.json 决定格式")
     parser.add_argument("--doi-list", dest="doi_list", default=None,
-                        help="覆盖 DOI 列表输出路径")
+                        help="覆盖 DOI 列表输出路径（默认与主输出同目录同名 .doi.txt）")
+    parser.add_argument("--no-doi-list", dest="no_doi_list", action="store_true",
+                        help="不生成 DOI 列表文件")
     parser.add_argument("--overwrite", action="store_true", help="允许覆盖已有输出文件")
     parser.add_argument("--explain", action="store_true", help="以 JSON 解释生效计划与来源能力，不联网")
     parser.add_argument("--strict-filters", action=argparse.BooleanOptionalAction,
@@ -2525,8 +2624,9 @@ def render_stdout(fmt: str, report: Report, records: list[Record]) -> str:
 
 def run(args: argparse.Namespace, cwd: Path, http: Http,
         policy: RetryPolicy, sleep_fn: Callable[[float], None]) -> int:
-    if args.stdout and (args.output or args.doi_list):
-        raise UsageError("--stdout 与 --output / --doi-list 不能同时使用")
+    no_doi_list = bool(getattr(args, "no_doi_list", False))
+    if args.stdout and (args.output or args.doi_list is not None or no_doi_list):
+        raise UsageError("--stdout 与 --output / --doi-list / --no-doi-list 不能同时使用")
     if args.stdout_format and not args.stdout:
         raise UsageError("--stdout-format 需要与 --stdout 一起使用")
 
@@ -2545,7 +2645,7 @@ def run(args: argparse.Namespace, cwd: Path, http: Http,
     http.sleep = sleep_fn
     client = SearchClient(cfg, http, retry=policy)
     if args.explain:
-        if args.output or args.doi_list or args.stdout_format or args.overwrite:
+        if args.output or args.doi_list is not None or no_doi_list or args.stdout_format or args.overwrite:
             raise UsageError("--explain 与文件输出、输出格式和覆盖选项互斥")
         explanation = client.explain(plan)
         explanation["output"] = {
@@ -2575,7 +2675,7 @@ def run(args: argparse.Namespace, cwd: Path, http: Http,
         )
         return EXIT_OK
 
-    doi_text, _ = render_doi_list(ordered)
+    doi_text = "" if doi_path is None else render_doi_list(ordered)[0]
     written = write_outputs(
         main_path, doi_path,
         render_main(main_path, report, ordered), doi_text,

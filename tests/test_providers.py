@@ -139,6 +139,24 @@ def test_oa_filter_overrides_structured_and_warns():
     assert any("覆盖" in w for w in warnings)
 
 
+@pytest.mark.parametrize("plan_kwargs,absent_terms", [
+    ({"year": "2024", "raw_filter": "publication_year:2023"},
+     ["from_publication_date:", "to_publication_date:"]),
+    ({"author": "Qiu", "raw_filter": "authorships.author.id:A123"},
+     ["raw_author_name.search:"]),
+    ({"oa_only": True, "raw_filter": "open_access.is_oa:false"},
+     ["is_oa:true"]),
+])
+def test_oa_filter_semantic_group_overrides_structured(plan_kwargs, absent_terms):
+    plan = make_plan(**plan_kwargs)
+    filt, warnings = OA.filter_string(plan)
+    for term in absent_terms:
+        assert term not in filt
+    assert plan.raw_filter in filt
+    assert len(warnings) == 1
+    assert "覆盖" in warnings[0]
+
+
 def test_oa_filter_appends_when_no_conflict():
     plan = make_plan(year="2024", raw_filter="is_retracted:false")
     filt, warnings = OA.filter_string(plan)

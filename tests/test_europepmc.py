@@ -48,13 +48,26 @@ def test_strict_unsupported_conditions_are_rejected_before_any_source_request():
     assert opener.urls == []
 
 
-def test_local_filters_use_a_bounded_scan():
-    http, _ = make_http([page([item(i, citedByCount=0) for i in range(3)], total=50)])
+def test_local_filters_use_a_bounded_scan_and_warn():
+    http, _ = make_http([page([item(i, citedByCount=0, language="fre") for i in range(3)], total=50)])
     result = litsearch.SearchClient(litsearch.Config(), http).search(make_plan(
-        sources=["europepmc"], limit=1, min_citations=10))
+        sources=["europepmc"], limit=1, min_citations=10, language="en"))
     assert result.records == []
     assert result.report.queries[0].fetched_count == 3
     assert result.report.queries[0].stop_reason == "scan_budget"
+    warnings = [d.message for d in result.report.diagnostics if d.code == "provider_warning"]
+    assert any("--min-citations" in m for m in warnings)
+    assert any("--language" in m for m in warnings)
+
+
+def test_unsupported_filter_messages_use_cli_labels():
+    http, _ = make_http([])
+    explained = litsearch.SearchClient(litsearch.Config(), http).explain(make_plan(
+        sources=["europepmc"], work_type="article", institution="Uni", fetch_sort="citations"))
+    msgs = [d["message"] for d in explained["diagnostics"]]
+    assert any("--type" in m for m in msgs)
+    assert any("--institution" in m for m in msgs)
+    assert any("--fetch-sort" in m for m in msgs)
 
 
 @pytest.mark.parametrize("payload", [

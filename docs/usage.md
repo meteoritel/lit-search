@@ -37,7 +37,7 @@ litsearch --concept "South China Sea" --concept "haptophyte,Haptophyta,coccolith
 | LITSEARCH_OUTPUT_DIR | 默认输出目录 |
 | LITSEARCH_CONFIG | 显式 TOML 路径，只从进程环境读取 |
 
-`.env` 提供 OPENALEX_API_KEY、CROSSREF_API_KEY、CROSSREF_MAILTO、LITSEARCH_OUTPUT_DIR 的回退值。配置文件使用 UTF-8；`.env` 兼容文件开头的 UTF-8 BOM，TOML 按标准解析器的编码规则读取。
+`.env` 提供 `OPENALEX_API_KEY`、`CROSSREF_API_KEY`、`CROSSREF_MAILTO`、`LITSEARCH_MAILTO`、`LITSEARCH_OUTPUT_DIR` 的回退值（`CROSSREF_MAILTO` 优于 `LITSEARCH_MAILTO`）。配置文件使用 UTF-8；`.env` 兼容开头的 UTF-8 BOM，TOML 按标准解析器编码读取。
 
 ```toml
 output_dir = "output"
@@ -88,10 +88,10 @@ CLI `--explain` 的 output.directory 为解析后的绝对默认输出目录，o
 | --author VALUE | 作者姓名；OpenAlex 还支持 A 开头的作者 ID |
 | --institution VALUE | 机构名称、OpenAlex 机构 ID 或 ROR 链接 |
 | --journal-issn VALUE | 期刊 ISSN |
-| --type VALUE | 来源支持的文献类型，article/preprint 在 Crossref 中有对应映射 |
+| --type VALUE | 来源支持的文献类型；Crossref 映射 `article`/`preprint` 并支持 Crossref 原生类型，其他值（如 `review`）将被忽略 |
 | --language VALUE | 语言代码 |
 | --oa-only / --no-oa-only | 开放获取筛选 |
-| --oa-filter VALUE | OpenAlex 原始 filter，同键覆盖结构化条件并生成诊断 |
+| --oa-filter VALUE | OpenAlex 原始 filter；同键或同语义组覆盖结构化条件并生成 `filter_override` 诊断 |
 | --require A,B | 组内 OR、组间 AND，可重复 |
 | --exclude X,Y | 命中任一排除词即剔除，可重复 |
 | --concept A,B | 同义词概念组，可重复；用于来源查询与软排序 |
@@ -100,33 +100,40 @@ CLI `--explain` 的 output.directory 为解析后的绝对默认输出目录，o
 | --fetch-sort relevance/citations/year | 远端候选排序，默认 relevance |
 | --merge-policy title/doi | 默认 title；doi 使用保守合并策略 |
 | --strict-filters / --no-strict-filters | 严格模式在联网前拒绝忽略或覆盖条件 |
-| --explain | JSON 解释生效计划与来源能力，不联网、不写文件 |
+| --explain | JSON 解释生效计划、各源查询数与筛选能力，不联网、不写文件 |
 | --title VALUE | Markdown 标题与默认文件名片段 |
 | --output PATH | 主输出，后缀为 .md/.csv/.json |
-| --doi-list PATH | DOI 列表路径 |
+| --doi-list PATH | 覆盖 DOI 列表路径（不能传空串） |
+| --no-doi-list | 跳过生成 DOI 列表文件 |
 | --overwrite | 允许覆盖已有文件 |
 | --stdout | 结果写 stdout，默认 JSON |
 | --stdout-format json/md/csv/doi | 指定 stdout 格式，需同时指定 --stdout |
 | --version / --help | 查看版本或完整帮助 |
 
+使用 `--oa-filter` 时，以下 OpenAlex filter 键会覆盖对应结构化参数并产出 `filter_override` 诊断（其中 `--year` 允许单侧覆盖 `from_publication_date` 或 `to_publication_date`，而 `publication_year` 会整体覆盖年份范围）：
+
+| 结构化参数 | 对应的 OpenAlex 原始 filter 键 |
+|---|---|
+| `--year` | `from_publication_date`、`to_publication_date`、`publication_year` |
+| `--min-citations` | `cited_by_count` |
+| `--author` | `authorships.author.id`、`raw_author_name.search` |
+| `--institution` | `institutions.id`、`institutions.ror`、`raw_affiliation_strings.search` |
+| `--journal-issn` | `primary_location.source.issn` |
+| `--type` | `type` |
+| `--oa-only` | `is_oa`、`open_access.is_oa` |
+| `--language` | `language` |
+
 ## 候选、过滤与排序
 
-`--limit` 控制每个来源/查询交给后续流程的候选窗口，`--max-results` 控制最终产出。远端候选在跨源合并后按需补摘要，执行标题/摘要主题过滤，再排序和截断。
+`--limit` 控制每个来源/查询交给后续流程的候选窗口，`--max-results` 控制最终产出。远端候选在跨源合并后按需补摘要，执行标题/摘要主题过滤，再排序截断。
 
-OpenAlex、Crossref、Europe PMC 使用 cursor 分页。Crossref 与 Europe PMC 需要按被引数或语言做本地筛选时，扫描预算为 limit 的三倍，保留至多 limit 条。JSON 的 fetched_count、mapped_count、returned_count 与 stop_reason 说明每个查询的执行情况。Crossref relevance 抓取在所有页明确使用 score 降序。
-
-`--fetch-sort` 决定哪些候选进入窗口；`--sort` 只改变窗口内结果的展示顺序。专题查找保留默认 relevance 取数，再显式使用 hybrid；在该窗口内找高被引文献使用 citations：
-
-```bash
-litsearch "marine bacteria" --source crossref --sort hybrid --stdout
-litsearch "marine bacteria" --source crossref --sort citations --stdout
-```
-
-OpenAlex/Crossref 的 `--fetch-sort citations/year` 在来源匹配范围内优先取高被引或较新的候选；主题查询仍随请求发送，但与默认相关性窗口相比，贴近专题的文献可能排在窗口之外。Europe PMC 当前仅支持 relevance 取数。
-
-查询语义按来源区分：OpenAlex 支持英文双引号短语与大写 AND/OR/NOT，其搜索范围可包含全文和关键词；Europe PMC 支持字段与 Boolean 查询，concepts 编译到 `TITLE_ABS:`；Crossref 按自身词查询语义检索，英文引号或 AND 不作为本工具的标题/摘要硬约束。需要每组主题词都出现在本地标题或摘要时，显式使用 `--require`。
-
-推荐先用较小窗口观察命中与诊断，再增加候选并核对筛选阶段统计，最后保存为预设。来源、查询数量、分页、本地扫描条件及补摘要预算都会增加请求成本；Europe PMC 或多个缺失摘要 DOI 的检索宜逐步扩大预算，实际耗时取决于远端响应和重试。
+- **游标分页与扫描预算**：三源均使用游标分页。Crossref 与 Europe PMC 需要按 `--min-citations` 或 `--language` 在本地筛选时，扫描预算扩大为 `3 × limit`（保留至多 `limit` 条），并发出 `provider_warning`。`queries[]` 中的 `fetched_count`、`mapped_count`、`returned_count` 与 `stop_reason`（`limit` / `scan_budget` / `exhausted`）记录执行情况。Crossref `relevance` 抓取在所有分页明确使用 `score` 降序。
+- **抓取序 vs 展示序**：`--fetch-sort` 决定进入窗口的候选，`--sort` 只改窗口内结果的展示顺序。专题检索应保留默认 `relevance` 抓取，并显式指定 `--sort hybrid`；使用 `--fetch-sort citations` 或 `year` 仅适用于不依赖主题相关性、纯按被引或时间抓取的场景（Europe PMC 仅支持 `relevance` 抓取）。
+- **各来源查询语义差异**：
+  - OpenAlex 支持英文双引号短语与大写 `AND`/`OR`/`NOT`，检索范围可涵盖全文与关键词。
+  - Europe PMC 支持字段与布尔语法，概念组自动编译至 `TITLE_ABS:`。
+  - Crossref 按自身分词与打分语义检索，引号与 `AND` 不作为标题/摘要硬约束；如需各主题词组必现于本地标题或摘要，请配合 `--require`。
+- **预算控制**：建议先以小窗口配合 `--explain` 核对命中与 `sources[].query_count`，再扩大 `--limit` 与 `--enrich-abstracts`（实际耗时随查询数、分页及重试次数增长）。
 
 匹配前统一大小写和标点，主题过滤只检查标题与摘要：
 
@@ -141,7 +148,11 @@ OpenAlex/Crossref 的 `--fetch-sort citations/year` 在来源匹配范围内优�
 
 `title:` / `abstract:` 适用于 require 与 exclude，可以与整词和子串写法组合。CLI 去掉逗号分隔的空词项；空 require/concept 组在联网前报参数错误，空 exclude 项不产生排除效果。每个 require 组的统计基于同一份排除词过滤后的集合，便于定位筛选瓶颈。
 
-`--enrich-abstracts N` 在硬过滤前向 Europe PMC 按 DOI 补空摘要，默认 0。N 控制尚未缓存的新 DOI 数，按候选顺序分成每批最多 10 个 DOI；分页和重试不额外消耗 DOI 预算。每批完整读取分页后缓存摘要或未找到结果，同客户端可复用正负缓存。查不到或预算用尽会产生诊断，响应或网络失败则整个检索失败。`requested` 按新 DOI 计数；缓存与统计详见 [Python 契约](python.md#摘要补齐)。
+`--enrich-abstracts N` 在硬过滤前向 Europe PMC core 按 DOI 补空摘要（默认 `0`）：
+
+- `N` 仅统计**本次尚未缓存的新 DOI**，按候选顺序每批最多合并查询 10 个 DOI；同客户端会复用正负缓存。
+- 分页、HTTP 重试与缓存读取不额外消耗预算，但任一批次请求或解析失败会导致整次检索失败。
+- 由于 Europe PMC 偏重生命科学与生物医学期刊，物理海洋、地球科学等非生医期刊可能会较多返回 `abstract_not_found`。详见 [Python 契约](python.md#摘要补齐)。
 
 ## 概念查询与主题排序
 
@@ -153,9 +164,12 @@ OpenAlex/Crossref 的 `--fetch-sort citations/year` 在来源匹配范围内优�
 litsearch --concept "South China Sea,Daya Bay" --concept "protist,ciliate" --concept "seasonal,monthly" --source openalex,europepmc --sort hybrid --stdout
 ```
 
-OpenAlex 将组内词编译为带引号的 OR 条件，组间用 AND；Europe PMC 在词前加 `TITLE_ABS:`。概念组至少为三组时，额外生成只含前两组的宽查询，因此将基本地理与研究对象放在前面。Crossref 按同义词位置轮换生成普通文本查询，并增加相同的宽查询，使用其自身的查询语义。`--explain` 的 compiled_queries 显示实际查询与来源筛选条件。
+- **OpenAlex**：将每组内词编译为带引号的 `OR` 条件，组间以 `AND` 连接。
+- **Europe PMC**：规则同 OpenAlex，但每个词项加 `TITLE_ABS:` 前缀。
+- **Crossref**：按同义词位置轮换生成纯文本查询（查询条数等于最长同义词组长度，组数 ≥ 3 时再加 1 条首词宽查询），不使用其他来源的布尔语法。
+- **宽召回查询**：概念组 ≥ 3 组时，额外生成只含前两组的宽查询（OpenAlex/Europe PMC 为 1 条前两组联合查询，Crossref 为 1 条前两组首词查询），因此建议将核心地域与研究对象放在前两组。
 
-预设由用户在 TOML 配置中定义，格式见[配置发现与优先级](#配置发现与优先级)。可先使用 `--explain` 核对实际查询，再根据检索结果调整 concepts、require 和排序方式。
+联网前可用 `--explain` 查看 `compiled_queries`（实际查询语法）及 `sources[].query_count`（各源待发请求条数预估），再据此调整概念组或预设。
 
 | 排序 | 计算与用途 |
 |---|---|
@@ -177,29 +191,29 @@ rrf/bm25/hybrid 对标题明确标为补充材料、评议回复或推荐记录�
 
 Crossref 有 DOI 的空标题记录保留，并按来源/查询聚合产生 field 为 title 的 provider_warning；其他来源可在合并时补齐标题。来源登记的 grant、peer-review 等类型同样保留；只需要 article 时，对支持类型筛选的来源显式使用 `--type article`。
 
-Crossref 的机构、OA、OpenAlex 作者 ID 和 OpenAlex 原始 filter 条件不受支持；被引数和语言在本地处理。所有被忽略条件进入结构化诊断。严格模式会在发送任何请求前拒绝被忽略或覆盖的条件。
+Crossref 的机构、OA、OpenAlex 作者 ID、OpenAlex 原始 filter 及非 Crossref 支持类型（如 `review`）不受支持；被引数和语言在本地处理。所有被忽略或覆盖的条件进入统一格式的结构化诊断，严格模式会在发送任何请求前拒绝。
 
-Europe PMC 无需 API key，年份、OA、作者姓名和 ISSN 在远端执行；被引数和语言在本地处理。机构、类型筛选、OpenAlex 作者 ID/原始 filter 及 relevance 之外的 fetch_sort 不受支持，普通模式诊断后忽略，严格模式联网前拒绝。
+Europe PMC 无需 API key，年份、OA、作者姓名和 ISSN 在远端执行；被引数和语言在本地处理并产出 `provider_warning`。机构、类型筛选、OpenAlex 作者 ID/原始 filter 及 `relevance` 之外的 `fetch_sort` 不受支持，普通模式诊断后忽略，严格模式联网前拒绝。
 
 各来源的覆盖范围和元数据完整性各异。远端全文或关键词命中可能在本地标题/摘要中找不到对应词，且语言字段可能缺失；这些条件会影响后置过滤的保留结果。
 
 ## 输出与错误
 
-默认生成 `<output_dir>/litsearch_<片段>_<日期>.md` 与同名 `.doi.txt`。片段优先取 title，否则取首个查询，保留中文，截断上限为 48 个字符；不同标题或参数可能生成同名目标。批次检索可通过不同 `--output` 路径隔离产物。DOI 列表每行一个裸 DOI，无 DOI 条目在诊断中说明，可交给 Zotero 的按标识符添加功能。
+默认生成 `<output_dir>/litsearch_<片段>_<日期>.md` 与同目录同名 `.doi.txt`。片段优先取 `--title`，否则取首个查询，英文转小写、空格及非词字符替换为 `-`，保留中文并按词边界截断（上限 48 字符；全标点时退化为短哈希）。不同参数若产生同名目标，可通过 `--output` 隔离路径。
 
-主结果与 DOI 目标必须是不同文件；已有目标需显式 `--overwrite`。内容先在目标目录预写，再逐文件替换。跨文件提交失败时，退出码为 5，stdout 列出已提交路径，stderr 给出错误；调用方应结合退出码处理这批产物。
+显式指定 `--output path/to/name.<ext>` 且未传 `--doi-list` 时，DOI 列表默认派生为同目录的 `path/to/name.doi.txt`；如不需要生成 DOI 列表，请传入 `--no-doi-list`。DOI 列表每行一个裸 DOI（可直接交给 Zotero 按标识符添加），无 DOI 条目会在诊断中说明。
 
-联网前发现已有文件未允许覆盖、目标为目录或父路径为文件时，按目标用法错误返回 2。目录目标应改为文件路径，`--overwrite` 只允许替换已有文件。预写或提交阶段的权限错误、同名竞争等文件操作失败返回 5。
+主结果与 DOI 目标必须是不同文件；已有目标需显式 `--overwrite`。内容先在目标目录预写，再逐文件替换。跨文件提交失败时退出码为 5，stdout 列出已提交路径，stderr 给出错误。
 
-默认提交会原子地拒绝并发创建的同名目标。POSIX 上的默认提交使用同目录硬链接；文件系统不支持该操作时返回输出错误，有意替换目标时可使用 `--overwrite`。
+联网前发现已有文件未允许覆盖、目标为目录、父路径为文件或 `--doi-list ""` 时，按用法错误返回 2。`--overwrite` 只替换已有文件，不接受目录目标。预写或提交阶段遇到权限错误或同名竞争等 IO 失败返回 5。
 
-`--overwrite` 对各目标分别替换；多进程写入同一目标时最后提交者胜出。主结果与 DOI 文件分别提交，可能来自不同运行。需要隔离运行产物时使用独立输出路径。
+默认提交原子拒绝并发创建的同名目标（POSIX 使用同目录硬链接，文件系统不支持时返回输出错误；有意替换已有文件请用 `--overwrite`）。使用 `--overwrite` 时各目标分别替换，多进程写入同一目标最后提交者胜出；如需严格隔离，请为每次运行指定独立路径。
 
 | 退出码 | 含义 |
 |---|---|
 | 0 | 成功，允许合法空结果 |
 | 2 | 命令行、检索意图或联网前的输出目标用法错误 |
-| 3 | 配置错误或所需凭据缺失 |
+| 3 | 配置错误、指定 `--preset` 不存在或所需凭据缺失 |
 | 4 | 网络、响应结构或远端错误 |
 | 5 | 文件输出失败 |
 

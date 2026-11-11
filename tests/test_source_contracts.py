@@ -330,8 +330,34 @@ def test_strict_filters_reject_overrides_before_network():
                      strict_filters=True)
     with pytest.raises(litsearch.UsageError):
         client.search(plan)
-    assert client.explain(plan)["sources"][0]["filter_execution"]["year"] == "overridden"
+    explained = client.explain(plan)
+    assert explained["sources"][0]["filter_execution"]["year"] == "overridden"
+    assert explained["diagnostics"][0]["field"] == "year"
     assert opener.urls == []
+
+    pub_year_plan = make_plan(year="2024", raw_filter="publication_year:2023", strict_filters=True)
+    with pytest.raises(litsearch.UsageError):
+        client.search(pub_year_plan)
+    assert client.explain(pub_year_plan)["sources"][0]["filter_execution"]["year"] == "overridden"
+    assert opener.urls == []
+
+
+def test_crossref_unsupported_work_type_is_diagnosed_and_skipped():
+    http, opener = make_http([json.dumps({"message": {"total-results": 0, "items": []}}).encode()])
+    client = litsearch.SearchClient(litsearch.Config(), http)
+    plan = make_plan(sources=["crossref"], work_type="review")
+    explained = client.explain(plan)
+    assert explained["sources"][0]["filter_execution"]["work_type"] == "unsupported"
+    assert explained["diagnostics"][0]["field"] == "work_type"
+    result = client.search(plan)
+    assert result.records == []
+    assert "type:review" not in opener.urls[0]
+
+    strict_http, strict_opener = make_http([])
+    with pytest.raises(litsearch.UsageError):
+        litsearch.SearchClient(litsearch.Config(), strict_http).search(
+            make_plan(sources=["crossref"], work_type="review", strict_filters=True))
+    assert strict_opener.urls == []
 
 
 def test_crossref_marks_openalex_author_ids_as_unsupported():
