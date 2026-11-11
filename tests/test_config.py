@@ -91,6 +91,28 @@ def test_parse_env_file_missing_file_returns_empty(tmp_path):
     assert litsearch.parse_env_file(tmp_path / "nope.env") == {}
 
 
+@pytest.mark.parametrize("encoding", ["utf-8", "utf-8-sig"])
+@pytest.mark.parametrize("first_key", ["OPENALEX_API_KEY", "LITSEARCH_OUTPUT_DIR"])
+def test_dotenv_bom_preserves_first_key_and_configuration_priority(tmp_path, encoding, first_key):
+    pairs = {"OPENALEX_API_KEY": "test-dotenv-key", "LITSEARCH_OUTPUT_DIR": "dotenv-output"}
+    keys = [first_key, *(key for key in pairs if key != first_key)]
+    (tmp_path / ".env").write_text(
+        "\n".join(f'{key}="{pairs[key]}"' for key in keys) + "\n\n", encoding=encoding)
+    cfg = litsearch.load_config(tmp_path, env={})
+    assert cfg.api_keys["openalex"] == "test-dotenv-key"
+    assert cfg.output_dir == tmp_path / "dotenv-output"
+    (tmp_path / "litsearch.toml").write_text('output_dir = "toml-output"\n', encoding="utf-8")
+    cfg = litsearch.load_config(tmp_path, env={"OPENALEX_API_KEY": "test-process-key"})
+    assert cfg.api_keys["openalex"] == "test-process-key"
+    assert cfg.output_dir == tmp_path / "toml-output"
+
+
+def test_dotenv_rejects_invalid_utf8(tmp_path):
+    (tmp_path / ".env").write_bytes(b"OPENALEX_API_KEY=\xff\n")
+    with pytest.raises(litsearch.ConfigError, match="无法读取配置"):
+        litsearch.load_config(tmp_path, env={})
+
+
 def test_project_local_litsearch_toml_is_used_without_a_user_config(tmp_path):
     (tmp_path / "litsearch.toml").write_text(
         'output_dir = "from-project"\n[presets.p]\nqueries = ["q"]\n',

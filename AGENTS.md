@@ -8,7 +8,7 @@
 - tests 使用离线 opener 与受控等待；新增网络行为在测试中提供明确响应。
 - 版本以源码 __version__ 为准；构建与分发验收由 scripts/check.py 执行。
 - 凭据保留在环境变量或受忽略配置中，结果与错误中的请求地址脱敏。
-- 正式文档描述当前契约；实施计划完成后归档到 docs/plans/archive 并更新索引。
+- 正式文档描述当前契约；实施计划完成后归档到 .local/archive 。
 
 ## Agent skills
 

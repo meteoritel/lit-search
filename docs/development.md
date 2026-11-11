@@ -39,7 +39,7 @@ CLI → 配置发现 / 参数解析 → QueryPlan
 
 版本的唯一来源是源码中的 `__version__`，setuptools 从该属性生成元数据。wheel 包含运行模块与分发元数据；sdist 包含源码、现役测试及 fixtures、用户文档、环境变量模板和统一验收脚本。本地专题预设保存在受 Git 忽略的 `.local/presets/`；资料与计划档案、本地测试配置均不进入分发包。
 
-统一验收在临时隔离环境离线安装当前 wheel，核对版本、安装后的 import 与 CLI、离线检索 JSON、配置解释、CP936 默认环境下的 UTF-8 输出，以及复制后的单文件运行；同时检查发布 tag 的接受与拒绝、sdist 资源与许可证元数据。构建产物位于 `dist/`。
+统一验收在临时隔离环境离线安装当前 wheel，核对版本、安装后的 import 与 CLI、离线检索 JSON、配置解释、CP936 默认环境下的 UTF-8 输出、CSV stdout 与文件字节一致性，以及复制后的单文件运行；同时检查发布 tag 的接受与拒绝、sdist 资源与许可证元数据。构建产物位于 `dist/`。
 
 ### Windows x64 便携包
 
@@ -83,7 +83,7 @@ git push origin v0.5.0
 - README 提供安装与最短调用路径。
 - usage.md 维护 CLI、配置、筛选、排序和输出规则；python.md 维护 Python 接口与结果契约。
 - docs/agents 维护 Agent 工作流约定，AGENTS.md 提供规则入口。
-- 临时实施计划放入 docs/plans；完成验收后移至 docs/plans/archive，按 `YYYY-MM-DD-主题.md` 命名并更新[计划索引](plans/README.md)。
-- 停用的研究报告和评测资料放入 docs/archive，并更新[资料索引](archive/README.md)。正式文档和代码注释只描述当前已确认行为。
+- 临时实施计划放入 docs/plans；完成验收后移至受 Git 忽略的 `.local/archive/`，按日期与主题归档。
+- 停用的研究报告和评测资料保存在 `.local/archive/`。正式文档和代码注释只描述当前已确认行为。
 
 `.local/` 用于受忽略的本地测试证据，`output/` 用于检索产物。归档原始日志和配置时保留其忽略边界，凭据不进入公开档案。

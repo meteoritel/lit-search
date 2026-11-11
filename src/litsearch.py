@@ -48,6 +48,7 @@ API_EUROPEPMC = "https://www.ebi.ac.uk/europepmc/webservices/rest/search"
 MAX_PER_PAGE = 100
 CROSSREF_PAGE_SIZE = 100
 CROSSREF_MAX_ROWS = 1000
+ABSTRACT_BATCH_SIZE = 10
 POLITE_DELAY = 0.5
 USER_AGENT = f"litsearch/{__version__}"
 DEFAULT_LIMIT = 25
@@ -1340,6 +1341,12 @@ class CrossrefProvider(Provider):
             cursor = next_cursor
 
         mapped = len(records)
+        missing_titles = sum(not record.title for record in records)
+        if missing_titles:
+            diagnostics.append(Diagnostic(
+                "provider_warning", f"crossref: {missing_titles} 条含 DOI 的映射候选缺少标题，已保留",
+                self.name, query, "title",
+            ))
         if plan.min_citations:
             before = len(records)
             records = [r for r in records
@@ -1514,38 +1521,57 @@ class SearchClient:
         self.retry = retry if retry is not None else RetryPolicy()
         self._abstract_cache: dict[str, str | None] = {}
 
+    def _fetch_abstracts(self, dois: list[str]) -> dict[str, str | None]:
+        query = " OR ".join(f"DOI:{_quote_query_term(doi)}" for doi in dois)
+        abstracts: dict[str, str | None] = dict.fromkeys(dois)
+        cursor = "*"
+        fetched = 0
+        while True:
+            url = _epmc_url(query, {"pageSize": str(MAX_PER_PAGE), "cursorMark": cursor})
+            payload = decode_json(request_with_backoff(self.http, url, self.retry), "europepmc")
+            items = _epmc_page(payload)
+            fetched += len(items)
+            for item in items:
+                remote_doi = item.get("doi")
+                if remote_doi is not None and not isinstance(remote_doi, str):
+                    raise NetworkError("europepmc: doi 必须是字符串或 null")
+                doi = norm_doi(remote_doi)
+                if doi is None or doi not in abstracts:
+                    continue
+                value = item.get("abstractText")
+                if value is not None and not isinstance(value, str):
+                    raise NetworkError("europepmc: abstractText 必须是字符串或 null")
+                if not abstracts[doi]:
+                    abstracts[doi] = strip_jats(value)
+            if fetched >= payload["hitCount"]:
+                return abstracts
+            next_cursor = payload.get("nextCursorMark")
+            if not items or not isinstance(next_cursor, str) or not next_cursor or next_cursor == cursor:
+                raise NetworkError("europepmc: 摘要分页响应缺少新的 nextCursorMark")
+            cursor = next_cursor
+
     def _enrich(self, records: list[Record], budget: int) -> EnrichmentStats:
         stats = EnrichmentStats()
         if not budget:
             return stats
+        eligible: list[tuple[Record, str]] = []
         for record in records:
             doi = norm_doi(record.doi)
-            if record.abstract or not doi:
-                continue
-            if doi in self._abstract_cache:
-                stats.cache_hits += 1
-            elif stats.requested < budget:
-                literal = doi.replace("\\", "\\\\").replace('"', '\\"')
-                url = _epmc_url(f'DOI:"{literal}"', {"pageSize": "100"})
-                payload = decode_json(request_with_backoff(self.http, url, self.retry), "europepmc")
-                items = _epmc_page(payload)
-                abstract = None
-                for item in items:
-                    remote_doi = item.get("doi")
-                    if remote_doi is not None and not isinstance(remote_doi, str):
-                        raise NetworkError("europepmc: doi 必须是字符串或 null")
-                    if norm_doi(remote_doi) == doi:
-                        value = item.get("abstractText")
-                        if value is not None and not isinstance(value, str):
-                            raise NetworkError("europepmc: abstractText 必须是字符串或 null")
-                        abstract = strip_jats(value)
-                        if abstract:
-                            break
-                self._abstract_cache[doi] = abstract
-                stats.requested += 1
-            else:
+            if not record.abstract and doi:
+                eligible.append((record, doi))
+        cached = set(self._abstract_cache)
+        uncached = list(dict.fromkeys(doi for _, doi in eligible if doi not in cached))[:budget]
+        for offset in range(0, len(uncached), ABSTRACT_BATCH_SIZE):
+            batch = uncached[offset:offset + ABSTRACT_BATCH_SIZE]
+            self._abstract_cache.update(self._fetch_abstracts(batch))
+            stats.requested += len(batch)
+        for record, doi in eligible:
+            if doi not in self._abstract_cache:
                 stats.budget_skipped += 1
                 continue
+            if doi in cached:
+                stats.cache_hits += 1
+            cached.add(doi)
             abstract = self._abstract_cache[doi]
             if abstract:
                 record.abstract = abstract
@@ -1917,7 +1943,7 @@ def parse_env_file(path: Path) -> dict[str, str]:
     if not path.is_file():
         return values
     try:
-        raw = path.read_text(encoding="utf-8")
+        raw = path.read_text(encoding="utf-8-sig")
     except (OSError, UnicodeDecodeError) as exc:
         raise ConfigError(f"无法读取配置：{path}（{exc}）") from exc
     for line in raw.splitlines():
@@ -2290,7 +2316,9 @@ def _check_output_paths(paths: list[Path], overwrite: bool) -> None:
                or (path.exists() and other.exists() and path.samefile(other))
                for other in paths[:index]):
             raise UsageError("主输出与 DOI 列表不能使用同一个文件")
-        if path.exists() and (path.is_dir() or not overwrite):
+        if path.is_dir():
+            raise UsageError(f"输出目标是目录：{path}（请指定文件路径）")
+        if path.exists() and not overwrite:
             raise UsageError(f"输出目标已存在：{path}（覆盖文件请使用 --overwrite）")
         for parent in path.parents:
             if parent.exists() and not parent.is_dir():
@@ -2382,7 +2410,7 @@ EPILOG = """\
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="litsearch",
-        description="多源文献检索工具（OpenAlex + Crossref），输出人读清单与 DOI 列表",
+        description="多源文献检索工具（OpenAlex + Crossref + Europe PMC），输出人读清单与 DOI 列表",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=EPILOG,
     )
@@ -2450,7 +2478,7 @@ def _force_utf8_stdio() -> None:
         try:
             reconfigure = getattr(stream, "reconfigure", None)
             if reconfigure is not None:
-                reconfigure(encoding="utf-8", errors="replace")
+                reconfigure(encoding="utf-8", errors="replace", newline="")
         except (AttributeError, ValueError):
             pass
 
@@ -2535,7 +2563,11 @@ def run(args: argparse.Namespace, cwd: Path, http: Http,
         print(f"[warn] {message}", file=sys.stderr)
 
     if args.stdout:
-        print(render_stdout(args.stdout_format or "json", report, ordered))
+        text = render_stdout(args.stdout_format or "json", report, ordered)
+        if args.stdout_format == "csv":
+            sys.stdout.write(text)
+        else:
+            print(text)
         print(
             f"[ok] 共 {len(ordered)} 篇（抓取 {fetched} 条，进入合并 {stats.total_in} 条，"
             f"DOI 合并 {stats.doi_merged}，标题合并 {stats.title_merged}）",

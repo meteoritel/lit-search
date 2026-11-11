@@ -27,7 +27,7 @@ from conftest import SleepRecorder, load_fixture, make_http, make_plan, make_rec
 ])
 def test_crossref_nullable_dates_through_complete_search(dates, year, publication_date, warnings):
     body = json.dumps({"message": {"total-results": 1, "items": [
-        {"DOI": "10.1000/date", **dates},
+        {"DOI": "10.1000/date", "title": ["Date contract"], **dates},
     ]}}).encode()
     http, opener = make_http([body])
     result = litsearch.SearchClient(litsearch.Config(), http).search(
@@ -77,6 +77,82 @@ def test_bad_crossref_doi_remains_a_network_error():
     http, _ = make_http([json.dumps({"message": {"total-results": 1, "items": [{"DOI": 42}]}}).encode()])
     with pytest.raises(litsearch.NetworkError, match="第 1 条记录"):
         litsearch.SearchClient(litsearch.Config(), http).search(make_plan(sources=["crossref"]))
+
+
+def test_crossref_missing_titles_are_retained_with_one_diagnostic_across_pages(monkeypatch):
+    monkeypatch.setattr(litsearch, "CROSSREF_PAGE_SIZE", 3)
+    pages = [json.dumps({"message": {"total-results": 6, "items": items,
+                                    "next-cursor": "next"}}).encode() for items in [
+        [{"DOI": "10.1/missing"}, {"DOI": "10.1/null", "title": None},
+         {"DOI": "10.1/empty", "title": []}],
+        [{"DOI": "10.1/blank", "title": ["<p> </p>"]}, {"title": []},
+         {"DOI": "10.1/named", "title": ["Named work"], "type": "grant"}],
+    ]]
+    http, opener = make_http(pages)
+    result = litsearch.SearchClient(litsearch.Config(), http).search(make_plan(
+        sources=["crossref"], limit=6, strict_filters=True, merge_policy="doi"))
+    assert len(result.records) == 5
+    assert sum(record.title is None for record in result.records) == 4
+    warnings = [d for d in result.report.diagnostics if d.field == "title"]
+    assert len(warnings) == 1
+    assert warnings[0].code == "provider_warning"
+    assert warnings[0].source == "crossref" and warnings[0].query == "q"
+    assert "4 条" in warnings[0].message
+    execution = result.report.queries[0]
+    assert (execution.fetched_count, execution.mapped_count, execution.returned_count) == (6, 5, 5)
+    assert next(record for record in result.records if record.doi == "10.1/named").work_type == "grant"
+    assert sum(record["title"] is None for record in result.to_dict()["results"]) == 4
+    for rendered in [litsearch.render_csv(result.records),
+                     litsearch.render_markdown(result.report, result.records)]:
+        assert "10.1/missing" in rendered
+    assert opener.remaining == []
+
+
+def test_cross_source_merge_can_fill_a_crossref_missing_title():
+    http, _ = make_http([
+        json.dumps({"message": {"total-results": 1, "items": [
+            {"DOI": "10.1/shared", "is-referenced-by-count": 10},
+        ]}}).encode(),
+        json.dumps({"meta": {"count": 1}, "results": [
+            {"id": "W123", "doi": "10.1/shared", "title": "Recovered title"},
+        ]}).encode(),
+    ])
+    result = litsearch.SearchClient(litsearch.Config(api_keys={"openalex": "key"}), http).search(
+        make_plan(sources=["crossref", "openalex"], strict_filters=True))
+    assert result.records[0].title == "Recovered title"
+    assert result.records[0].source == "crossref"
+    assert result.records[0].source_ids == {"crossref": ["10.1/shared"], "openalex": ["W123"]}
+    assert next(d for d in result.report.diagnostics if d.field == "title").source == "crossref"
+
+
+@pytest.mark.parametrize("source", ["openalex", "crossref"])
+@pytest.mark.parametrize("fetch_sort", ["relevance", "citations", "year"])
+def test_fetch_sort_preserves_query_filters_and_cursor_on_every_page(source, fetch_sort, monkeypatch):
+    monkeypatch.setattr(litsearch, "CROSSREF_PAGE_SIZE", 1)
+    if source == "crossref":
+        pages = [json.dumps({"message": {"total-results": 2, "next-cursor": "cursor+next",
+                                        "items": [{"DOI": f"10.1/{i}", "title": [f"Paper {i}"]}]}}).encode()
+                 for i in range(2)]
+    else:
+        pages = [json.dumps({"meta": {"count": 2, "next_cursor": "cursor+next" if i == 0 else None},
+                            "results": [{"id": f"W{i}", "title": f"Paper {i}"}]}).encode()
+                 for i in range(2)]
+    http, opener = make_http(pages)
+    plan = make_plan(queries=['"marine protist" grazing'], sources=[source], limit=2,
+                     year="2024", work_type="article", journal_issn="1234-5678", fetch_sort=fetch_sort)
+    result = litsearch.SearchClient(litsearch.Config(api_keys={"openalex": "key"}), http).search(plan)
+    for index, url in enumerate(opener.urls):
+        params = urllib.parse.parse_qs(urllib.parse.urlparse(url).query)
+        assert params["query" if source == "crossref" else "search"] == plan.queries
+        assert params["cursor"] == ["*" if index == 0 else "cursor+next"]
+        assert "2024" in params["filter"][0] and "1234-5678" in params["filter"][0]
+        assert "article" in params["filter"][0]
+        expected = ({"relevance": "score", "citations": "is-referenced-by-count", "year": "published"}
+                    if source == "crossref" else
+                    {"citations": "cited_by_count:desc", "year": "publication_date:desc"}).get(fetch_sort)
+        assert params.get("sort") == ([expected] if expected else None)
+    assert len(opener.urls) == 2
+    assert [hit["rank"] for record in result.records for hit in record.retrieval_hits] == [1, 2]
 
 
 def test_crossref_cursor_retrieves_beyond_the_single_request_maximum():
@@ -183,6 +259,24 @@ def test_conservative_merge_preserves_different_dois_and_records_title_associati
     assert {r.doi: r.related_dois for r in records} == {
         "10.1/pre": ["10.2/pub"], "10.2/pub": ["10.1/pre"],
     }
+
+
+@pytest.mark.parametrize("policy", ["title", "doi"])
+def test_title_identity_normalizes_unicode_case_and_punctuation_through_search(policy):
+    http, _ = make_http([json.dumps({"message": {"total-results": 2, "items": [
+        {"DOI": "10.1/a", "title": ["Ｒｅ-evaluation_of Marine Protists"]},
+        {"DOI": "10.1/b", "title": ["Reevaluation of marine protists"]},
+    ]}}).encode()])
+    result = litsearch.SearchClient(litsearch.Config(), http).search(make_plan(
+        sources=["crossref"], merge_policy=policy))
+    if policy == "title":
+        assert len(result.records) == 1
+        assert result.records[0].doi_aliases == ["10.1/a", "10.1/b"]
+        assert result.report.stats.title_merged == 1
+    else:
+        assert {record.doi: record.related_dois for record in result.records} == {
+            "10.1/a": ["10.1/b"], "10.1/b": ["10.1/a"],
+        }
 
 
 def test_repeated_source_identity_without_doi_is_merged():

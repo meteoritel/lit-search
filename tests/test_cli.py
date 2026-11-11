@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import csv
+import io
 import json
 import os
 import subprocess
@@ -104,6 +106,78 @@ def test_source_cli_forces_utf8_even_with_cp936_defaults(tmp_path):
     assert json.loads(explanation.stdout.decode("utf-8"))["plan"]["queries"] == ["海洋细菌"]
 
 
+@pytest.mark.parametrize("encoding", [None, "cp936"])
+def test_csv_stdout_matches_file_bytes_without_blank_records(tmp_path, encoding):
+    source = Path(litsearch.__file__).resolve()
+    body = json.dumps({"message": {"total-results": 1, "items": [{
+        "DOI": "10.1000/csv", "title": ['A "marine", 海洋 paper'],
+        "container-title": ['Marine "Journal",\nLetters'],
+    }]}}).encode()
+    script = f"""
+import io, sys
+sys.path.insert(0, {str(source.parent)!r})
+import litsearch
+transport = litsearch.Http(opener=lambda request, timeout: io.BytesIO({body!r}), polite=0)
+litsearch.Http = lambda: transport
+raise SystemExit(litsearch.main(sys.argv[1:]))
+"""
+    env = dict(os.environ, PYTHONUTF8="0")
+    env.pop("PYTHONIOENCODING", None)
+    if encoding:
+        env["PYTHONIOENCODING"] = encoding
+    command = [sys.executable, "-c", script, "q", "--source", "crossref", "--limit", "1"]
+    output = subprocess.run([*command, "--stdout", "--stdout-format", "csv"],
+                            cwd=tmp_path, env=env, capture_output=True, check=True)
+    path = tmp_path / "结果.csv"
+    subprocess.run([*command, "--output", str(path)], cwd=tmp_path, env=env,
+                   capture_output=True, check=True)
+    assert output.stdout == path.read_bytes()
+    assert b"\r\r\n" not in output.stdout
+    assert output.stdout.endswith(b"\r\n")
+    assert not output.stdout.endswith(b"\r\n\r\n")
+    rows = list(csv.DictReader(io.StringIO(output.stdout.decode("utf-8"), newline="")))
+    assert len(rows) == 1
+    assert rows[0]["title"] == 'A "marine", 海洋 paper'
+    assert rows[0]["venue"] == 'Marine "Journal",\nLetters'
+    assert "[ok]" in output.stderr.decode("utf-8")
+
+
+@pytest.mark.parametrize("target_kind,overwrite,expected", [
+    ("file", False, "覆盖文件请使用 --overwrite"),
+    ("directory", False, "输出目标是目录"),
+    ("directory", True, "输出目标是目录"),
+    ("parent_file", True, "输出父路径不是目录"),
+])
+def test_output_target_errors_are_precise_and_precede_network(
+    tmp_path, monkeypatch, capsys, target_kind, overwrite, expected,
+):
+    path = tmp_path / "result.md"
+    if target_kind == "directory":
+        path.mkdir()
+    elif target_kind == "file":
+        path.write_text("previous", encoding="utf-8")
+    else:
+        parent = tmp_path / "parent"
+        parent.write_text("previous", encoding="utf-8")
+        path = parent / "result.md"
+    http, opener = make_http([])
+    monkeypatch.setattr(litsearch, "Http", lambda: http)
+    argv = ["q", "--source", "crossref", "--output", str(path)]
+    if overwrite:
+        argv.append("--overwrite")
+    assert litsearch.main(argv) == litsearch.EXIT_ARGS
+    captured = capsys.readouterr()
+    assert expected in captured.err
+    assert str(path if target_kind != "parent_file" else path.parent) in captured.err
+    if target_kind == "directory":
+        assert "--overwrite" not in captured.err
+        assert path.is_dir()
+    elif target_kind == "file":
+        assert path.read_text(encoding="utf-8") == "previous"
+    assert captured.out == ""
+    assert opener.urls == []
+
+
 # --------------------------------------------------------------------------- #
 # main() 的退出码（都在任何网络调用之前失败）
 # --------------------------------------------------------------------------- #
@@ -126,7 +200,7 @@ def test_main_returns_arg_error_for_unknown_source():
 
 def test_main_help_exits_zero(capsys):
     assert litsearch.main(["--help"]) == litsearch.EXIT_OK
-    assert "litsearch" in capsys.readouterr().out
+    assert "OpenAlex + Crossref + Europe PMC" in capsys.readouterr().out
 
 
 @pytest.mark.parametrize("error,expected", [
@@ -142,13 +216,48 @@ def test_main_maps_errors_to_exit_codes(monkeypatch, error, expected):
     assert litsearch.main(["query"]) == expected
 
 
-@pytest.mark.parametrize("spec", ["", " ", ",; ,"])
-def test_empty_require_is_rejected_before_network(spec, tmp_path):
-    args = litsearch.build_parser().parse_args(["q", "--require", spec, "--stdout"])
+@pytest.mark.parametrize("spec", ["", " ", ", ,"])
+@pytest.mark.parametrize("option", ["--require", "--concept"])
+def test_empty_group_is_rejected_before_network(spec, option, tmp_path):
+    args = litsearch.build_parser().parse_args(["q", option, spec, "--stdout"])
     http, opener = make_http([])
-    with pytest.raises(litsearch.UsageError, match="require"):
+    with pytest.raises(litsearch.UsageError, match=option.removeprefix("--")):
         litsearch.run(args, tmp_path, http, litsearch.RetryPolicy(), lambda _: None)
     assert opener.urls == []
+
+
+@pytest.mark.parametrize("spec", ["", " ", ", ,"])
+def test_empty_exclude_is_a_noop(spec, tmp_path, monkeypatch, capsys):
+    code, _, _ = run_cli(["q", "--source", "crossref", "--exclude", spec, "--stdout"],
+                         [load_fixture("crossref_page1.json")], tmp_path, monkeypatch, key=None)
+    payload = json.loads(capsys.readouterr().out)
+    assert code == litsearch.EXIT_OK
+    assert payload["filters"]["exclude"] == []
+    assert payload["filter_stats"]["before"] == payload["filter_stats"]["after"]
+
+
+def test_strict_explain_reports_capabilities_but_search_rejects_before_network(tmp_path, capsys):
+    http, opener = make_http([])
+    argv = ["q", "--source", "crossref", "--institution", "Institute", "--strict-filters"]
+    args = litsearch.build_parser().parse_args([*argv, "--explain"])
+    assert litsearch.run(args, tmp_path, http, litsearch.RetryPolicy(), lambda _: None) == litsearch.EXIT_OK
+    explanation = json.loads(capsys.readouterr().out)
+    assert explanation["sources"][0]["filter_execution"]["institution"] == "unsupported"
+    assert explanation["diagnostics"][0]["code"] == "unsupported_filter"
+    args = litsearch.build_parser().parse_args(argv)
+    with pytest.raises(litsearch.UsageError, match="严格"):
+        litsearch.run(args, tmp_path, http, litsearch.RetryPolicy(), lambda _: None)
+    assert opener.urls == []
+
+
+def test_missing_title_warning_is_shared_by_json_and_stderr(tmp_path, monkeypatch, capsys):
+    body = json.dumps({"message": {"total-results": 1, "items": [{"DOI": "10.1/untitled"}]}}).encode()
+    code, _, _ = run_cli(["q", "--source", "crossref", "--stdout"], [body],
+                         tmp_path, monkeypatch, key=None)
+    captured = capsys.readouterr()
+    warning = next(d for d in json.loads(captured.out)["diagnostics"] if d["field"] == "title")
+    assert code == litsearch.EXIT_OK
+    assert warning["message"] in captured.err
 
 
 # --------------------------------------------------------------------------- #

@@ -32,13 +32,17 @@ payload = result.to_dict()
 
 `concepts` 为同义词组数组，用于查询编译与可选主题排序，保留缺少部分概念证据的候选；`require` 用于硬过滤。至少提供一个非空 queries 或 concepts。只有概念组时显式传入 `queries=[]`。来源编译与字段过滤规则见 [CLI 文档](usage.md#概念查询与主题排序)。
 
-需要配置文件发现时显式调用 `load_config(Path(...))`。需要离线检查时调用 `client.explain(plan)`，其中 `compiled_queries` 给出逐来源的 query 和包含来源筛选语法的 remote_query。返回计划为独立副本，可用于报告和后续核对。
+需要配置文件发现时显式调用 `load_config(Path(...))`。需要离线检查时调用 `client.explain(plan)`，其中 `compiled_queries` 给出逐来源的 query 和包含来源筛选语法的 remote_query。返回计划为独立副本，可用于报告和后续核对。explain 校验意图并返回来源能力诊断；strict_filters 的能力拒绝在 search 联网前执行。
 
 ## 摘要补齐
 
 `QueryPlan.enrich_abstracts` 为非负整数，默认 0。启用后，在身份合并之后、require/exclude 之前，对缺少摘要且有 DOI 的候选查询 Europe PMC core。只接受相同 DOI 的摘要，只填空值，并将 `abstract_source` 设为 europepmc；文献身份与检索命中证据保持原语义。
 
-预算是每次 search 中尚未缓存的 DOI 查询次数，按合并后的候选顺序消耗。相同 SearchClient 实例缓存成功摘要和未找到结果；缓存读取不占新查询预算，HTTP 重试遵循客户端策略。补齐的元数据来源不产生检索投票。响应错误与网络失败整体抛出 NetworkError。
+预算按每次 search 中尚未缓存的新 DOI 计数，按合并后的候选顺序消耗。每批最多组合 10 个 DOI，批次仅包含剩余预算内的 DOI；HTTP 请求数随批次、分页和重试变化。每批完整读取 Europe PMC 分页，按规范化 DOI 回填首个有效摘要，完成后才缓存未找到结果。
+
+相同 SearchClient 实例缓存成功摘要和未找到结果；缓存读取不占新 DOI 预算，HTTP 重试遵循客户端策略。补齐的元数据来源不产生检索投票。响应错误、分页未完整返回与网络失败整体抛出 NetworkError，失败批次不写入缓存。
+
+`enrichment` 统计本次调用：requested 为实际执行的新 DOI 数，一次批次请求可贡献多个 DOI，分页、HTTP 重试和缓存读取不另计；cache_hits 为读取已有缓存的候选数，本次预取不计为缓存命中，同 DOI 的后续候选读取计入；filled 为实际填入摘要的候选数；not_found 为已查询或命中负缓存后仍无摘要的候选数；budget_skipped 为预算耗尽后跳过的候选数。已有摘要或无 DOI 的记录不进入这些计数，预算为零时该阶段不执行。
 
 ## Transport 与测试
 
@@ -82,7 +86,7 @@ assert result.records[0].doi == "10.1000/example"
 逐查询执行信息保留 `label` / `total_count`，并提供独立机器字段：
 
 - source、query：来源与实际执行的手工或概念编译查询。
-- remote_total：来源报告的原始命中量。
+- remote_total：来源当次报告的原始命中量，采用该来源的匹配语义；后续合并、过滤与截断各自统计，索引更新可改变命中量。
 - fetched_count：网络响应实际包含的候选量。
 - mapped_count：成功映射到 Record 的候选量。
 - returned_count：来源本地过滤与候选限制后交给合并流程的数量。
@@ -100,6 +104,8 @@ fetch_window_limited 区分 limit 候选窗口与 scan_budget 扫描预算，展
 缺失标量为 None/JSON null，缺失集合为空集合；citation_count 为 0、is_open_access 为 False 都是有效值。
 
 Crossref 日期按 published、issued 优先级选取有年份的分支。空日期保留记录，显式 null 日期元素产生带 DOI 或记录位置及 field 的 provider_warning；缺失日期为 null。年或年月部分日期补 1，内部空位保留 year、publication_date 为 null。错误的日期结构仍抛 NetworkError。
+
+Crossref 保留有 DOI 的空标题记录，并将缺失标题的映射候选按来源/查询聚合为 field=`title` 的 provider_warning；该计数发生在来源本地筛选之前。无标题且无 DOI 的记录不进入映射结果，错误标题结构仍抛 NetworkError。来源类型保留，数据质量警告不触发 strict_filters 的预检拒绝。
 
 Crossref 和 Europe PMC 的标题、摘要，以及补齐摘要，共用 HTML/JATS 纯文本处理：实体预解码一层，再解析已知标签；段落转为空白，上下标保留文字，保留 Unicode 与科学比较符。更深层编码保留为文本，避免无界解码。OpenAlex 使用原始标题与倒排摘要重建。
 
@@ -123,9 +129,11 @@ Crossref 和 Europe PMC 的标题、摘要，以及补齐摘要，共用 HTML/JA
 
 合并记录时，对相同 `(source, query)` 保留最佳 rank，独立查询分别计票。`relevance_score` 保存合并记录中的最大原始相关分，供 relevance 排序使用；跨来源与查询的融合使用名次。排序公式见 [CLI 文档](usage.md#概念查询与主题排序)。
 
+`ranking_evidence.rrf/bm25` 为原始分项，`ranking_score` 为所选排序经覆盖比例与 ancillary 处理后的最终分数；覆盖比例只作用于 bm25/hybrid，ancillary 因子为 0.5。标题关联统一使用 NFKC/casefold 后仅保留字母数字的身份规则，见[去重与来源差异](usage.md#去重与来源差异)。
+
 `open_access_pdf` 是兼容字段；调用方可使用 pdf_url、oa_url 和 is_open_access 分别处理文件地址、开放阅读入口与访问状态。
 
-CSV 为记录导出，普通集合字段采用分号文本，映射字段及 retrieval_hits 使用 JSON 字符串。CSV/DOI 格式侧重条目交付，需要完整执行诊断时使用 JSON 或 Python 返回值。
+CSV 为记录导出，普通集合字段采用分号文本，映射字段及 retrieval_hits 使用 JSON 字符串。CSV 记录分隔符为 CRLF，CLI stdout 与文件内容一致；需要完整执行诊断时使用 JSON 或 Python 返回值。
 
 ## 异常
 

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import csv
+import io
 import json
 import os
 import shutil
@@ -80,20 +82,34 @@ def check_distribution() -> None:
         assert "不存在的参数" in error.stderr.decode("utf-8")
 
         probe = '''
-import io, json, litsearch
+import io, json, sys, litsearch
 body = json.dumps({"message": {"total-results": 1, "items": [
-    {"DOI": "10.1000/smoke", "title": ["Smoke test"], "type": "journal-article"}
+    {"DOI": "10.1000/smoke", "title": ['Smoke "test", 海洋'], "type": "journal-article",
+     "container-title": ['Marine "Journal",\\nLetters']}
 ]}}).encode()
 transport = litsearch.Http(opener=lambda request, timeout: io.BytesIO(body), polite=0)
 litsearch.Http = lambda: transport
-raise SystemExit(litsearch.main(["q", "--source", "crossref", "--limit", "1", "--stdout"]))
+raise SystemExit(litsearch.main(["q", "--source", "crossref", "--limit", "1"] + sys.argv[1:]))
 '''
-        search = subprocess.run([str(python), "-I", "-c", probe], cwd=temporary, env=env,
+        probe_command = [str(python), "-I", "-c", probe]
+        search = subprocess.run([*probe_command, "--stdout"], cwd=temporary, env=env,
                                 check=True, capture_output=True, text=True, encoding="utf-8")
         payload = json.loads(search.stdout)
         assert payload["results"][0]["doi"] == "10.1000/smoke"
         assert payload["results"][0]["work_type"] == "article"
         assert payload["schema_version"] == 1
+
+        csv_stdout = subprocess.run([*probe_command, "--stdout", "--stdout-format", "csv"],
+                                    cwd=temporary, env=encoded_env, check=True, capture_output=True)
+        csv_path = temporary / "结果.csv"
+        subprocess.run([*probe_command, "--output", str(csv_path)], cwd=temporary,
+                       env=encoded_env, check=True, capture_output=True)
+        assert csv_stdout.stdout == csv_path.read_bytes()
+        assert b"\r\r\n" not in csv_stdout.stdout
+        csv_rows = list(csv.DictReader(io.StringIO(csv_stdout.stdout.decode("utf-8"), newline="")))
+        assert len(csv_rows) == 1
+        assert csv_rows[0]["title"] == 'Smoke "test", 海洋'
+        assert csv_rows[0]["venue"] == 'Marine "Journal",\nLetters'
 
         standalone = temporary / "litsearch.py"
         shutil.copyfile(ROOT / "src/litsearch.py", standalone)

@@ -4,6 +4,8 @@
 
 Windows x64 便携版自带 Python；安装 wheel 或直接运行源码时要求 Python 3.12+，运行时仅使用标准库。默认检索来源为 OpenAlex，默认按被引数排序。
 
+项目面向使用英文关键词与同义词组织的文献检索，**中文文献检索不在项目规划中**。中文主题请先整理为英文术语，再使用自由查询或 `--concept` 概念组。CLI 中文提示、UTF-8 输入输出和中文路径保持支持；查询按用户提供的词项提交，工具不做自动翻译。详见[检索范围](docs/usage.md#检索范围)。
+
 ## 安装
 
 从 [GitHub Releases](https://github.com/meteoritel/lit-search/releases) 下载发布产物，无需克隆仓库。Release 提供 Windows x64 便携 ZIP、wheel、sdist 和 `SHA256SUMS`。
@@ -70,10 +72,10 @@ python src/litsearch.py --help
 
 ## 第一次检索
 
-Crossref 无需 API key，可直接开始：
+Crossref 无需 API key，可直接开始。专题检索显式选择 hybrid，在相关性候选窗口内按主题证据排序：
 
 ```shell
-litsearch "marine bacteria" --source crossref --limit 10 --stdout
+litsearch "marine bacteria" --source crossref --limit 10 --sort hybrid --stdout
 ```
 
 `--stdout` 输出 JSON；日志与诊断写入 stderr。联网前可用 `--explain` 查看实际查询、筛选能力和默认输出目录：
@@ -114,6 +116,8 @@ litsearch "marine bacteria" --source crossref --output output/marine.json --doi-
 
 `--year` 可省略；`--limit` 控制每个来源、每个查询的候选窗口，`--max-results` 控制最终结果上限。`require` 组内按 OR、组间按 AND 匹配标题与摘要；缺失摘要会影响保留结果。
 
+默认按相关性获取候选，最终按被引数排序；专题查找可显式使用 `--sort hybrid`。需要窗口内的高被引文献时用 `--sort citations`。`--fetch-sort citations` 会改取来源匹配范围内的高被引候选，可能挤出更贴近主题的文献，详见[候选与排序](docs/usage.md#候选过滤与排序)。
+
 可在自己的 TOML 配置中定义命名预设，通过 `--preset NAME` 调用；配置格式见 [CLI 文档](docs/usage.md#配置发现与优先级)。
 
 ## Python 调用
@@ -143,7 +147,8 @@ payload = result.to_dict()
 - [CLI、配置与检索工作流](docs/usage.md)
 - [Python 接口与 JSON 契约](docs/python.md)
 - [开发、离线测试与分发验收](docs/development.md)
-- [资料档案](docs/archive/README.md)与[计划索引](docs/plans/README.md)
+
+历史计划与评测资料保存在受 Git 忽略的 `.local/archive/`。
 
 安装开发依赖后，本地与 CI 使用同一验收入口：
 
