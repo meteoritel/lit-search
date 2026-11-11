@@ -2,23 +2,32 @@
 
 多源文献检索工具，提供 CLI 和 Python 调用入口。支持 OpenAlex、Crossref、Europe PMC，统一合并、补摘要、过滤和排序，输出 Markdown、JSON、CSV 或供 Zotero 导入的 DOI 列表。
 
-要求 Python 3.12+，运行时仅使用标准库。默认检索来源为 OpenAlex，默认按被引数排序。
+Windows x64 便携版自带 Python；安装 wheel 或直接运行源码时要求 Python 3.12+，运行时仅使用标准库。默认检索来源为 OpenAlex，默认按被引数排序。
 
 ## 安装
 
-克隆本仓库并进入项目目录：
+从 [GitHub Releases](https://github.com/meteoritel/lit-search/releases) 下载发布产物，无需克隆仓库。Release 提供 Windows x64 便携 ZIP、wheel、sdist 和 `SHA256SUMS`。
 
-```shell
-git clone https://github.com/meteoritel/lit-search.git
-cd lit-search
+### Windows x64 便携版（推荐）
+
+下载 `litsearch-<版本>-windows-x64.zip`，完整解压并进入其中的 `litsearch` 文件夹，在 PowerShell 中运行：
+
+```powershell
+.\litsearch.exe --version
+.\litsearch.exe --help
+.\litsearch.exe "marine bacteria" --source crossref --limit 10 --stdout
 ```
 
-### 安装 CLI
+便携版无需安装 Python。请保留 `litsearch.exe` 与 `_internal` 的相对位置；该程序通过终端传入参数使用。配置和默认 `output/` 目录以调用时的当前目录为准，详见下文。
 
-已安装 [uv](https://docs.astral.sh/uv/getting-started/installation/) 时，可将命令安装到独立工具环境：
+更新时将新版本解压到新目录，再迁移自己的配置。ZIP 中只附带 `.env.example`，可复制为 `.env` 后填写凭据。
+
+### 安装 wheel 中的 CLI
+
+下载 Release 中的 `litsearch-<版本>-py3-none-any.whl`。已安装 [uv](https://docs.astral.sh/uv/getting-started/installation/) 时，在下载目录将命令安装到独立工具环境；将下面的 `<版本>` 替换为下载文件名中的版本：
 
 ```shell
-uv tool install .
+uv tool install --python 3.12 ./litsearch-<版本>-py3-none-any.whl
 litsearch --version
 litsearch --help
 ```
@@ -31,7 +40,7 @@ Windows PowerShell：
 
 ```powershell
 python -m venv .venv
-.venv/Scripts/python.exe -m pip install .
+.venv/Scripts/python.exe -m pip install ./litsearch-<版本>-py3-none-any.whl
 .venv/Scripts/litsearch.exe --help
 ```
 
@@ -39,19 +48,25 @@ macOS / Linux：
 
 ```shell
 python3 -m venv .venv
-.venv/bin/python -m pip install .
+.venv/bin/python -m pip install ./litsearch-<版本>-py3-none-any.whl
 .venv/bin/litsearch --help
 ```
 
 这两种方式都可在对应虚拟环境中 `import litsearch`。激活环境后，可直接使用 `python` 和 `litsearch` 命令。
 
+请使用本仓库 Release 中的 wheel 安装。
+
 ### 直接运行源码
 
+开发或需要直接运行单文件时，可克隆仓库：
+
 ```shell
+git clone https://github.com/meteoritel/lit-search.git
+cd lit-search
 python src/litsearch.py --help
 ```
 
-`src/litsearch.py` 可单独复制运行。下文的 `litsearch` 也可替换为 `python src/litsearch.py` 或虚拟环境中的命令路径。
+`src/litsearch.py` 可单独复制运行。下文的 `litsearch` 也可替换为 `.\litsearch.exe`、`python src/litsearch.py` 或虚拟环境中的命令路径。
 
 ## 第一次检索
 

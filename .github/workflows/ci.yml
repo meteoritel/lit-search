@@ -2,7 +2,12 @@ name: checks
 
 on:
   push:
+    branches: ["**"]
   pull_request:
+  workflow_call:
+
+permissions:
+  contents: read
 
 jobs:
   check:
@@ -20,3 +25,12 @@ jobs:
           enable-cache: true
       - run: uv sync --locked --extra dev
       - run: uv run --locked --extra dev python scripts/check.py
+      - name: Upload checked Python distributions
+        if: github.ref_type == 'tag' && matrix.os == 'windows-latest' && matrix.python == '3.12'
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: python-distributions
+          path: |
+            dist/*.whl
+            dist/*.tar.gz
+          if-no-files-found: error

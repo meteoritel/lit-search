@@ -11,7 +11,7 @@ uv sync --locked --extra dev
 uv run --locked --extra dev python scripts/check.py
 ```
 
-`scripts/check.py` 是统一验收入口，依次执行 Ruff、mypy、pytest、`uv build` 和分发检查。任一步失败即停止。本地与 GitHub Actions 使用同一命令；CI 配置覆盖 Windows / Linux 与 Python 3.12 / 3.14。
+`scripts/check.py` 是统一验收入口，依次执行 Ruff、mypy、pytest、`uv build` 和分发检查。任一步失败即停止。本地与 GitHub Actions 使用同一命令；CI 配置覆盖 Windows / Linux 与 Python 3.12 / 3.14，并通过 `workflow_call` 供 Release 工作流复用。
 
 定位问题时可用 `uv run --locked --extra dev python -m pytest tests/test_cli.py` 单独运行相关回归。完整验收使用统一入口。
 
@@ -39,7 +39,42 @@ CLI → 配置发现 / 参数解析 → QueryPlan
 
 版本的唯一来源是源码中的 `__version__`，setuptools 从该属性生成元数据。wheel 包含运行模块与分发元数据；sdist 包含源码、现役测试及 fixtures、用户文档、环境变量模板和统一验收脚本。本地专题预设保存在受 Git 忽略的 `.local/presets/`；资料与计划档案、本地测试配置均不进入分发包。
 
-统一验收在临时隔离环境离线安装当前 wheel，核对版本、安装后的 import 与 CLI、离线检索 JSON、配置解释、CP936 默认环境下的 UTF-8 输出，以及复制后的单文件运行；同时检查 sdist 资源与许可证元数据。构建产物位于 `dist/`。
+统一验收在临时隔离环境离线安装当前 wheel，核对版本、安装后的 import 与 CLI、离线检索 JSON、配置解释、CP936 默认环境下的 UTF-8 输出，以及复制后的单文件运行；同时检查发布 tag 的接受与拒绝、sdist 资源与许可证元数据。构建产物位于 `dist/`。
+
+### Windows x64 便携包
+
+便携版使用 Windows x64 Python 3.12 和 PyInstaller `onedir`，自带解释器及运行依赖。PyInstaller 属于锁定的 `release` 开发依赖组，按 Windows / Python 3.12 条件安装；wheel 的运行时依赖保持为空。
+
+在 Windows x64 上执行：
+
+```shell
+uv sync --locked --python 3.12 --extra dev --group release
+uv run --locked --python 3.12 --extra dev --group release python scripts/check.py
+uv run --locked --python 3.12 --extra dev --group release python scripts/release.py build
+```
+
+`scripts/release.py` 复用源码版本，检查 wheel 与当前源码一致，在临时目录构建便携包，附入 README、项目及 Python/PyInstaller 许可证、`.env.example` 和 CLI/Python 文档。构建过程只复制明确列出的用户资料，不读取本机凭据文件。
+
+验收从 ZIP 解压产物，在带中文和空格的路径、独立调用目录、隔离配置以及不含 Python 的 PATH 中执行，覆盖版本、帮助、UTF-8 输出、错误退出码、`--explain` 和当前目录 TOML 发现。所有检查通过后才替换 `dist/release/` 中的发布附件：
+
+- `litsearch-<版本>-windows-x64.zip`：完整的 `litsearch/` 目录，包含 `litsearch.exe`、`_internal/` 和随附资料。
+- `litsearch-<版本>-py3-none-any.whl`、`litsearch-<版本>.tar.gz`：已验收的 Python 分发产物。
+- `SHA256SUMS`：上述附件的 SHA-256 校验值。
+
+### GitHub Release
+
+`.github/workflows/release.yml` 在推送 `v*` tag 时触发。工作流要求 tag 严格等于 `v<源码 __version__>`；通过完整 CI 矩阵后，取 Windows / Python 3.12 已验收的 wheel 和 sdist，构建并验收便携 ZIP。
+
+发布作业只在构建成功后运行，核对附件校验和，使用 `GITHUB_TOKEN` 创建草稿 Release、上传全部附件并公开发布。只有该作业授予 `contents: write`；无需配置 PyPI 凭据。Release 使用 GitHub 自动生成的说明，已有同名 Release 时停止，不覆盖既有附件。
+
+发布时先更新源码 `__version__`，提交并推送经过验收的代码，再为该提交创建对应 tag。例如源码版本为 `0.5.0` 时：
+
+```shell
+git tag v0.5.0
+git push origin v0.5.0
+```
+
+上述推送会自动发布 GitHub Release。项目发布渠道为 GitHub Releases，PyPI 同名项目不属于本仓库。
 
 来源协议调整时，先核对 [官方契约](python.md#外部来源契约)，再使用响应样例验证映射与分页。真实在线检索使用个人配置，凭据保存在环境变量或受忽略的配置文件中，请求地址中的凭据应脱敏。
 

@@ -25,6 +25,9 @@ litsearch = "litsearch:main"
 [project.optional-dependencies]
 dev = ["pytest>=8", "ruff>=0.8", "mypy>=1.13"]
 
+[dependency-groups]
+release = ["pyinstaller>=6.22.3; sys_platform == 'win32' and python_version == '3.12'"]
+
 [tool.setuptools]
 package-dir = { "" = "src" }
 py-modules = ["litsearch"]

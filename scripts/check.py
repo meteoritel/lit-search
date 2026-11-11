@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import ast
 import json
 import os
 import shutil
@@ -13,22 +12,18 @@ import tempfile
 import zipfile
 from pathlib import Path
 
+from release import source_version
+
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def source_version() -> str:
-    module = ast.parse((ROOT / "src/litsearch.py").read_text(encoding="utf-8"))
-    for node in module.body:
-        if isinstance(node, ast.Assign) and any(
-            isinstance(target, ast.Name) and target.id == "__version__" for target in node.targets
-        ):
-            return str(ast.literal_eval(node.value))
-    raise AssertionError("源码缺少 __version__")
-
-
 def check_distribution() -> None:
     version = source_version()
+    for tag, code in ((f"v{version}", 0), (version, 2), (f"v{version}-mismatch", 2)):
+        result = subprocess.run([sys.executable, str(ROOT / "scripts/release.py"),
+                                 "check-tag", tag], cwd=ROOT, capture_output=True)
+        assert result.returncode == code, (tag, result.stdout, result.stderr)
     wheel = ROOT / "dist" / f"litsearch-{version}-py3-none-any.whl"
     sdist = ROOT / "dist" / f"litsearch-{version}.tar.gz"
     with zipfile.ZipFile(wheel) as archive:
@@ -38,12 +33,14 @@ def check_distribution() -> None:
         assert not any(line.startswith("Requires-Dist:") and "extra ==" not in line
                        for line in metadata.splitlines())
         assert "litsearch.py" in archive.namelist()
+        assert archive.read("litsearch.py") == (ROOT / "src/litsearch.py").read_bytes()
         assert not any(name.startswith(("examples/", ".local/")) for name in archive.namelist())
     with tarfile.open(sdist) as archive:
         names = set(archive.getnames())
         for relative in ("tests/conftest.py", "tests/fixtures/openalex_page1.json",
                          "tests/fixtures/retrieval_replay.json", "tests/fixtures/retrieval_gold.json",
-                         "scripts/check.py", "docs/python.md", "docs/usage.md", "uv.lock"):
+                         "scripts/check.py", "scripts/release.py", "docs/python.md",
+                         "docs/usage.md", "uv.lock"):
             assert f"litsearch-{version}/{relative}" in names, relative
         assert not any(name.startswith((f"litsearch-{version}/docs/archive/",
                                         f"litsearch-{version}/docs/plans/",
