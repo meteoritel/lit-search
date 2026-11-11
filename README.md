@@ -124,7 +124,7 @@ litsearch "marine bacteria" --source crossref --output output/marine.json --no-d
 - `--require` 组内 OR、组间 AND 匹配标题与摘要，缺失摘要会直接影响留存。
 - 默认按相关性取数、按被引数展示；专题检索建议搭配 `--sort hybrid`，避免盲目使用 `--fetch-sort citations` 挤出贴题文献。详见[候选、过滤与排序](docs/usage.md#候选过滤与排序)。
 
-可在 TOML 配置中定义命名预设并通过 `--preset NAME` 调用，格式见[配置发现与优先级](docs/usage.md#配置发现与优先级)。
+可在 TOML 配置中定义命名预设并通过 `--preset NAME` 调用（`--list-presets` 可离线列出已有预设与凭据状态），格式见[配置发现与优先级](docs/usage.md#配置发现与优先级)。
 
 ## Python 调用
 

@@ -80,13 +80,14 @@ CLI `--explain` 的 output.directory 为解析后的绝对默认输出目录，o
 |---|---|
 | query... | 自由文本查询，可给多个；也可从预设或 concept 提供 |
 | --preset NAME | 选择命名预设 |
+| --list-presets | 离线列出已定义预设、配置来源与凭据状态（可搭 `--stdout` 输出 JSON） |
 | --source openalex,crossref,europepmc | 来源列表，默认 openalex |
 | --year YEAR / START-END | 年份范围，起点不晚于终点 |
 | --limit N | 每个来源/查询的候选上限，默认 25 |
 | --max-results N | 合并、主题过滤、排序后的最终上限 |
 | --min-citations N | 最低被引数，0 表示不限 |
-| --author VALUE | 作者姓名；OpenAlex 还支持 A 开头的作者 ID |
-| --institution VALUE | 机构名称、OpenAlex 机构 ID 或 ROR 链接 |
+| --author VALUE | 作者姓名、OpenAlex 作者 ID（`A...`）或作者链接（`https://openalex.org/A...`） |
+| --institution VALUE | 机构名称、OpenAlex 机构 ID/链接（`I...` / `https://openalex.org/I...`）或 ROR 链接 |
 | --journal-issn VALUE | 期刊 ISSN |
 | --type VALUE | 来源支持的文献类型；Crossref 映射 `article`/`preprint` 并支持 Crossref 原生类型，其他值（如 `review`）将被忽略 |
 | --language VALUE | 语言代码 |

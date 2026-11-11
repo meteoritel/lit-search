@@ -120,6 +120,14 @@ def test_openalex_author_and_institution_dispatch_id_vs_name():
     assert "authorships.author.id:A123" in filt
     assert "institutions.id:I456" in filt
 
+    by_url = make_plan(
+        author="https://openalex.org/a123",
+        institution="https://openalex.org/i456",
+    )
+    filt_url = OA.filter_string(by_url)[0]
+    assert "authorships.author.id:A123" in filt_url
+    assert "institutions.id:I456" in filt_url
+
     by_name = make_plan(author="Jane Smith", institution="University of X")
     filt2 = OA.filter_string(by_name)[0]
     assert "raw_author_name.search:Jane Smith" in filt2
@@ -127,8 +135,9 @@ def test_openalex_author_and_institution_dispatch_id_vs_name():
 
 
 def test_openalex_ror_url_is_normalised_to_ror_id():
-    plan = make_plan(institution="https://ror.org/03yrm5c26")
-    assert "institutions.ror:03yrm5c26" in OA.filter_string(plan)[0]
+    for url in ("https://ror.org/03yrm5c26", "https://ror.org/03yrm5c26/"):
+        plan = make_plan(institution=url)
+        assert "institutions.ror:03yrm5c26" in OA.filter_string(plan)[0]
 
 
 def test_oa_filter_overrides_structured_and_warns():

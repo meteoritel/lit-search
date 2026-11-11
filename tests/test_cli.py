@@ -499,3 +499,36 @@ def test_explain_reports_per_source_query_count(tmp_path, monkeypatch, capsys):
     payload = json.loads(capsys.readouterr().out)
     counts = {item["source"]: item["query_count"] for item in payload["sources"]}
     assert counts == {"openalex": 2, "crossref": 3}
+
+
+def test_help_is_self_sufficient_for_agents_without_docs(capsys):
+    assert litsearch.main(["--help"]) == litsearch.EXIT_OK
+    help_text = capsys.readouterr().out
+    for expected in ("OPENALEX_API_KEY", "crossref", "europepmc", "退出码", "--list-presets", "不做自动翻译"):
+        assert expected in help_text
+
+
+def test_list_presets_reports_config_and_redacts_keys(tmp_path, monkeypatch, capsys):
+    (tmp_path / "litsearch.toml").write_text(
+        'output_dir = "custom_out"\n[api_keys]\nopenalex = "secret-oa-key"\n'
+        '[presets.wnp]\nqueries = ["Western North Pacific water mass"]\nsources = ["crossref"]\nyear = "2020-2026"\n',
+        encoding="utf-8",
+    )
+    code, _, _ = run_cli(["--list-presets"], [], tmp_path, monkeypatch, key=None)
+    text = capsys.readouterr().out
+    assert code == litsearch.EXIT_OK
+    assert "wnp" in text and "已配置" in text
+    assert "secret-oa-key" not in text
+
+    code_json, _, _ = run_cli(["--list-presets", "--stdout"], [], tmp_path, monkeypatch, key=None)
+    payload = json.loads(capsys.readouterr().out)
+    assert code_json == litsearch.EXIT_OK
+    assert payload["sources"]["openalex"]["key_configured"] is True
+    assert "wnp" in payload["presets"]
+    assert "secret-oa-key" not in json.dumps(payload)
+
+    http, _ = make_http([])
+    for conflict in (["q", "--list-presets"], ["--list-presets", "--explain"], ["--list-presets", "--preset", "wnp"]):
+        with pytest.raises(litsearch.UsageError):
+            litsearch.run(litsearch.build_parser().parse_args(conflict),
+                          tmp_path, http, litsearch.RetryPolicy(), lambda _: None)

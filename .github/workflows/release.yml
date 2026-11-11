@@ -12,11 +12,21 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  verify-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - name: Check release tag
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: python3 scripts/release.py check-tag "$RELEASE_TAG"
+
   check:
+    needs: verify-tag
     uses: ./.github/workflows/ci.yml
 
   build:
-    needs: check
+    needs: [verify-tag, check]
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v7.0.1
@@ -25,10 +35,6 @@ jobs:
           python-version: "3.12"
           enable-cache: true
       - run: uv sync --locked --extra dev --group release
-      - name: Check release tag
-        env:
-          RELEASE_TAG: ${{ github.ref_name }}
-        run: uv run --locked --extra dev --group release python scripts/release.py check-tag "$env:RELEASE_TAG"
       - uses: actions/download-artifact@v8.0.2
         with:
           name: python-distributions

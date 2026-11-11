@@ -63,9 +63,9 @@ uv run --locked --python 3.12 --extra dev --group release python scripts/release
 
 ### GitHub Release
 
-`.github/workflows/release.yml` 在推送 `v*` tag 时触发。工作流要求 tag 严格等于 `v<源码 __version__>`；通过完整 CI 矩阵后，取 Windows / Python 3.12 已验收的 wheel 和 sdist，构建并验收便携 ZIP。
+`.github/workflows/release.yml` 在推送 `v*` tag 时触发。工作流先在 `verify-tag` 作业快速核对 tag 严格等于 `v<源码 __version__>`，不匹配立即失败；随后调用完整 CI 矩阵，取 Windows / Python 3.12 已验收的 wheel 和 sdist，构建并验收便携 ZIP。
 
-发布作业只在构建成功后运行，核对附件校验和，使用 `GITHUB_TOKEN` 创建草稿 Release、上传全部附件并公开发布。只有该作业授予 `contents: write`；无需配置 PyPI 凭据。Release 使用 GitHub 自动生成的说明，已有同名 Release 时停止，不覆盖既有附件。
+发布作业只在构建成功后运行，核对附件校验和，使用 GitHub Actions 自动注入的 `GITHUB_TOKEN` 创建草稿 Release、上传全部附件并公开发布。只有该作业授予 `contents: write`（需确保仓库 Actions 设置允许工作流请求写权限，无需额外配置 PAT 或 PyPI 凭据）。Release 使用 GitHub 自动生成的说明，已有同名 Release 时停止，不覆盖既有附件；若创建草稿后公开阶段因瞬时网络失败，可在 GitHub 网页手动发布或删除残留草稿后重跑。
 
 发布时先更新源码 `__version__`，提交并推送经过验收的代码，再为该提交创建对应 tag。例如源码版本为 `0.5.0` 时：
 

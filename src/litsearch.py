@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""多源文献检索，Python 3.12+ 标准库运行时。
+"""多源文献检索（OpenAlex / Crossref / Europe PMC），Python 3.12+ 标准库运行时。
 
-CLI：python litsearch.py --help
-Python：SearchClient(Config(...)).search(QueryPlan(...))
+CLI：litsearch --help / python litsearch.py --help
+Python：cfg = load_config(Path(".")); SearchClient(cfg).search(QueryPlan(queries=[...], sources=[...]))
+Crossref 与 Europe PMC 免 API key；OpenAlex 需在 Config.api_keys["openalex"] 或环境中提供 key。
 结果走 stdout，诊断走 stderr；退出码 0/2/3/4/5 分别对应成功、参数、配置、网络和输出。
 """
 
@@ -981,6 +982,12 @@ class Provider:
                policy: RetryPolicy, cfg: "Config") -> ProviderResult:
         raise NotImplementedError
 
+def _extract_openalex_id(value: str | None, prefix: str) -> str | None:
+    text = (value or "").strip()
+    match = re.fullmatch(rf"(?:https?://openalex\.org/)?({prefix}\d+)", text, re.IGNORECASE)
+    return match.group(1).upper() if match else None
+
+
 class OpenAlexProvider(Provider):
     name = "openalex"
     env_key = "OPENALEX_API_KEY"
@@ -1034,16 +1041,19 @@ class OpenAlexProvider(Provider):
             entries.append(("min_citations", "cited_by_count", f">{plan.min_citations - 1}"))
         if plan.author:
             value = plan.author.strip()
-            if re.fullmatch(r"A\d+", value):
-                entries.append(("author", "authorships.author.id", value))
+            author_id = _extract_openalex_id(value, "A")
+            if author_id:
+                entries.append(("author", "authorships.author.id", author_id))
             else:
                 entries.append(("author", "raw_author_name.search", value))
         if plan.institution:
             value = plan.institution.strip()
-            if re.fullmatch(r"https?://ror\.org/\w+", value):
-                entries.append(("institution", "institutions.ror", value.rstrip("/").rsplit("/", 1)[-1]))
-            elif re.fullmatch(r"I\d+", value):
-                entries.append(("institution", "institutions.id", value))
+            ror_match = re.fullmatch(r"https?://ror\.org/(\w+)/?", value, re.IGNORECASE)
+            inst_id = _extract_openalex_id(value, "I")
+            if ror_match:
+                entries.append(("institution", "institutions.ror", ror_match.group(1)))
+            elif inst_id:
+                entries.append(("institution", "institutions.id", inst_id))
             else:
                 entries.append(("institution", "raw_affiliation_strings.search", value))
         if plan.journal_issn:
@@ -1244,7 +1254,7 @@ class CrossrefProvider(Provider):
         for key in ("min_citations", "language"):
             if key in modes:
                 modes[key] = "local"
-        if plan.author and re.fullmatch(r"A\d+", plan.author):
+        if _extract_openalex_id(plan.author, "A"):
             modes["author"] = "unsupported"
         if plan.work_type and self._resolved_work_type(plan.work_type) is None:
             modes["work_type"] = "unsupported"
@@ -1287,7 +1297,7 @@ class CrossrefProvider(Provider):
         filters = [f"{k}:{v}" for k, v in self.structured_filters(plan)]
         if filters:
             params["filter"] = ",".join(filters)
-        if plan.author and not re.fullmatch(r"A\d+", plan.author.strip()):
+        if plan.author and not _extract_openalex_id(plan.author, "A"):
             params["query.author"] = plan.author.strip()
         remote_sort = FETCH_SORT_CROSSREF.get(plan.fetch_sort)
         if remote_sort:
@@ -1443,7 +1453,7 @@ class EuropePMCProvider(Provider):
         for key in ("min_citations", "language"):
             if key in modes:
                 modes[key] = "local"
-        if plan.author and re.fullmatch(r"A\d+", plan.author):
+        if _extract_openalex_id(plan.author, "A"):
             modes["author"] = "unsupported"
         if plan.fetch_sort != "relevance":
             modes["fetch_sort"] = "unsupported"
@@ -1462,7 +1472,7 @@ class EuropePMCProvider(Provider):
         if plan.oa_only:
             parts.append("OPEN_ACCESS:Y")
         for key, value in (("AUTH", plan.author), ("ISSN", plan.journal_issn)):
-            if value and not (key == "AUTH" and re.fullmatch(r"A\d+", value)):
+            if value and not (key == "AUTH" and _extract_openalex_id(value, "A")):
                 parts.append(f"{key}:{_quote_query_term(value)}")
         return " AND ".join(parts)
 
@@ -2479,28 +2489,31 @@ def write_outputs(main_path: Path | None, doi_path: Path | None,
 # --------------------------------------------------------------------------- #
 
 EPILOG = """\
-过滤语法：
-  --require "a,b" --require "c,d"  组内 OR、组间 AND
+凭据与配置：
+  默认来源 openalex 需 OPENALEX_API_KEY；crossref 与 europepmc 免 key 立即可用。
+  配置优先级：环境变量 > LITSEARCH_CONFIG > 用户级 config.toml > ./litsearch.toml > ./.env。
+  支持键：OPENALEX_API_KEY、CROSSREF_MAILTO / LITSEARCH_MAILTO、LITSEARCH_OUTPUT_DIR、LITSEARCH_CONFIG。
+
+查询与过滤语法：
+  不做自动翻译；中文主题请先转为英文术语或 --concept 概念组。
+  --require "a,b" --require "c,d"  组内 OR、组间 AND（作用域：合并后标题与摘要）
   --exclude "x,y"                  命中任一即排除
-  默认词首前缀匹配；'=sea' 为整词；'*bacteri*' 为任意位置子串。
-  主题过滤作用于合并后的标题与摘要。
+  默认词首前缀匹配；'=sea' 为整词；'*bacteri*' 为任意位置子串；支持 title:/abstract: 前缀。
 
-候选与结果：
+候选、排序与输出：
   --limit 是每个来源/查询的候选上限；--max-results 是最终结果上限。
-  --fetch-sort 决定远端候选排序，--sort 决定最终展示排序。
-  Crossref 与 Europe PMC 本地过滤的扫描预算是 limit 的三倍；执行统计和停止原因见 JSON。
+  --fetch-sort 决定远端候选排序，--sort 决定最终展示排序（专题检索建议 hybrid）。
+  Crossref 与 Europe PMC 本地过滤扫描预算为 3×limit；可用 --explain 预检各源能力与查询数。
+  默认写 output/ 下 .md 与 .doi.txt（--no-doi-list 可跳过）；--stdout 默认输出 JSON。
 
-输出与检查：
-  默认写 output/ 下的 Markdown 与 DOI 列表（--no-doi-list 可跳过）；已有文件需 --overwrite。
-  --stdout 默认 JSON，可用 --stdout-format md|csv|doi。
-  --explain 输出脱敏的生效计划，不联网、不写文件。
-  --strict-filters 拒绝来源忽略或原始 filter 覆盖的筛选条件。
-  --merge-policy doi 保留 DOI 不同的同名文献；默认 title 合并同名版本。
+流约定与退出码：
+  结果或文件路径走 stdout；进度、警告与错误走 stderr（任一来源失败整次检索失败）。
+  退出码：0=成功（含合法空结果）  2=参数/目标错误  3=配置/缺 key  4=网络/远端错误  5=写文件失败。
 
 示例：
-  litsearch "marine bacteria" --source crossref --limit 10 --stdout
-  litsearch '"low nucleic acid content" bacteria' --year 2022-2026 --stdout
-  litsearch --preset marine --explain
+  litsearch "marine bacteria" --source crossref --limit 10 --sort hybrid --stdout
+  litsearch --concept "South China Sea" --concept "marine bacteria,protist" --source crossref --explain
+  litsearch --list-presets
 """
 
 
@@ -2515,8 +2528,10 @@ def build_parser() -> argparse.ArgumentParser:
                         help="自由文本检索词，可给多个（合并去重）；可用 --preset 代替")
     parser.add_argument("--preset", default=None,
                         help="使用配置文件 [presets] 中的命名检索预设")
+    parser.add_argument("--list-presets", dest="list_presets", action="store_true",
+                        help="列出已加载的预设、配置来源与凭据状态（离线，不联网）")
     parser.add_argument("--source", default=None,
-                        help="数据源，逗号分隔（默认 openalex）；可选 openalex,crossref,europepmc")
+                        help="数据源，逗号分隔（默认 openalex，需 API key）；crossref / europepmc 免 key")
     parser.add_argument("--year", default=None, help="年份过滤：2024 或 2021-2026")
     parser.add_argument("--limit", type=int, default=None,
                         help="每个查询从远端抓取的候选条数上限（默认 25，可超过 100，自动分页）")
@@ -2526,9 +2541,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--min-citations", type=int, default=None, help="最低被引数")
     parser.add_argument("--enrich-abstracts", type=int, default=None, metavar="N",
                         help="按 DOI 用 Europe PMC 补齐空摘要，最多查询 N 个 DOI（默认 0）")
-    parser.add_argument("--author", default=None, help="作者（姓名或 OpenAlex 作者 ID）")
+    parser.add_argument("--author", default=None, help="作者（姓名、OpenAlex 作者 ID 或 OpenAlex 作者链接）")
     parser.add_argument("--institution", default=None,
-                        help="机构（名称、OpenAlex 机构 ID 或 ROR 链接）")
+                        help="机构（名称、OpenAlex 机构 ID/链接或 ROR 链接）")
     parser.add_argument("--journal-issn", default=None, help="期刊 ISSN")
     parser.add_argument("--type", dest="work_type", default=None,
                         help="文献类型，如 article / preprint / review（Crossref 仅支持 article、preprint 及原生类型）")
@@ -2536,11 +2551,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--oa-only", action=argparse.BooleanOptionalAction,
                         default=None, help="仅开放获取（--no-oa-only 关闭）")
     parser.add_argument("--oa-filter", default=None, metavar="STR",
-                        help="直接透传给 OpenAlex 的原始 filter 字符串（逃生舱，优先级最高）")
+                        help="透传给 OpenAlex 的原始 filter（如 publication_year:2023,is_oa:true）；覆盖同义结构化条件")
     parser.add_argument("--require", action="append", default=None, metavar="A,B",
                         help="相关性分组过滤，可重复；组内逗号分隔为 OR，组间为 AND")
     parser.add_argument("--concept", action="append", default=None, metavar="A,B",
-                        help="主题概念同义词组，可重复；按来源生成精查询与宽召回查询，不作硬过滤")
+                        help="主题概念同义词组，可重复；≥3 组额外生成前两组宽查，建议核心词放前两组")
     parser.add_argument("--exclude", action="append", default=None, metavar="X,Y",
                         help="排除词，可重复；命中任一即剔除")
     parser.add_argument("--sort", choices=list(SORT_CHOICES),
@@ -2622,13 +2637,70 @@ def render_stdout(fmt: str, report: Report, records: list[Record]) -> str:
     return render_json(report, records)
 
 
+def _presets_overview(cfg: Config, cwd: Path) -> dict[str, Any]:
+    return {
+        "version": __version__,
+        "config_path": str(cfg.config_path) if cfg.config_path else None,
+        "config_origins": dict(cfg.origins),
+        "output": {
+            "directory": str(_output_directory(cfg, cwd)),
+            "origin": cfg.origins.get("output_dir", "default"),
+        },
+        "sources": {
+            name: {
+                "requires_api_key": provider.requires_api_key,
+                "key_configured": bool(cfg.api_keys.get(name)),
+            }
+            for name, provider in PROVIDERS.items()
+        },
+        "presets": {
+            name: {"origin": cfg.origins.get(f"presets.{name}"), **preset_body}
+            for name, preset_body in sorted(cfg.presets.items())
+        },
+    }
+
+
+def _format_presets_text(overview: dict[str, Any]) -> str:
+    oa_ready = overview["sources"]["openalex"]["key_configured"]
+    lines = [
+        f"默认输出目录：{overview['output']['directory']}（来源：{overview['output']['origin']}）",
+        f"OpenAlex API key：{'已配置' if oa_ready else '未配置（可使用 --source crossref 或 europepmc 免 key 检索）'}",
+        "已定义预设：",
+    ]
+    presets = overview["presets"]
+    if not presets:
+        lines.append("  （无；可在 litsearch.toml 或用户级 config.toml 的 [presets.<name>] 中定义）")
+        return "\n".join(lines)
+    for name, body in presets.items():
+        parts = [f"sources={body.get('sources') or body.get('source') or '默认'}"]
+        if body.get("year"):
+            parts.append(f"year={body['year']}")
+        if body.get("sort"):
+            parts.append(f"sort={body['sort']}")
+        if body.get("queries"):
+            parts.append(f"queries={len(body['queries'])}")
+        if body.get("concepts"):
+            parts.append(f"concepts={len(body['concepts'])}")
+        lines.append(f"  - {name}: {', '.join(parts)}（来源：{body.get('origin') or 'unknown'}）")
+    return "\n".join(lines)
+
+
 def run(args: argparse.Namespace, cwd: Path, http: Http,
         policy: RetryPolicy, sleep_fn: Callable[[float], None]) -> int:
     no_doi_list = bool(getattr(args, "no_doi_list", False))
+    list_presets = bool(getattr(args, "list_presets", False))
     if args.stdout and (args.output or args.doi_list is not None or no_doi_list):
         raise UsageError("--stdout 与 --output / --doi-list / --no-doi-list 不能同时使用")
     if args.stdout_format and not args.stdout:
         raise UsageError("--stdout-format 需要与 --stdout 一起使用")
+    if list_presets:
+        if (args.explain or args.output or args.doi_list is not None or no_doi_list
+                or args.overwrite or args.stdout_format or args.query or args.preset):
+            raise UsageError("--list-presets 不能与检索词、--preset、--explain、--stdout-format 或文件输出选项同时使用")
+        overview = _presets_overview(load_config(cwd), cwd)
+        print(json.dumps(overview, ensure_ascii=False, indent=2)
+              if args.stdout else _format_presets_text(overview))
+        return EXIT_OK
 
     cfg = load_config(cwd)
     preset_name = args.preset

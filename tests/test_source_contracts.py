@@ -360,10 +360,11 @@ def test_crossref_unsupported_work_type_is_diagnosed_and_skipped():
     assert strict_opener.urls == []
 
 
-def test_crossref_marks_openalex_author_ids_as_unsupported():
+@pytest.mark.parametrize("author", [" A123 ", "https://openalex.org/A123"])
+def test_crossref_marks_openalex_author_ids_as_unsupported(author):
     http, opener = make_http([])
     client = litsearch.SearchClient(litsearch.Config(), http)
-    plan = make_plan(sources=["crossref"], author=" A123 ", strict_filters=True)
+    plan = make_plan(sources=["crossref"], author=author, strict_filters=True)
     with pytest.raises(litsearch.UsageError):
         client.search(plan)
     assert client.explain(plan)["sources"][0]["filter_execution"]["author"] == "unsupported"
